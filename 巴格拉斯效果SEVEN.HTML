@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+  }
+  #ebook-container {
+    width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  #ebook-page {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  #ebook-header {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  #page-number {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+  <div id="ebook-container">
+    <div id="ebook-page">
+      <div id="ebook-header">巴格拉斯效果</div>
+      <div id="inputSection">
+        <label for="card">請輸入一張撲克牌（例如：黑桃A）：</label>
+        <input type="text" id="cardInput">
+        <br>
+        <label for="number"> 請選擇數字（1-52）：</label>
+        <input type="number" id="number" min="1" max="52">
+        <br>
+        <button onclick="calculate()">計算</button>
+      </div>
+      <p id="result"></p>
+      <div id="article" style="display: none;">
+        <div id="article-header">計算結果文章</div>
+        <div id="articleContent"></div>
+      </div>
+      <div id="page-number">-第<span id="currentPageNumber">37</span>頁-</div>
+    </div>
+  </div>
+  <script>
+    var deckA = [
+      { suit: "梅花", number: "4" },
+      { suit: "紅心", number: "2" },
+      { suit: "方塊", number: "7" },
+      { suit: "梅花", number: "3" },
+      { suit: "紅心", number: "4" },
+      { suit: "方塊", number: "6" },
+      { suit: "黑桃", number: "A" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "9" },
+      { suit: "黑桃", number: "2" },
+      { suit: "紅心", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "梅花", number: "Q" },
+      { suit: "紅心", number: "8" },
+      { suit: "黑桃", number: "6" },
+      { suit: "黑桃", number: "5" },
+      { suit: "紅心", number: "9" },
+      { suit: "梅花", number: "K" },
+      { suit: "方塊", number: "2" },
+      { suit: "紅心", number: "J" },
+      { suit: "黑桃", number: "3" },
+      { suit: "黑桃", number: "8" },
+      { suit: "紅心", number: "6" },
+      { suit: "梅花", number: "10" },
+      { suit: "方塊", number: "5" },
+      { suit: "方塊", number: "K" },
+      { suit: "梅花", number: "2" },
+      { suit: "紅心", number: "3" },
+      { suit: "方塊", number: "8" },
+      { suit: "梅花", number: "5" },
+      { suit: "黑桃", number: "K" },
+      { suit: "方塊", number: "J" },
+      { suit: "梅花", number: "8" },
+      { suit: "黑桃", number: "10" },
+      { suit: "紅心", number: "K" },
+      { suit: "梅花", number: "J" },
+      { suit: "黑桃", number: "7" },
+      { suit: "紅心", number: "10" },
+      { suit: "方塊", number: "A" },
+      { suit: "黑桃", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "方塊", number: "4" },
+      { suit: "梅花", number: "A" },
+      { suit: "梅花", number: "9" },
+      { suit: "黑桃", number: "J" },
+      { suit: "方塊", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "方塊", number: "10" },
+      { suit: "梅花", number: "6" },
+      { suit: "紅心", number: "A" },
+      { suit: "方塊", number: "9" }
+    ];
+
+    var deckB = [
+      { suit: "黑桃", number: "9" },
+      { suit: "黑桃", number: "2" },
+      { suit: "紅心", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "梅花", number: "Q" },
+      { suit: "紅心", number: "8" },
+      { suit: "黑桃", number: "6" },
+      { suit: "黑桃", number: "5" },
+      { suit: "紅心", number: "9" },
+      { suit: "梅花", number: "K" },
+      { suit: "方塊", number: "2" },
+      { suit: "紅心", number: "J" },
+      { suit: "黑桃", number: "3" },
+      { suit: "黑桃", number: "8" },
+      { suit: "紅心", number: "6" },
+      { suit: "梅花", number: "10" },
+      { suit: "方塊", number: "5" },
+      { suit: "方塊", number: "K" },
+      { suit: "梅花", number: "2" },
+      { suit: "紅心", number: "3" },
+      { suit: "方塊", number: "8" },
+      { suit: "梅花", number: "5" },
+      { suit: "黑桃", number: "K" },
+      { suit: "方塊", number: "J" },
+      { suit: "梅花", number: "8" },
+      { suit: "黑桃", number: "10" },
+      { suit: "紅心", number: "K" },
+      { suit: "梅花", number: "J" },
+      { suit: "黑桃", number: "7" },
+      { suit: "紅心", number: "10" },
+      { suit: "方塊", number: "A" },
+      { suit: "黑桃", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "方塊", number: "4" },
+      { suit: "梅花", number: "A" },
+      { suit: "梅花", number: "9" },
+      { suit: "黑桃", number: "J" },
+      { suit: "方塊", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "方塊", number: "10" },
+      { suit: "梅花", number: "6" },
+      { suit: "紅心", number: "A" },
+      { suit: "方塊", number: "9" },
+      { suit: "梅花", number: "4" },
+      { suit: "紅心", number: "2" },
+      { suit: "方塊", number: "7" },
+      { suit: "梅花", number: "3" },
+      { suit: "紅心", number: "4" },
+      { suit: "方塊", number: "6" },
+      { suit: "黑桃", number: "A" },
+      { suit: "紅心", number: "5" }
+    ];
+
+    var deckC = [
+      { suit: "黑桃", number: "5" },
+      { suit: "紅心", number: "9" },
+      { suit: "梅花", number: "K" },
+      { suit: "方塊", number: "2" },
+      { suit: "紅心", number: "J" },
+      { suit: "黑桃", number: "3" },
+      { suit: "黑桃", number: "8" },
+      { suit: "紅心", number: "6" },
+      { suit: "梅花", number: "10" },
+      { suit: "方塊", number: "5" },
+      { suit: "方塊", number: "K" },
+      { suit: "梅花", number: "2" },
+      { suit: "紅心", number: "3" },
+      { suit: "方塊", number: "8" },
+      { suit: "梅花", number: "5" },
+      { suit: "黑桃", number: "K" },
+      { suit: "方塊", number: "J" },
+      { suit: "梅花", number: "8" },
+      { suit: "黑桃", number: "10" },
+      { suit: "紅心", number: "K" },
+      { suit: "梅花", number: "J" },
+      { suit: "黑桃", number: "7" },
+      { suit: "紅心", number: "10" },
+      { suit: "方塊", number: "A" },
+      { suit: "黑桃", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "方塊", number: "4" },
+      { suit: "梅花", number: "A" },
+      { suit: "梅花", number: "9" },
+      { suit: "黑桃", number: "J" },
+      { suit: "方塊", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "方塊", number: "10" },
+      { suit: "梅花", number: "6" },
+      { suit: "紅心", number: "A" },
+      { suit: "梅花", number: "9" },
+      { suit: "方塊", number: "4" },
+      { suit: "紅心", number: "2" },
+      { suit: "方塊", number: "7" },
+      { suit: "梅花", number: "3" },
+      { suit: "紅心", number: "4" },
+      { suit: "方塊", number: "6" },
+      { suit: "黑桃", number: "A" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "9" },
+      { suit: "黑桃", number: "2" },
+      { suit: "紅心", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "梅花", number: "Q" },
+      { suit: "紅心", number: "8" },
+      { suit: "黑桃", number: "6" }
+    ];
+
+    var deckD = [
+      { suit: "梅花", number: "10" },
+      { suit: "方塊", number: "5" },
+      { suit: "方塊", number: "K" },
+      { suit: "梅花", number: "2" },
+      { suit: "紅心", number: "3" },
+      { suit: "方塊", number: "8" },
+      { suit: "梅花", number: "5" },
+      { suit: "黑桃", number: "K" },
+      { suit: "方塊", number: "J" },
+      { suit: "梅花", number: "8" },
+      { suit: "黑桃", number: "10" },
+      { suit: "紅心", number: "K" },
+      { suit: "梅花", number: "J" },
+      { suit: "黑桃", number: "7" },
+      { suit: "紅心", number: "10" },
+      { suit: "方塊", number: "A" },
+      { suit: "黑桃", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "方塊", number: "4" },
+      { suit: "梅花", number: "A" },
+      { suit: "梅花", number: "9" },
+      { suit: "黑桃", number: "J" },
+      { suit: "方塊", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "方塊", number: "10" },
+      { suit: "梅花", number: "6" },
+      { suit: "紅心", number: "A" },
+      { suit: "方塊", number: "9" },
+      { suit: "梅花", number: "4" },
+      { suit: "紅心", number: "2" },
+      { suit: "方塊", number: "7" },
+      { suit: "梅花", number: "3" },
+      { suit: "紅心", number: "4" },
+      { suit: "方塊", number: "6" },
+      { suit: "黑桃", number: "A" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "9" },
+      { suit: "黑桃", number: "2" },
+      { suit: "紅心", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "梅花", number: "Q" },
+      { suit: "紅心", number: "8" },
+      { suit: "黑桃", number: "6" },
+      { suit: "黑桃", number: "5" },
+      { suit: "紅心", number: "9" },
+      { suit: "梅花", number: "K" },
+      { suit: "方塊", number: "2" },
+      { suit: "紅心", number: "J" },
+      { suit: "黑桃", number: "3" },
+      { suit: "黑桃", number: "8" },
+      { suit: "紅心", number: "6" }
+    ];
+
+    var deckE = [
+      { suit: "黑桃", number: "K" },
+      { suit: "方塊", number: "J" },
+      { suit: "梅花", number: "8" },
+      { suit: "黑桃", number: "10" },
+      { suit: "紅心", number: "K" },
+      { suit: "梅花", number: "J" },
+      { suit: "黑桃", number: "7" },
+      { suit: "紅心", number: "10" },
+      { suit: "方塊", number: "A" },
+      { suit: "黑桃", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "方塊", number: "4" },
+      { suit: "梅花", number: "A" },
+      { suit: "梅花", number: "9" },
+      { suit: "黑桃", number: "J" },
+      { suit: "方塊", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "方塊", number: "10" },
+      { suit: "梅花", number: "6" },
+      { suit: "紅心", number: "A" },
+      { suit: "方塊", number: "9" },
+      { suit: "梅花", number: "4" },
+      { suit: "紅心", number: "2" },
+      { suit: "方塊", number: "7" },
+      { suit: "梅花", number: "3" },
+      { suit: "紅心", number: "4" },
+      { suit: "方塊", number: "6" },
+      { suit: "黑桃", number: "A" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "9" },
+      { suit: "黑桃", number: "2" },
+      { suit: "紅心", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "梅花", number: "Q" },
+      { suit: "紅心", number: "8" },
+      { suit: "黑桃", number: "6" },
+      { suit: "黑桃", number: "5" },
+      { suit: "紅心", number: "9" },
+      { suit: "梅花", number: "K" },
+      { suit: "方塊", number: "2" },
+      { suit: "紅心", number: "J" },
+      { suit: "黑桃", number: "3" },
+      { suit: "黑桃", number: "8" },
+      { suit: "紅心", number: "6" },
+      { suit: "梅花", number: "10" },
+      { suit: "方塊", number: "5" },
+      { suit: "方塊", number: "K" },
+      { suit: "梅花", number: "2" },
+      { suit: "紅心", number: "3" },
+      { suit: "方塊", number: "8" },
+      { suit: "梅花", number: "5" }
+    ];
+
+    var deckF = [
+      { suit: "方塊", number: "A" },
+      { suit: "黑桃", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "方塊", number: "4" },
+      { suit: "梅花", number: "A" },
+      { suit: "梅花", number: "9" },
+      { suit: "黑桃", number: "J" },
+      { suit: "方塊", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "方塊", number: "10" },
+      { suit: "梅花", number: "6" },
+      { suit: "紅心", number: "A" },
+      { suit: "方塊", number: "9" },
+      { suit: "梅花", number: "4" },
+      { suit: "紅心", number: "2" },
+      { suit: "方塊", number: "7" },
+      { suit: "梅花", number: "3" },
+      { suit: "紅心", number: "4" },
+      { suit: "方塊", number: "6" },
+      { suit: "黑桃", number: "A" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "9" },
+      { suit: "黑桃", number: "2" },
+      { suit: "紅心", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "梅花", number: "Q" },
+      { suit: "紅心", number: "8" },
+      { suit: "黑桃", number: "6" },
+      { suit: "黑桃", number: "5" },
+      { suit: "紅心", number: "9" },
+      { suit: "梅花", number: "K" },
+      { suit: "方塊", number: "2" },
+      { suit: "紅心", number: "J" },
+      { suit: "黑桃", number: "3" },
+      { suit: "黑桃", number: "8" },
+      { suit: "紅心", number: "6" },
+      { suit: "梅花", number: "10" },
+      { suit: "方塊", number: "5" },
+      { suit: "方塊", number: "K" },
+      { suit: "梅花", number: "2" },
+      { suit: "紅心", number: "3" },
+      { suit: "方塊", number: "8" },
+      { suit: "梅花", number: "5" },
+      { suit: "黑桃", number: "K" },
+      { suit: "方塊", number: "J" },
+      { suit: "梅花", number: "8" },
+      { suit: "黑桃", number: "10" },
+      { suit: "紅心", number: "K" },
+      { suit: "梅花", number: "J" },
+      { suit: "黑桃", number: "7" },
+      { suit: "紅心", number: "10" }
+    ];
+
+    var deckG = [
+      { suit: "方塊", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "方塊", number: "10" },
+      { suit: "梅花", number: "6" },
+      { suit: "紅心", number: "A" },
+      { suit: "方塊", number: "9" },
+      { suit: "梅花", number: "4" },
+      { suit: "紅心", number: "2" },
+      { suit: "方塊", number: "7" },
+      { suit: "梅花", number: "3" },
+      { suit: "紅心", number: "4" },
+      { suit: "方塊", number: "6" },
+      { suit: "黑桃", number: "A" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "9" },
+      { suit: "黑桃", number: "2" },
+      { suit: "紅心", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "梅花", number: "Q" },
+      { suit: "紅心", number: "8" },
+      { suit: "黑桃", number: "6" },
+      { suit: "黑桃", number: "5" },
+      { suit: "紅心", number: "9" },
+      { suit: "梅花", number: "K" },
+      { suit: "方塊", number: "2" },
+      { suit: "紅心", number: "J" },
+      { suit: "黑桃", number: "3" },
+      { suit: "黑桃", number: "8" },
+      { suit: "紅心", number: "6" },
+      { suit: "梅花", number: "10" },
+      { suit: "方塊", number: "5" },
+      { suit: "方塊", number: "K" },
+      { suit: "梅花", number: "2" },
+      { suit: "紅心", number: "3" },
+      { suit: "方塊", number: "8" },
+      { suit: "梅花", number: "5" },
+      { suit: "黑桃", number: "K" },
+      { suit: "方塊", number: "J" },
+      { suit: "梅花", number: "8" },
+      { suit: "黑桃", number: "10" },
+      { suit: "紅心", number: "K" },
+      { suit: "梅花", number: "J" },
+      { suit: "黑桃", number: "7" },
+      { suit: "紅心", number: "10" },
+      { suit: "方塊", number: "A" },
+      { suit: "黑桃", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "方塊", number: "4" },
+      { suit: "梅花", number: "A" },
+      { suit: "梅花", number: "9" },
+      { suit: "黑桃", number: "J" },
+    ];
+
+    var deckH = [
+      { suit: "方塊", number: "9" },
+      { suit: "紅心", number: "A" },
+      { suit: "梅花", number: "6" },
+      { suit: "方塊", number: "10" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "方塊", number: "Q" },
+      { suit: "黑桃", number: "J" },
+      { suit: "梅花", number: "9" },
+      { suit: "梅花", number: "A" },
+      { suit: "方塊", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "黑桃", number: "4" },
+      { suit: "方塊", number: "A" },
+      { suit: "紅心", number: "10" },
+      { suit: "黑桃", number: "7" },
+      { suit: "梅花", number: "J" },
+      { suit: "紅心", number: "K" },
+      { suit: "黑桃", number: "10" },
+      { suit: "梅花", number: "8" },
+      { suit: "方塊", number: "J" },
+      { suit: "黑桃", number: "K" },
+      { suit: "梅花", number: "5" },
+      { suit: "方塊", number: "8" },
+      { suit: "紅心", number: "3" },
+      { suit: "梅花", number: "2" },
+      { suit: "方塊", number: "K" },
+      { suit: "方塊", number: "5" },
+      { suit: "梅花", number: "10" },
+      { suit: "紅心", number: "6" },
+      { suit: "黑桃", number: "8" },
+      { suit: "黑桃", number: "3" },
+      { suit: "紅心", number: "J" },
+      { suit: "方塊", number: "2" },
+      { suit: "梅花", number: "K" },
+      { suit: "紅心", number: "9" },
+      { suit: "黑桃", number: "5" },
+      { suit: "黑桃", number: "6" },
+      { suit: "紅心", number: "8" },
+      { suit: "梅花", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "紅心", number: "Q" },
+      { suit: "黑桃", number: "2" },
+      { suit: "黑桃", number: "9" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "A" },
+      { suit: "方塊", number: "6" },
+      { suit: "紅心", number: "4" },
+      { suit: "梅花", number: "3" },
+      { suit: "方塊", number: "7" },
+      { suit: "紅心", number: "2" },
+      { suit: "梅花", number: "4" }
+    ];
+
+    var deckI = [
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "A" },
+      { suit: "方塊", number: "6" },
+      { suit: "紅心", number: "4" },
+      { suit: "梅花", number: "3" },
+      { suit: "方塊", number: "7" },
+      { suit: "紅心", number: "2" },
+      { suit: "梅花", number: "4" },
+      { suit: "方塊", number: "9" },
+      { suit: "紅心", number: "A" },
+      { suit: "梅花", number: "6" },
+      { suit: "方塊", number: "10" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "方塊", number: "Q" },
+      { suit: "黑桃", number: "J" },
+      { suit: "梅花", number: "9" },
+      { suit: "梅花", number: "A" },
+      { suit: "方塊", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "黑桃", number: "4" },
+      { suit: "方塊", number: "A" },
+      { suit: "紅心", number: "10" },
+      { suit: "黑桃", number: "7" },
+      { suit: "梅花", number: "J" },
+      { suit: "紅心", number: "K" },
+      { suit: "黑桃", number: "10" },
+      { suit: "梅花", number: "8" },
+      { suit: "方塊", number: "J" },
+      { suit: "黑桃", number: "K" },
+      { suit: "梅花", number: "5" },
+      { suit: "方塊", number: "8" },
+      { suit: "紅心", number: "3" },
+      { suit: "梅花", number: "2" },
+      { suit: "方塊", number: "K" },
+      { suit: "方塊", number: "5" },
+      { suit: "梅花", number: "10" },
+      { suit: "紅心", number: "6" },
+      { suit: "黑桃", number: "8" },
+      { suit: "黑桃", number: "3" },
+      { suit: "紅心", number: "J" },
+      { suit: "方塊", number: "2" },
+      { suit: "梅花", number: "K" },
+      { suit: "紅心", number: "9" },
+      { suit: "黑桃", number: "5" },
+      { suit: "黑桃", number: "6" },
+      { suit: "紅心", number: "8" },
+      { suit: "梅花", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "紅心", number: "Q" },
+      { suit: "黑桃", number: "2" },
+      { suit: "黑桃", number: "9" }
+    ];
+
+    var deckJ = [
+      { suit: "黑桃", number: "6" },
+      { suit: "紅心", number: "8" },
+      { suit: "梅花", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "紅心", number: "Q" },
+      { suit: "黑桃", number: "2" },
+      { suit: "黑桃", number: "9" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "A" },
+      { suit: "方塊", number: "6" },
+      { suit: "紅心", number: "4" },
+      { suit: "梅花", number: "3" },
+      { suit: "方塊", number: "7" },
+      { suit: "紅心", number: "2" },
+      { suit: "梅花", number: "4" },
+      { suit: "方塊", number: "9" },
+      { suit: "紅心", number: "A" },
+      { suit: "梅花", number: "6" },
+      { suit: "方塊", number: "10" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "方塊", number: "Q" },
+      { suit: "黑桃", number: "J" },
+      { suit: "梅花", number: "9" },
+      { suit: "梅花", number: "A" },
+      { suit: "方塊", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "黑桃", number: "4" },
+      { suit: "方塊", number: "A" },
+      { suit: "紅心", number: "10" },
+      { suit: "黑桃", number: "7" },
+      { suit: "梅花", number: "J" },
+      { suit: "紅心", number: "K" },
+      { suit: "黑桃", number: "10" },
+      { suit: "梅花", number: "8" },
+      { suit: "方塊", number: "J" },
+      { suit: "黑桃", number: "K" },
+      { suit: "梅花", number: "5" },
+      { suit: "方塊", number: "8" },
+      { suit: "紅心", number: "3" },
+      { suit: "梅花", number: "2" },
+      { suit: "方塊", number: "K" },
+      { suit: "方塊", number: "5" },
+      { suit: "梅花", number: "10" },
+      { suit: "紅心", number: "6" },
+      { suit: "黑桃", number: "8" },
+      { suit: "黑桃", number: "3" },
+      { suit: "紅心", number: "J" },
+      { suit: "方塊", number: "2" },
+      { suit: "梅花", number: "K" },
+      { suit: "紅心", number: "9" },
+      { suit: "黑桃", number: "5" }
+    ];
+
+    var deckK = [
+      { suit: "紅心", number: "6" },
+      { suit: "黑桃", number: "8" },
+      { suit: "黑桃", number: "3" },
+      { suit: "紅心", number: "J" },
+      { suit: "方塊", number: "2" },
+      { suit: "梅花", number: "K" },
+      { suit: "紅心", number: "9" },
+      { suit: "黑桃", number: "5" },
+      { suit: "黑桃", number: "6" },
+      { suit: "紅心", number: "8" },
+      { suit: "梅花", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "紅心", number: "Q" },
+      { suit: "黑桃", number: "2" },
+      { suit: "黑桃", number: "9" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "A" },
+      { suit: "方塊", number: "6" },
+      { suit: "紅心", number: "4" },
+      { suit: "梅花", number: "3" },
+      { suit: "方塊", number: "7" },
+      { suit: "紅心", number: "2" },
+      { suit: "梅花", number: "4" },
+      { suit: "方塊", number: "9" },
+      { suit: "紅心", number: "A" },
+      { suit: "梅花", number: "6" },
+      { suit: "方塊", number: "10" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "方塊", number: "Q" },
+      { suit: "黑桃", number: "J" },
+      { suit: "梅花", number: "9" },
+      { suit: "梅花", number: "A" },
+      { suit: "方塊", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "黑桃", number: "4" },
+      { suit: "方塊", number: "A" },
+      { suit: "紅心", number: "10" },
+      { suit: "黑桃", number: "7" },
+      { suit: "梅花", number: "J" },
+      { suit: "紅心", number: "K" },
+      { suit: "黑桃", number: "10" },
+      { suit: "梅花", number: "8" },
+      { suit: "方塊", number: "J" },
+      { suit: "黑桃", number: "K" },
+      { suit: "梅花", number: "5" },
+      { suit: "方塊", number: "8" },
+      { suit: "紅心", number: "3" },
+      { suit: "梅花", number: "2" },
+      { suit: "方塊", number: "K" },
+      { suit: "方塊", number: "5" },
+      { suit: "梅花", number: "10" }
+    ];
+
+    var deckL = [
+      { suit: "梅花", number: "5" },
+      { suit: "方塊", number: "8" },
+      { suit: "紅心", number: "3" },
+      { suit: "梅花", number: "2" },
+      { suit: "方塊", number: "K" },
+      { suit: "方塊", number: "5" },
+      { suit: "梅花", number: "10" },
+      { suit: "紅心", number: "6" },
+      { suit: "黑桃", number: "8" },
+      { suit: "黑桃", number: "3" },
+      { suit: "紅心", number: "J" },
+      { suit: "方塊", number: "2" },
+      { suit: "梅花", number: "K" },
+      { suit: "紅心", number: "9" },
+      { suit: "黑桃", number: "5" },
+      { suit: "黑桃", number: "6" },
+      { suit: "紅心", number: "8" },
+      { suit: "梅花", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "紅心", number: "Q" },
+      { suit: "黑桃", number: "2" },
+      { suit: "黑桃", number: "9" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "A" },
+      { suit: "方塊", number: "6" },
+      { suit: "紅心", number: "4" },
+      { suit: "梅花", number: "3" },
+      { suit: "方塊", number: "7" },
+      { suit: "紅心", number: "2" },
+      { suit: "梅花", number: "4" },
+      { suit: "方塊", number: "9" },
+      { suit: "紅心", number: "A" },
+      { suit: "梅花", number: "6" },
+      { suit: "方塊", number: "10" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "方塊", number: "Q" },
+      { suit: "黑桃", number: "J" },
+      { suit: "梅花", number: "9" },
+      { suit: "梅花", number: "A" },
+      { suit: "方塊", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "黑桃", number: "4" },
+      { suit: "方塊", number: "A" },
+      { suit: "紅心", number: "10" },
+      { suit: "黑桃", number: "7" },
+      { suit: "梅花", number: "J" },
+      { suit: "紅心", number: "K" },
+      { suit: "黑桃", number: "10" },
+      { suit: "梅花", number: "8" },
+      { suit: "方塊", number: "J" },
+      { suit: "黑桃", number: "K" }
+    ];
+
+    var deckM = [
+      { suit: "紅心", number: "10" },
+      { suit: "黑桃", number: "7" },
+      { suit: "梅花", number: "J" },
+      { suit: "紅心", number: "K" },
+      { suit: "黑桃", number: "10" },
+      { suit: "梅花", number: "8" },
+      { suit: "方塊", number: "J" },
+      { suit: "黑桃", number: "K" },
+      { suit: "梅花", number: "5" },
+      { suit: "方塊", number: "8" },
+      { suit: "紅心", number: "3" },
+      { suit: "梅花", number: "2" },
+      { suit: "方塊", number: "K" },
+      { suit: "方塊", number: "5" },
+      { suit: "梅花", number: "10" },
+      { suit: "紅心", number: "6" },
+      { suit: "黑桃", number: "8" },
+      { suit: "黑桃", number: "3" },
+      { suit: "紅心", number: "J" },
+      { suit: "方塊", number: "2" },
+      { suit: "梅花", number: "K" },
+      { suit: "紅心", number: "9" },
+      { suit: "黑桃", number: "5" },
+      { suit: "黑桃", number: "6" },
+      { suit: "紅心", number: "8" },
+      { suit: "梅花", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "紅心", number: "Q" },
+      { suit: "黑桃", number: "2" },
+      { suit: "黑桃", number: "9" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "A" },
+      { suit: "方塊", number: "6" },
+      { suit: "紅心", number: "4" },
+      { suit: "梅花", number: "3" },
+      { suit: "方塊", number: "7" },
+      { suit: "紅心", number: "2" },
+      { suit: "梅花", number: "4" },
+      { suit: "方塊", number: "9" },
+      { suit: "紅心", number: "A" },
+      { suit: "梅花", number: "6" },
+      { suit: "方塊", number: "10" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "方塊", number: "Q" },
+      { suit: "黑桃", number: "J" },
+      { suit: "梅花", number: "9" },
+      { suit: "梅花", number: "A" },
+      { suit: "方塊", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "黑桃", number: "4" },
+      { suit: "方塊", number: "A" }
+    ];
+
+    var deckN = [
+      { suit: "黑桃", number: "J" },
+      { suit: "梅花", number: "9" },
+      { suit: "梅花", number: "A" },
+      { suit: "方塊", number: "4" },
+      { suit: "紅心", number: "7" },
+      { suit: "黑桃", number: "4" },
+      { suit: "方塊", number: "A" },
+      { suit: "紅心", number: "10" },
+      { suit: "黑桃", number: "7" },
+      { suit: "梅花", number: "J" },
+      { suit: "紅心", number: "K" },
+      { suit: "黑桃", number: "10" },
+      { suit: "梅花", number: "8" },
+      { suit: "方塊", number: "J" },
+      { suit: "黑桃", number: "K" },
+      { suit: "梅花", number: "5" },
+      { suit: "方塊", number: "8" },
+      { suit: "紅心", number: "3" },
+      { suit: "梅花", number: "2" },
+      { suit: "方塊", number: "K" },
+      { suit: "方塊", number: "5" },
+      { suit: "梅花", number: "10" },
+      { suit: "紅心", number: "6" },
+      { suit: "黑桃", number: "8" },
+      { suit: "黑桃", number: "3" },
+      { suit: "紅心", number: "J" },
+      { suit: "方塊", number: "2" },
+      { suit: "梅花", number: "K" },
+      { suit: "紅心", number: "9" },
+      { suit: "黑桃", number: "5" },
+      { suit: "黑桃", number: "6" },
+      { suit: "紅心", number: "8" },
+      { suit: "梅花", number: "Q" },
+      { suit: "方塊", number: "3" },
+      { suit: "紅心", number: "Q" },
+      { suit: "黑桃", number: "2" },
+      { suit: "黑桃", number: "9" },
+      { suit: "紅心", number: "5" },
+      { suit: "黑桃", number: "A" },
+      { suit: "方塊", number: "6" },
+      { suit: "紅心", number: "4" },
+      { suit: "梅花", number: "3" },
+      { suit: "方塊", number: "7" },
+      { suit: "紅心", number: "2" },
+      { suit: "梅花", number: "4" },
+      { suit: "方塊", number: "9" },
+      { suit: "紅心", number: "A" },
+      { suit: "梅花", number: "6" },
+      { suit: "方塊", number: "10" },
+      { suit: "黑桃", number: "Q" },
+      { suit: "梅花", number: "7" },
+      { suit: "方塊", number: "Q" }
+    ];
+
+
+
+
+    function calculate() {
+      var cardInput = document.getElementById("cardInput").value;
+      var selectedNumber = parseInt(document.getElementById("number").value);
+
+      var parsedCard = parseCardInput(cardInput);
+
+      var closestDeck = findClosestDeck(parsedCard.suit, parsedCard.number, selectedNumber);
+      var closestDeckDifference = getClosestDeckDifference(parsedCard.suit, parsedCard.number, selectedNumber, closestDeck);
+
+      var extraMessage = getExtraMessage(closestDeckDifference);
+
+      var resultString = "撲克牌 " + parsedCard.suit + "" + parsedCard.number +
+                         "<br>牌組" + closestDeck + "的" + parsedCard.suit + parsedCard.number +
+                         "更接近第" + selectedNumber + "張" +
+                         "<br>並且 落差為" + closestDeckDifference + "張" +
+                         extraMessage;
+
+      document.getElementById("result").innerHTML = resultString;
+
+      showArticle(resultString);
+      hideInputSection();
+    }
+
+    function findClosestDeck(suit, cardNumber, selectedNumber) {
+      var deckAIndex = getCardIndex(deckA, { suit, number: cardNumber });
+      var deckBIndex = getCardIndex(deckB, { suit, number: cardNumber });
+      var deckCIndex = getCardIndex(deckC, { suit, number: cardNumber });
+      var deckDIndex = getCardIndex(deckD, { suit, number: cardNumber });
+      var deckEIndex = getCardIndex(deckE, { suit, number: cardNumber });
+      var deckFIndex = getCardIndex(deckF, { suit, number: cardNumber });
+      var deckGIndex = getCardIndex(deckG, { suit, number: cardNumber });
+      var deckHIndex = getCardIndex(deckH, { suit, number: cardNumber });
+      var deckIIndex = getCardIndex(deckI, { suit, number: cardNumber });
+      var deckJIndex = getCardIndex(deckJ, { suit, number: cardNumber });
+      var deckKIndex = getCardIndex(deckK, { suit, number: cardNumber });
+      var deckLIndex = getCardIndex(deckL, { suit, number: cardNumber });
+      var deckMIndex = getCardIndex(deckM, { suit, number: cardNumber });
+      var deckNIndex = getCardIndex(deckN, { suit, number: cardNumber });
+
+
+      var deckADifference = Math.abs(deckAIndex - selectedNumber);
+      var deckBDifference = Math.abs(deckBIndex - selectedNumber);
+      var deckCDifference = Math.abs(deckCIndex - selectedNumber);
+      var deckDDifference = Math.abs(deckDIndex - selectedNumber);
+      var deckEDifference = Math.abs(deckEIndex - selectedNumber);
+      var deckFDifference = Math.abs(deckFIndex - selectedNumber);
+      var deckGDifference = Math.abs(deckGIndex - selectedNumber);
+      var deckHDifference = Math.abs(deckHIndex - selectedNumber);
+      var deckIDifference = Math.abs(deckIIndex - selectedNumber);
+      var deckJDifference = Math.abs(deckJIndex - selectedNumber);
+      var deckKDifference = Math.abs(deckKIndex - selectedNumber);
+      var deckLDifference = Math.abs(deckLIndex - selectedNumber);
+      var deckMDifference = Math.abs(deckMIndex - selectedNumber);
+      var deckNDifference = Math.abs(deckNIndex - selectedNumber);
+
+
+
+      var minDifference = Math.min(deckADifference, deckBDifference, deckCDifference, deckDDifference,deckEDifference,deckFDifference,deckGDifference,deckHDifference,deckIDifference,deckJDifference,deckKDifference,deckLDifference,deckMDifference,deckNDifference);
+
+      if (minDifference === deckADifference) {
+        return "A";
+      } else if (minDifference === deckBDifference) {
+        return "B";
+      } else if (minDifference === deckCDifference) {
+        return "C";
+      } else if (minDifference === deckDDifference) {
+        return "D";
+      } else if (minDifference === deckEDifference) {
+        return "E";
+      } else if (minDifference === deckFDifference) {
+        return "F";
+      } else if (minDifference === deckGDifference) {
+        return "G";
+      } else if (minDifference === deckHDifference) {
+        return "H";
+      } else if (minDifference === deckIDifference) {
+        return "I";
+      } else if (minDifference === deckJDifference) {
+        return "J";
+      } else if (minDifference === deckKDifference) {
+        return "K";
+      } else if (minDifference === deckLDifference) {
+        return "L";
+      } else if (minDifference === deckMDifference) {
+        return "M";
+      } else {
+        return "N";
+      }
+    }
+    function getCardIndex(deck, card) {
+      for (var i = 0; i < deck.length; i++) {
+        if (deck[i].suit === card.suit && deck[i].number === card.number) {
+          return i + 1;
+        }
+      }
+      return 0;
+    }
+
+    function getClosestDeckDifference(suit, cardNumber, selectedNumber, closestDeck) {
+            var closestDeckIndex = getCardIndex((closestDeck === "A" ? deckA : closestDeck === "B" ? deckB : closestDeck === "C" ? deckC : closestDeck === "D" ? deckD : closestDeck === "E" ? deckE : closestDeck === "F" ? deckF : closestDeck === "G" ? deckG : closestDeck === "H" ? deckH : closestDeck === "I" ? deckI : closestDeck === "J" ? deckJ : closestDeck === "K" ? deckK : closestDeck === "L" ? deckL : closestDeck === "M" ? deckM : deckN), { suit, number: cardNumber });
+      return Math.abs(closestDeckIndex - selectedNumber);
+    }
+
+    function parseCardInput(input) {
+      var matches = input.match(/^(黑桃|紅心|方塊|梅花)([2-9]|10|A|J|Q|K)$/);
+      if (matches) {
+        return {
+          suit: matches[1],
+          number: matches[2]
+        };
+      } else {
+        return null;
+      }
+    }
+
+    function getExtraMessage(difference) {
+      if (difference === 0) {
+        return "<br>拿掉鬼牌和廣告牌";
+      } else if (difference === 1) {
+        return "<br>拿掉鬼牌";
+      } else if (difference === 2) {
+        return "<br>拿掉廣告牌";
+      } else {
+        return "";
+      }
+    }
+
+    function showArticle(resultString) {
+      var articleContent = document.getElementById("articleContent");
+      articleContent.innerHTML = "根據計算結果，" + resultString + "，以下是相關文章內容。"; // 自定義文章內容
+      document.getElementById("article").style.display = "block";
+    }
+
+    function hideInputSection() {
+      document.getElementById("inputSection").style.display = "none";
+    }
+  </script>
+</body>
+</html>
