@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="viewport" contect="width=device-width,initial-scale=1.0" />
+        <link rel="apple-touch-icon" href="apple-touch-icon.jpg">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
   }
   #ebook-container {
-    width: 800px;
-    margin: 0 auto;
+    max-width: 100%;
     background-color: #fff;
-    border: 1px solid #ccc;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
   #ebook-page {
-    width: 100%;
     background-color: #fff;
-    border: 1px solid #ccc;
     padding: 20px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     position: relative;
@@ -26,6 +28,42 @@
     text-align: center;
     font-size: 24px;
     margin-bottom: 20px;
+  }
+  #inputSection {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center; /* Center the input section */
+  }
+  #inputSection label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  #inputSection input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  #inputSection button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #inputSection button:hover {
+    background-color: #0056b3;
+  }
+  #result {
+    margin-bottom: 15px;
+  }
+  #article {
+    display: none;
   }
   #page-number {
     position: absolute;
@@ -40,21 +78,21 @@
 <body>
   <div id="ebook-container">
     <div id="ebook-page">
-      <div id="ebook-header">巴格拉斯效果-我與大衛的故事</div>
+      <div id="ebook-header"><strong>巴格拉斯效果-我與大衛的故事</strong></div>
       <div id="inputSection">
-        <label for="card">請輸入一張撲克牌（例如：黑桃A）：</label>
+        <label for="cardInput"><strong>請輸入一張撲克牌（例如：黑桃A）：</strong></label>
         <input type="text" id="cardInput">
         <br>
-        <label for="number"> 請選擇數字（1-52）：</label>
+        <label for="number"><strong>請選擇數字（1-52）：</strong></label>
         <input type="number" id="number" min="1" max="52">
         <br>
-        <button onclick="calculate()">計算</button>
+        <button onclick="calculate()"><strong>計算</strong></button>
       </div>
       <p id="result"></p>
-      <div id="article" style="display: none;">
+      <div id="article">
         <div id="articleContent"></div>
       </div>
-      <div id="page-number">-第<span id="currentPageNumber">37</span>頁-</div>
+      <div id="page-number"><strong>-第<span id="currentPageNumber">37</span>頁-</strong></div>
     </div>
   </div>
   <script>
@@ -787,6 +825,10 @@
 
       var resultString = "從" + getDeckTranslation(closestDeck) + "拿出一副撲克牌並且把牌交給我，請我把牌取出，並" + extraMessage ;
 
+// 更新牌组页数显示
+  var pageNumberElement = document.getElementById("currentPageNumber");
+  pageNumberElement.innerText = closestDeck.charCodeAt(0) - 64; // 将字母转换为对应的页数，A为1，B为2，以此类推
+
       // 将前面段落的显示移除，只保留后面的答案段落
       document.getElementById("result").innerHTML = "";
       showArticle(resultString);
@@ -921,11 +963,11 @@
 
     function getExtraMessage(difference) {
       if (difference === 0) {
-        return "拿掉鬼牌和廣告牌";
+        return "<br>拿掉鬼牌和廣告牌";
       } else if (difference === 1) {
-        return "拿掉鬼牌";
+        return "<br>拿掉鬼牌";
       } else if (difference === 2) {
-        return "拿掉廣告牌";
+        return "<br>拿掉廣告牌";
       } else {
         return "";
       }
