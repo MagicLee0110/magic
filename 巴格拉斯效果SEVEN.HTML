@@ -1,79 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="viewport" contect="width=device-width,initial-scale=1.0" />
-        <link rel="apple-touch-icon" href="apple-touch-icon.jpg">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-  }
-  #ebook-container {
-    max-width: 100%;
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  #ebook-page {
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-  }
-  #ebook-header {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  #inputSection {
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    text-align: center; /* Center the input section */
-  }
-  #inputSection label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  #inputSection input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 10px;
-  }
-  #inputSection button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  #inputSection button:hover {
-    background-color: #0056b3;
-  }
-  #result {
-    margin-bottom: 15px;
-  }
-  #article {
-    display: none;
-  }
-  #page-number {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 14px;
-    text-align: center;
-    width: 100%;
-  }
-</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="apple-touch-icon.jpg">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    #ebook-container {
+			text-align: center;
+			margin-top: 60px;
+			background-color: #fff;
+			border: 1px solid #ddd;
+			padding: 40px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			max-width: 800px;
+			margin: 0 auto;
+			font-size: 24px;
+			line-height: 1.5;
+			letter-spacing: 1px;
+    }
+
+    #ebook-page {
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    #ebook-header {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    #inputSection {
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: center; /* Center the input section */
+    }
+    #inputSection label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    #inputSection input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    #inputSection button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #inputSection button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      margin-bottom: 15px;
+    }
+    #article {
+      display: none;
+    }
+    #page-number {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 14px;
+      text-align: center;
+      width: 100%;
+    }
+
+    #inputSection input[type="text"],
+    #inputSection input[type="number"] {
+      width: 150px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    #inputSection input[type="text"]:focus,
+    #inputSection input[type="number"]:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    /* 使用 Google Fonts 字型 */
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
 </head>
 <body>
   <div id="ebook-container">
@@ -823,7 +853,7 @@
 
       var extraMessage = getExtraMessage(closestDeckDifference);
 
-      var resultString = "從" + getDeckTranslation(closestDeck) + "拿出一副撲克牌並且把牌交給我，請我把牌取出，並" + extraMessage ;
+      var resultString = "從" + getDeckTranslation(closestDeck) + "拿出一副撲克牌並且把牌交給我，大衛請我把牌取出，" + extraMessage ;
 
 // 更新牌组页数显示
   var pageNumberElement = document.getElementById("currentPageNumber");
@@ -963,11 +993,11 @@
 
     function getExtraMessage(difference) {
       if (difference === 0) {
-        return "<br>拿掉鬼牌和廣告牌";
+        return "拿掉鬼牌和廣告牌後";
       } else if (difference === 1) {
-        return "<br>拿掉鬼牌";
+        return "拿掉鬼牌後";
       } else if (difference === 2) {
-        return "<br>拿掉廣告牌";
+        return "拿掉廣告牌後";
       } else {
         return "";
       }
@@ -976,9 +1006,9 @@
   function showArticle(resultString) {
     var articleContent = document.getElementById("articleContent");
     articleContent.innerHTML = `
-      <p>故事發生在1976年的，當時我已認識大衛多年，但始終沒有機會能看到那個效果！直到有一天，大衛邀請我去他家裡作客。</p>
-      <p>當我們聊得正愉快時，大衛突然讓我隨意說出一張牌，我說了方塊5。下一秒，大衛請我說出一個1-52之間的數字，我說了32。</p>
-      <p>此時我心裡面想...該不會！！！此時大衛緩緩起身，${resultString}，背面向上一張一張往下發到第32張，你知道的...那張正是方塊5！！！</p>
+      <p><br><br>    故事發生在1976年，<br>當時我已認識大衛多年，但始終沒有機會能看到那個效果！<br>直到有一天，大衛邀請我去他家裡作客。</p>
+      <p>當我們聊得正愉快時...<br>大衛突然讓我隨意說出一張牌，我說了方塊5。<br>下一秒，大衛請我說出一個1-52之間的數字，我說了32。</p>
+      <p>此時我心裡面想...該不會！！！<br>只見大衛緩緩起身，${resultString}，讓我從背面向上一張一張往下發到第32張，1...2...3...4...5...6......30...31....32....，<br>你知道的...那張正是方塊5！！！<br><br>我永遠忘不了那天!!!<br>如此幸運能見證到奇蹟發生，那一刻是言語無法形容的感動，<br>感謝大衛-巴格拉斯，一位真正的天才，多希望你們當時也能在場見證，這就是我親眼見證到的傳說中的<br>"巴格拉斯效果"<br><br><br><br><br><br><br></p>
     `;
     document.getElementById("article").style.display = "block";
   }
