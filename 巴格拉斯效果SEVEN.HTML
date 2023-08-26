@@ -105,6 +105,17 @@
     padding: 0;
     margin: 0 1px; /* 调整按钮之间的水平间距 */
   }
+  .clear-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  }
+function clearInput() {
+  var cardInput = document.getElementById("cardInput");
+  var numberInput = document.getElementById("number");
+  cardInput.value = "";
+  numberInput.value = "";
+}
 
   </style>
 </head>
@@ -158,6 +169,8 @@
     <button class="small-button" onclick="chooseNumber('9')">9</button>
     <button class="small-button" onclick="chooseNumber('0')">0</button>
   </div>
+<br>
+<button class="clear-button" onclick="clearInput()">重新輸入</button> <!-- 新增的刪除按鈕 -->
 <br>
         <button onclick="calculate()"><strong>計算</strong></button>
       </div>
@@ -883,6 +896,13 @@
       { suit: "梅花", number: "7" },
       { suit: "黑桃", number: "Q" }
     ];
+
+function clearInput() {
+  var cardInput = document.getElementById("cardInput");
+  var numberInput = document.getElementById("number");
+  cardInput.value = "";
+  numberInput.value = "";
+}
 
   function chooseCard(value) {
     var cardInput = document.getElementById("cardInput");
