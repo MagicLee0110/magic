@@ -87,6 +87,25 @@
       font-size: 12px;
       text-align: center;
     }
+#cardButtons {
+  width: 100%; /* 设置容器宽度为100% */
+  display: flex;
+  justify-content: center; /* 水平居中按钮 */
+}
+  #numberButtons {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px; /* 添加上边距以与输入框分隔开 */
+  }
+
+  .small-button {
+    width: 1cm;
+    height: 1cm;
+    font-size: 16px;
+    padding: 0;
+    margin: 0 2px; /* 调整按钮之间的水平间距 */
+  }
+
   </style>
 </head>
 <body>
@@ -94,10 +113,47 @@
     <div id="ebook-page">
       <div id="ebook-header"><strong>我與大衛的故事</strong></div>
       <div id="inputSection">
-        <label for="cardInput"><strong>請輸入一張撲克牌（例如：黑桃A）：</strong></label>
-        <input type="text" id="cardInput">
-        <label for="number"><strong>請選擇數字（1-52）：</strong></label>
-        <input type="number" id="number" min="1" max="52">
+<label for="cardInput"><strong>請輸入撲克牌：</strong></label>
+<div id="cardButtons">
+  <button class="small-button" onclick="chooseCard('黑桃')">♠</button>
+  <button class="small-button" onclick="chooseCard('紅心')">♥</button>
+  <button class="small-button" onclick="chooseCard('方塊')">♦</button>
+  <button class="small-button" onclick="chooseCard('梅花')">♣</button>
+</div>
+<br>
+<div id="cardButtons">
+  <button class="small-button" onclick="chooseCard('A')">A</button>
+  <button class="small-button" onclick="chooseCard('2')">2</button>
+  <button class="small-button" onclick="chooseCard('3')">3</button>
+  <button class="small-button" onclick="chooseCard('4')">4</button>
+  <button class="small-button" onclick="chooseCard('5')">5</button>
+  <button class="small-button" onclick="chooseCard('6')">6</button>
+  <button class="small-button" onclick="chooseCard('7')">7</button>
+  <button class="small-button" onclick="chooseCard('8')">8</button>
+  <button class="small-button" onclick="chooseCard('9')">9</button>
+  <button class="small-button" onclick="chooseCard('10')">10</button>
+  <button class="small-button" onclick="chooseCard('J')">J</button>
+  <button class="small-button" onclick="chooseCard('Q')">Q</button>
+  <button class="small-button" onclick="chooseCard('K')">K</button>
+</div>
+
+  <input type="text" id="cardInput">
+  <label for="number"><strong>請輸入數字：</strong></label>
+  <input type="number" id="number" min="1" max="52">
+  <!-- 新增數字按鈕 -->
+  <div id="numberButtons">
+    <button class="small-button" onclick="chooseNumber('1')">1</button>
+    <button class="small-button" onclick="chooseNumber('2')">2</button>
+    <button class="small-button" onclick="chooseNumber('3')">3</button>
+    <button class="small-button" onclick="chooseNumber('4')">4</button>
+    <button class="small-button" onclick="chooseNumber('5')">5</button>
+    <button class="small-button" onclick="chooseNumber('6')">6</button>
+    <button class="small-button" onclick="chooseNumber('7')">7</button>
+    <button class="small-button" onclick="chooseNumber('8')">8</button>
+    <button class="small-button" onclick="chooseNumber('9')">9</button>
+    <button class="small-button" onclick="chooseNumber('0')">0</button>
+  </div>
+<br>
         <button onclick="calculate()"><strong>計算</strong></button>
       </div>
       <p id="result"></p>
@@ -822,6 +878,15 @@
       { suit: "梅花", number: "7" },
       { suit: "黑桃", number: "Q" }
     ];
+
+  function chooseCard(value) {
+    var cardInput = document.getElementById("cardInput");
+    cardInput.value = cardInput.value + value;
+  }
+function chooseNumber(value) {
+  var numberInput = document.getElementById("number");
+  numberInput.value = numberInput.value+ value;
+}
 
 
     function calculate() {
