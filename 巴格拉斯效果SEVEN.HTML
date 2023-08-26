@@ -55,12 +55,6 @@
       border-radius: 6px;
       margin-bottom: 10px;
       font-size: 14px;
-    display: flex; /* 使用 flexbox 佈局 */
-    flex-direction: column; /* 垂直排列子元素 */
-    justify-content: center; /* 垂直置中對齊 */
-    align-items: center; /* 水平置中對齊 */
-    height: 100vh; /* 將高度設置為整個視窗的高度 */
-  }
     }
     #inputSection button {
       background-color: #007bff;
@@ -88,7 +82,7 @@
     /* 頁數提示 */
     #page-number {
       font-size: 12px;
-      text-align: right;
+      text-align: center;
     }
   </style>
 </head>
@@ -991,9 +985,9 @@
   function showArticle(resultString) {
     var articleContent = document.getElementById("articleContent");
     articleContent.innerHTML = `
-      <p><br><br>    故事發生在1976年，<br>當時我已認識大衛多年，但始終沒有機會能看到那個效果！<br>直到有一天，大衛邀請我去他家裡作客。</p>
-      <p>當我們聊得正愉快時...<br>大衛突然讓我隨意說出一張牌，我說了方塊5。<br>下一秒，大衛請我說出一個1-52之間的數字，我說了32。</p>
-      <p>此時我心裡面想...該不會！！！<br>只見大衛緩緩起身，${resultString}，讓我從背面向上一張一張往下發到第32張，1...2...3...4...5...6......30...31....32....，<br>你知道的...那張正是方塊5！！！<br><br>我永遠忘不了那天!!!<br>如此幸運能見證到奇蹟發生，那一刻是言語無法形容的感動，<br>感謝大衛-巴格拉斯，一位真正的天才，多希望你們當時也能在場見證，這就是我親眼見證到的傳說中的<br>"巴格拉斯效果"<br><br><br><br><br><br><br></p>
+      <p><br><br>    故事發生在1976年，<br>當時我已認識大衛多年，<br>但始終沒有機會能看到那個效果！<br>直到有一天，大衛邀請我去他家裡作客。</p>
+      <p>當我們聊得正愉快時...<br>大衛突然讓我隨意說出一張牌，<br>我說了方塊5。<br>下一秒，大衛請我說出一個1-52之間的數字，<br>我說了32。</p>
+      <p>此時我心裡面想...該不會！！！<br>只見大衛緩緩起身，${resultString}，讓我從背面向上一張一張往下發到第32張，1...2...3...4...5...6......30...31....32....，<br>你知道的...那張正是方塊5！！！<br><br>我永遠忘不了那天!!!<br>如此幸運能見證到奇蹟發生，那一刻是言語無法形容的感動，感謝大衛-巴格拉斯，一位真正的天才，多希望你們當時也能在場見證，這就是我親眼見證到的傳說中的"巴格拉斯效果"<br><br><br><br><br><br></p>
     `;
     document.getElementById("article").style.display = "block";
   }
