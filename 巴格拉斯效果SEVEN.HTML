@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="apple-touch-icon.jpg">
@@ -88,22 +88,22 @@
       text-align: center;
     }
 #cardButtons {
-  width: 100%; /* 设置容器宽度为100% */
   display: flex;
   justify-content: center; /* 水平居中按钮 */
+    margin: 10px; /* 添加上边距以与输入框分隔开 */
 }
   #numberButtons {
     display: flex;
     justify-content: center;
-    margin-top: 10px; /* 添加上边距以与输入框分隔开 */
+    margin-top: 5px; /* 添加上边距以与输入框分隔开 */
   }
 
   .small-button {
     width: 1cm;
     height: 1cm;
-    font-size: 16px;
+    font-size: 10px;
     padding: 0;
-    margin: 0 2px; /* 调整按钮之间的水平间距 */
+    margin: 0 1px; /* 调整按钮之间的水平间距 */
   }
 
   </style>
@@ -120,7 +120,6 @@
   <button class="small-button" onclick="chooseCard('方塊')">♦</button>
   <button class="small-button" onclick="chooseCard('梅花')">♣</button>
 </div>
-<br>
 <div id="cardButtons">
   <button class="small-button" onclick="chooseCard('A')">A</button>
   <button class="small-button" onclick="chooseCard('2')">2</button>
