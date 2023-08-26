@@ -1,98 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="viewport" contect="width=device-width,initial-scale=1.0" />
-        <link rel="apple-touch-icon" href="apple-touch-icon.jpg">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 50px;
-    padding: 50px;
-  }
-  #ebook-container {
-    max-width: 100%;
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  #ebook-page {
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-  }
-  #ebook-header {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  #inputSection {
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    text-align: center; /* Center the input section */
-  }
-  #inputSection label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  #inputSection input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 10px;
-  }
-  #inputSection button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  #inputSection button:hover {
-    background-color: #0056b3;
-  }
-  #result {
-    margin-bottom: 15px;
-  }
-  #article {
-    display: none;
-  }
-  #page-number {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 14px;
-    text-align: center;
-    width: 100%;
-  }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="apple-touch-icon.jpg">
+  <style>
+    /* 全局設定 */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+      margin: 50px;
+      padding: 50px;
+    }
+    
+    /* 電子書容器 */
+    #ebook-container {
+      text-align: center;
+      margin-top: 60px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 40px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 24px;
+      line-height: 1.5;
+      letter-spacing: 1px;
+    }
+
+    /* 電子書頁面 */
+    #ebook-page {
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    /* 電子書標題 */
+    #ebook-header {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    /* 輸入區域 */
+    #inputSection {
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    #inputSection label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
     #inputSection input[type="text"],
     #inputSection input[type="number"] {
-      width: 250px; /* 調整輸入欄位的寬度 */
-      padding: 10px; /* 調整上下間距 */
+      width: 150px;
+      padding: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
       margin-bottom: 10px;
-      font-size: 14px; /* 調整字型大小 */
+      font-size: 14px;
+    }
+    #inputSection button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #inputSection button:hover {
+      background-color: #0056b3;
     }
 
-    #inputSection input[type="text"]:focus,
-    #inputSection input[type="number"]:focus {
-      outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    /* 結果區域 */
+    #result {
+      margin-bottom: 15px;
     }
 
-    /* 使用 Google Fonts 字型 */
-    body {
-      font-family: 'Roboto', sans-serif;
+    /* 故事內容 */
+    #article {
+      display: none;
+    }
+
+    /* 頁數提示 */
+    #page-number {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 14px;
+      text-align: center;
+      width: 100%;
     }
   </style>
 </head>
