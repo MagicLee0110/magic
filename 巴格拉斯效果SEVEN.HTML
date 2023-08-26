@@ -55,6 +55,12 @@
       border-radius: 6px;
       margin-bottom: 10px;
       font-size: 14px;
+    display: flex; /* 使用 flexbox 佈局 */
+    flex-direction: column; /* 垂直排列子元素 */
+    justify-content: center; /* 垂直置中對齊 */
+    align-items: center; /* 水平置中對齊 */
+    height: 100vh; /* 將高度設置為整個視窗的高度 */
+  }
     }
     #inputSection button {
       background-color: #007bff;
@@ -81,12 +87,8 @@
 
     /* 頁數提示 */
     #page-number {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      font-size: 14px;
-      text-align: center;
-      width: 100%;
+      font-size: 12px;
+      text-align: right;
     }
   </style>
 </head>
