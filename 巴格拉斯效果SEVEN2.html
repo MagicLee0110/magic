@@ -1119,51 +1119,76 @@ function calculate() {
       }
     }
 
-    var currentPage = 1; // 初始頁面為1
+// 初始化当前页码为0
+var currentPage = 1; 
 
 function showArticle() {
   var articleContent = document.getElementById("articleContent");
-if (currentPage === 1) {
+  var headerElement = document.getElementById("ebook-header");
+  var pageNumberElement = document.getElementById("page-number");
+
+  if (currentPage === 0) {
+    articleContent.innerHTML = `<h1><br><br><br><br><br><br><br><br><br><br><br><br><br>Chapter3 我與大衛的故事<br><br><br><br><br><br><br><br><br><br><br><br><br></h1>`;
+    headerElement.style.display = "none"; // 隐藏标题
+    pageNumberElement.style.display = "none"; // 隐藏页数
+  } else if (currentPage === 1) {
     articleContent.innerHTML = `
-        <p><br><br>    大衛·巴格拉斯（David Berglas）</p>
-	<p>"聖殿級的ACAAN"</p>
-        <img src="book1.jpg" alt="Description of image" style="width:100%; height:auto;">
-	<p><br></p>
+      <p><br><br>大衛·巴格拉斯（David Berglas）</p>
+      <p>"聖殿級的ACAAN"</p>
+      <img src="book1.jpg" alt="Description of image" style="width:100%; height:auto;">
+      <p><br></p>
     `;
-} else if (currentPage === 2) {
-      articleContent.innerHTML = `
-          <p><br><br>    故事發生在1976年，<br>當時我已認識大衛多年，<br>但始終沒有機會能看到那個效果！<br>直到有一天，大衛邀請我去他家裡作客。<br>記得當時我們聊得正愉快時...<br>大衛突然讓我隨意說出一張牌，<br>和一個1-52之間的數字<br>我說了方塊5，32。</p>
-          <p>大衛先是跟我分享了一個有趣的小故事後，<br>便緩緩起身，${globalResultString}，讓我從背面向上一張一張往下發到第32張，1...2...3...4...5...6......30...31....32....，<br>你知道的...那張正是方塊5！！！<br><br>我永遠忘不了那天!!!<br>多希望你們當時也能在場見證，<br>這就是我親眼見證到的傳說中的<br>"巴格拉斯效果"<br><br><br></p>
-      `;
-  } else {
-      articleContent.innerHTML = `
-          <p><br><br><br><br><br><br><br><br><br><br><br><br><br>".........我永遠忘不了那個男人........永遠......!!!"<br><br><br><br><br><br><br><br><br><br><br><br><br></p>
-      `;
+    headerElement.style.display = "block"; // 显示标题
+    pageNumberElement.style.display = "block"; // 显示页数
+  } else if (currentPage === 2) {
+    articleContent.innerHTML = `
+      <p><br><br>故事發生在1976年，<br>當時我已認識大衛多年，<br>但始終沒有機會能看到那個效果！<br>直到有一天，大衛邀請我去他家裡作客。<br>記得當時我們聊得正愉快時...<br>大衛突然讓我隨意說出一張牌，<br>和一個1-52之間的數字<br>我說了方塊5，32。</p>
+      <p>大衛先是跟我分享了一個有趣的小故事後，<br>便緩緩起身，${globalResultString}，讓我從背面向上一張一張往下發到第32張，1...2...3...4...5...6......30...31....32....，<br>你知道的...那張正是方塊5！！！<br><br>我永遠忘不了那天!!!<br>多希望你們當時也能在場見證，<br>這就是我親眼見證到的傳說中的<br>"巴格拉斯效果"<br><br><br></p>
+    `;
+    headerElement.style.display = "block"; // 显示标题
+    pageNumberElement.style.display = "block"; // 显示页数
+  } else if (currentPage === 3) {
+    articleContent.innerHTML = `
+      <p><br><br><br><br><br><br><br><br><br><br><br><br><br>".........我永遠忘不了那個男人........永遠......!!!"<br><br><br><br><br><br><br><br><br><br><br><br><br></p>
+    `;
+    headerElement.style.display = "block"; // 显示标题
+    pageNumberElement.style.display = "block"; // 显示页数
+  } else if (currentPage === 4) {
+    articleContent.innerHTML = `<h1><br><br><br><br><br><br><br><br><br><br><br><br><br>Chapter4 ACAAN<br><br><br><br><br><br><br><br><br><br><br><br><br></h1>`;
+    headerElement.style.display = "none"; // 隐藏标题
+    pageNumberElement.style.display = "none"; // 隐藏页数
   }
+  
   document.getElementById("article").style.display = "block";
-  updatePageNumber(); // 添加这行以更新页码
+  updatePageNumber(); 
 }
 
 function previousPage() {
-  if (currentPage > 1) {
+  if (currentPage > 0) {
     currentPage--;
     showArticle();
-    updatePageNumber(); // 添加这行以更新页码
+    updatePageNumber();
   }
 }
 
 function nextPage() {
-  if (currentPage < 3) { // 如果有3页
+  if (currentPage < 4) {
     currentPage++;
     showArticle();
-    updatePageNumber(); // 添加这行以更新页码
+    updatePageNumber();
   }
 }
 
 function updatePageNumber() {
   var pageNumberElement = document.getElementById("currentPageNumber");
-  pageNumberElement.innerText = currentPage + 30;
+  if (currentPage === 0 || currentPage === 4) {
+    pageNumberElement.innerText = "";
+  } else {
+    pageNumberElement.innerText = currentPage + 30;
+  }
 }
+
+
 
     function hideInputSection() {
       document.getElementById("inputSection").style.display = "none";
