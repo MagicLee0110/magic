@@ -116,6 +116,34 @@ function clearInput() {
   cardInput.value = "";
   numberInput.value = "";
 }
+/* 调整按钮的位置和样式 */
+#prevPageButton, #nextPageButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 20px;
+  font-size: 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none; /* 初始化时隐藏按钮 */
+  opacity: 0; /* 初始时设置透明度为0 */
+  z-index: 1;
+}
+
+#prevPageButton {
+  left: 10px;
+}
+
+#nextPageButton {
+  right: 10px;
+}
+
+#prevPageButton:hover, #nextPageButton:hover {
+  background-color: #0056b3;
+}
 
   </style>
 </head>
@@ -180,8 +208,8 @@ function clearInput() {
       </div>
       <div id="page-number"><strong>-第<span id="currentPageNumber">37</span>頁-</strong></div>
       <div>
-        <button onclick="previousPage()">上一頁</button>
-        <button onclick="nextPage()">下一頁</button>
+    <button id="prevPageButton" onclick="previousPage()">上一頁</button>
+    <button id="nextPageButton" onclick="nextPage()">下一頁</button>
       </div>
     </div>
   </div>
@@ -940,6 +968,10 @@ function calculate() {
     // 将前面段落的显示移除，只保留后面的答案段落
     document.getElementById("result").innerHTML = "";
     hideInputSection();
+
+  // 显示按钮
+  document.getElementById("prevPageButton").style.display = "block";
+  document.getElementById("nextPageButton").style.display = "block";
 
     // 调用 showArticle 函数
     showArticle();
