@@ -131,6 +131,7 @@ function clearInput() {
   display: none; /* 初始化时隐藏按钮 */
   opacity: 0; /* 初始时设置透明度为0 */
   z-index: 1;
+  outline: none;
 }
 
 #prevPageButton {
@@ -143,6 +144,10 @@ function clearInput() {
 
 #prevPageButton:hover, #nextPageButton:hover {
   background-color: #0056b3;
+}
+
+#prevPageButton:active, #nextPageButton:active {
+  background-color: #007bff; /* 恢复原背景色 */
 }
 
   </style>
