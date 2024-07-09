@@ -1089,11 +1089,12 @@ function calculate() {
 
 function showArticle() {
   var articleContent = document.getElementById("articleContent");
-  if (currentPage === 1) {
-      articleContent.innerHTML = `
-          <p><br><br><br><br><br><br><br><br><br><br><br><br><br>"巴格拉斯效果的上一頁頁頁頁頁頁頁頁頁頁"<br><br><br><br><br><br><br><br><br><br><br><br><br></p>
-      `;
-  } else if (currentPage === 2) {
+if (currentPage === 1) {
+    articleContent.innerHTML = `
+        <p><br><br><br><br><br><br><br><br><br><br><br><br><br>"巴格拉斯效果的上一頁頁頁頁頁頁頁頁頁頁"<br><br><br><br><br><br><br><br><br><br><br><br><br></p>
+        <img src="book1.jpg" alt="Description of image" style="width:100%; height:auto;">
+    `;
+} else if (currentPage === 2) {
       articleContent.innerHTML = `
           <p><br><br>    故事發生在1976年，<br>當時我已認識大衛多年，<br>但始終沒有機會能看到那個效果！<br>直到有一天，大衛邀請我去他家裡作客。<br>記得當時我們聊得正愉快時...<br>大衛突然讓我隨意說出一張牌，<br>和一個1-52之間的數字<br>我說了方塊5，32。</p>
           <p>大衛先是跟我分享了一個有趣的小故事後，<br>便緩緩起身，${globalResultString}，讓我從背面向上一張一張往下發到第32張，1...2...3...4...5...6......30...31....32....，<br>你知道的...那張正是方塊5！！！<br><br>我永遠忘不了那天!!!<br>多希望你們當時也能在場見證，<br>這就是我親眼見證到的傳說中的<br>"巴格拉斯效果"<br><br><br></p>
