@@ -7,23 +7,47 @@
  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
  <style>
     /* 全局精緻設定 */
-    body { display: flex; justify-content: center; background-color: #f2f2f2; align-items: center; height: 100vh; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+    body { display: flex; justify-content: center; background-color: #1a1a1a; align-items: center; height: 100vh; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
     #ebook-container { text-align: center; padding: 20px; width: 100%; max-width: 400px; }
-    #ebook-page { background-color: #fff; padding: 25px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); position: relative; min-height: 550px; border-radius: 8px; transition: 0.3s; }
-    #ebook-header { text-align: center; font-size: 20px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-weight: bold; }
+    
+    /* 電子書頁面固定容器 */
+    #ebook-page { 
+        background-color: #fffaf0; 
+        padding: 25px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        position: relative; 
+        height: 600px; /* 固定高度以利頁數定位 */
+        border-radius: 8px; 
+        border-left: 10px solid #2c1a1a; 
+        transition: 0.3s; 
+        box-sizing: border-box;
+    }
+    
+    #ebook-header { text-align: center; font-size: 20px; margin-bottom: 20px; border-bottom: 2px solid #3e2723; padding-bottom: 10px; font-weight: bold; color: #3e2723; }
 
     /* 輸入區塊 */
-    #inputSection { background-color: #f9f9f9; padding: 10px; border-radius: 8px; }
+    #inputSection { background-color: #efebe9; padding: 10px; border-radius: 8px; }
     .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 5px; }
-    .small-button { width: 44px; height: 42px; font-size: 20px; margin: 2px; cursor: pointer; border: 1px solid #ccc; border-radius: 6px; background: white; }
-    .small-button:active { background: #007bff; color: white; }
-    input { width: 85%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin: 10px 0; text-align: center; font-size: 16px; background: #fff; font-weight: bold; }
-    .calc-btn { background-color: #007bff; color: #fff; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; font-size: 18px; width: 80%; margin-top: 10px; }
-    .clear-button { background: none; color: #888; border: 1px solid #888; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-top: 15px; }
+    .small-button { width: 44px; height: 42px; font-size: 20px; margin: 2px; cursor: pointer; border: 1px solid #bcaaa4; border-radius: 6px; background: white; }
+    .small-button:active { background: #3e2723; color: white; }
+    input { width: 85%; padding: 10px; border: 1px solid #bcaaa4; border-radius: 6px; margin: 10px 0; text-align: center; font-size: 16px; background: #fff; font-weight: bold; }
+    .calc-btn { background-color: #3e2723; color: #fff; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; font-size: 18px; width: 80%; margin-top: 10px; }
+    .clear-button { background: none; color: #8d6e63; border: 1px solid #8d6e63; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-top: 15px; }
 
     /* 故事區塊 */
-    #article { display: none; text-align: left; line-height: 1.8; font-size: 16px; color: #333; animation: fadeIn 0.5s; }
-    #page-number { font-size: 12px; text-align: center; margin-top: 20px; font-weight: bold; }
+    #article { display: none; text-align: left; line-height: 1.8; font-size: 16px; color: #3e2723; animation: fadeIn 0.5s; overflow-y: auto; height: 420px; }
+    
+    /* 固定在底部的頁數 */
+    #page-number { 
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        font-size: 12px; 
+        text-align: center; 
+        font-weight: bold; 
+        color: #8d6e63; 
+    }
     
     /* 翻頁熱區 */
     #prevPageButton, #nextPageButton { position: absolute; top: 0; bottom: 0; width: 25%; background: transparent; border: none; cursor: pointer; z-index: 10; font-size: 0; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -78,7 +102,7 @@
         </div>
         <input type="number" id="number" readonly placeholder="點選數字">
         <br>
-        <button class="calc-btn" onclick="calculate()"><strong>計算結果</strong></button>
+        <button class="calc-btn" onclick="calculate()"><strong>啟動故事</strong></button>
         <br>
         <button class="clear-button" onclick="clearInput()">重新輸入</button>
       </div>
@@ -95,7 +119,6 @@
   </div>
 
 <script>
-    // 原始牌序資料
     var baseStack = [
         {suit:"梅花",number:"4"},{suit:"紅心",number:"2"},{suit:"方塊",number:"7"},{suit:"梅花",number:"3"},
         {suit:"紅心",number:"4"},{suit:"方塊",number:"6"},{suit:"黑桃",number:"A"},{suit:"紅心",number:"5"},
@@ -112,7 +135,6 @@
         {suit:"方塊",number:"10"},{suit:"梅花",number:"6"},{suit:"紅心",number:"A"},{suit:"方塊",number:"9"}
     ];
 
-    // 生成13副牌 A-M
     var allDecks = {};
     for (var i = 0; i < 13; i++) {
         var key = String.fromCharCode(65 + i);
@@ -123,8 +145,7 @@
     var globalResultString = "";
     var currentPage = 1;
     var storyBookPage = 37;
-    var userCard = "";
-    var userNum = 0;
+    var userNumInput = 0;
 
     function chooseCard(v) { document.getElementById("cardInput").value += v; }
     function chooseNumber(v) { document.getElementById("number").value += v; }
@@ -132,33 +153,30 @@
 
     function calculate() {
         var cardVal = document.getElementById("cardInput").value;
-        userNum = parseInt(document.getElementById("number").value);
+        userNumInput = parseInt(document.getElementById("number").value);
         var parsed = parseCard(cardVal);
-        userCard = cardVal;
 
-        if (!parsed || isNaN(userNum)) { alert("請完整輸入！"); return; }
+        if (!parsed || isNaN(userNumInput)) { alert("請完整輸入！"); return; }
 
         let found = false;
         for (let key in allDecks) {
             let deck = allDecks[key];
             let pos = getPos(deck, parsed);
 
-            // 正數：[廣告, 廣告, 52張]
-            if (pos + 2 === userNum) {
-                setCalcResult(key, "確認包含廣告牌在內", "正面朝下一張張往下發", userNum);
+            if (pos + 2 === userNumInput) {
+                setCalcResult(key, "確認包含那兩張廣告牌後", "背面向下一張張往下發", userNumInput);
                 found = true; break;
             }
-            if (pos === userNum) {
-                setCalcResult(key, "拿掉那兩張廣告牌後", "正面朝下一張張往下發", userNum);
+            if (pos === userNumInput) {
+                setCalcResult(key, "拿掉那兩張廣告牌後", "背面向下一張張往下發", userNumInput);
                 found = true; break;
             }
-            // 逆數：[52張, 鬼, 鬼] -> 總56或54
-            if (55 - pos === userNum) {
-                setCalcResult(key, "確認包含兩張鬼牌在內", "背面朝上一張張數起", userNum);
+            if (55 - pos === userNumInput) {
+                setCalcResult(key, "確認包含那兩張鬼牌後", "正面朝上一張張數起", userNumInput);
                 found = true; break;
             }
-            if (53 - pos === userNum) {
-                setCalcResult(key, "拿掉兩張鬼牌後", "背面朝上一張張數起", userNum);
+            if (53 - pos === userNumInput) {
+                setCalcResult(key, "拿掉那兩張鬼牌後", "正面朝上一張張數起", userNumInput);
                 found = true; break;
             }
         }
@@ -173,8 +191,8 @@
 
     function setCalcResult(k, action, direction, n) {
         var locs = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
-        globalResultString = `起身走到${locs[k]}${globalResultString}拿出一副撲克牌並且把牌交給我，大衛請我把牌取出，${action}，讓我從${direction}到第${n}張`;
-        storyBookPage = k.charCodeAt(0) - 64 + 30; // 31-43
+        globalResultString = `起身走到${locs[k]}拿出一副撲克牌並且把牌交給我，大衛請我把牌取出，${action}，讓我從${direction}到第 ${n} 張`;
+        storyBookPage = k.charCodeAt(0) - 64 + 30; 
     }
 
     function getPos(deck, t) {
@@ -192,32 +210,34 @@
     function showArticle() {
         var content = document.getElementById("articleContent");
         var header = document.getElementById("ebook-header");
-        var pgNum = document.getElementById("page-number");
+        var pgNumDiv = document.getElementById("page-number");
         var pgDisp = document.getElementById("currentPageNumber");
 
         if (currentPage === 0) {
             content.innerHTML = `<h1><br><br><br>Chapter3<br>我與大衛的故事</h1>`;
-            header.style.display = "none"; pgNum.style.display = "none";
+            header.style.display = "none"; pgNumDiv.style.display = "none";
         } else if (currentPage === 1) {
-            content.innerHTML = `<p><br>大衛·巴格拉斯（David Berglas）</p><p>"聖殿級的ACAAN"</p><img src="book1.jpg" style="width:100%; border-radius:5px;"><p><br>ACAAN 是魔術師終其一生追求的聖杯...</p>`;
-            header.style.display = "block"; pgNum.style.display = "block";
-            pgDisp.innerText = 31;
+            content.innerHTML = `<p><br>大衛·巴格拉斯（David Berglas）</p><p>"聖殿級的ACAAN"</p><img src="book1.jpg" style="width:100%; border-radius:5px;"><p><br>ACAAN 是魔術師終其一生追求的聖杯。在大衛的世界裡，這不只是魔術，更是純粹的奇蹟。</p>`;
+            header.style.display = "block"; pgNumDiv.style.display = "block";
+            pgDisp.innerText = storyBookPage - 1; // 翻頁連貫：前一頁 -1
         } else if (currentPage === 2) {
             content.innerHTML = `
                 <p><br>故事發生在1976年，當時我已認識大衛多年，但始終沒有機會能看到那個效果！</p>
                 <p>直到有一天，大衛邀請我去他家裡作客。記得當時我們聊得正愉快時...大衛突然讓我隨意說出一張牌，和一個 1-52 之間的數字。</p>
-                <p>我說了「${userCard}，${userNum}」。</p>
-                <p>大衛先是跟我分享了一個有趣的小故事後，便緩緩起身，${globalResultString}。他看著我說：1...2...3...4...一直發到第 ${userNum} 張。</p>
-                <p>你知道的...那張正是我的「${userCard}」！！！</p>
+                <p>我說了方塊5，32。</p>
+                <p>大衛先是跟我分享了一個有趣的小故事後，便緩緩起身，${globalResultString}，數到最後，翻開那一張牌...</p>
+                <p>你知道的...那張正是「方塊5」！！！</p>
                 <p>我永遠忘不了那天!!! 多希望你們當時也能在場見證，這就是我親眼見證到的傳說中的 "巴格拉斯效果"。</p>
             `;
-            pgDisp.innerText = storyBookPage;
+            header.style.display = "block"; pgNumDiv.style.display = "block";
+            pgDisp.innerText = storyBookPage; // 核心揭曉頁
         } else if (currentPage === 3) {
             content.innerHTML = `<p><br><br><br><br><center>".........我永遠忘不了那個男人........永遠......!!!"</center></p>`;
-            pgDisp.innerText = storyBookPage + 1;
+            header.style.display = "block"; pgNumDiv.style.display = "block";
+            pgDisp.innerText = storyBookPage + 1; // 翻頁連貫：下一頁 +1
         } else if (currentPage === 4) {
             content.innerHTML = `<h1><br><br><br>Chapter4<br>MY ACAAN</h1>`;
-            header.style.display = "none"; pgNum.style.display = "none";
+            header.style.display = "none"; pgNumDiv.style.display = "none";
         }
         document.getElementById("article").style.display = "block";
     }
@@ -225,7 +245,6 @@
     function previousPage() { if (currentPage > 0) { currentPage--; showArticle(); } }
     function nextPage() { if (currentPage < 4) { currentPage++; showArticle(); } }
 
-    // 防護功能
     document.addEventListener("keydown", e => { if (e.keyCode == 123 || (e.ctrlKey && e.key.toLowerCase() === 'u')) e.preventDefault(); });
     document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
