@@ -1,1228 +1,233 @@
 <!DOCTYPE html>
 <html>
 <head>
+ <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="apple-touch-icon.jpg">
-  <style>
-    /* 全局設定 */
-    body {
-      display: flex;
-      justify-content: center;
-      background-color: #f2f2f2;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      padding: 0;
-    }
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ <style>
+    /* 全局精緻設定 */
+    body { display: flex; justify-content: center; background-color: #f2f2f2; align-items: center; height: 100vh; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+    #ebook-container { text-align: center; padding: 20px; width: 100%; max-width: 400px; }
+    #ebook-page { background-color: #fff; padding: 25px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); position: relative; min-height: 550px; border-radius: 8px; transition: 0.3s; }
+    #ebook-header { text-align: center; font-size: 20px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-weight: bold; }
+
+    /* 輸入區塊 */
+    #inputSection { background-color: #f9f9f9; padding: 10px; border-radius: 8px; }
+    .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 5px; }
+    .small-button { width: 44px; height: 42px; font-size: 20px; margin: 2px; cursor: pointer; border: 1px solid #ccc; border-radius: 6px; background: white; }
+    .small-button:active { background: #007bff; color: white; }
+    input { width: 85%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin: 10px 0; text-align: center; font-size: 16px; background: #fff; font-weight: bold; }
+    .calc-btn { background-color: #007bff; color: #fff; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; font-size: 18px; width: 80%; margin-top: 10px; }
+    .clear-button { background: none; color: #888; border: 1px solid #888; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-top: 15px; }
+
+    /* 故事區塊 */
+    #article { display: none; text-align: left; line-height: 1.8; font-size: 16px; color: #333; animation: fadeIn 0.5s; }
+    #page-number { font-size: 12px; text-align: center; margin-top: 20px; font-weight: bold; }
     
-    /* 電子書容器 */
-    #ebook-container {
-      text-align: center;
-      padding: 20px;
-    }
+    /* 翻頁熱區 */
+    #prevPageButton, #nextPageButton { position: absolute; top: 0; bottom: 0; width: 25%; background: transparent; border: none; cursor: pointer; z-index: 10; font-size: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+    #prevPageButton { left: 0; }
+    #nextPageButton { right: 0; }
 
-    /* 電子書頁面 */
-    #ebook-page {
-      background-color: #fff;
-      padding: 20px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-      position: relative;
-    }
-
-    /* 電子書標題 */
-    #ebook-header {
-      text-align: center;
-      font-size: 20px;
-      margin-bottom: -10px;
-    }
-
-    /* 輸入區域 */
-    #inputSection {
-      background-color: #f9f9f9;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    #inputSection label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    #inputSection input[type="text"],
-    #inputSection input[type="number"] {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-    #inputSection button {
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-
-    }
-    #inputSection button:hover {
-      background-color: #0056b3;
-    }
-
-    /* 結果區域 */
-    #result {
-      margin-bottom: 10px;
-    }
-
-    /* 故事內容 */
-    #article {
-      display: none;
-    }
-
-    /* 頁數提示 */
-    #page-number {
-      font-size: 12px;
-      text-align: center;
-    }
-#cardButtons {
-  display: flex;
-  justify-content: center; /* 水平居中按钮 */
-    margin: 10px; /* 添加上边距以与输入框分隔开 */
-}
-  #numberButtons {
-    display: flex;
-    justify-content: center;
-    margin-top: 5px; /* 添加上边距以与输入框分隔开 */
-  }
-
-  .small-button {
-    width: 1.5cm;
-    height: 1.2cm;
-    font-size: 30px;
-    padding: 0;
-    margin: 0 1px; /* 调整按钮之间的水平间距 */
-  }
-  .clear-button {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  }
-function clearInput() {
-  var cardInput = document.getElementById("cardInput");
-  var numberInput = document.getElementById("number");
-  cardInput.value = "";
-  numberInput.value = "";
-}
-/* 调整按钮的位置和样式 */
-#prevPageButton, #nextPageButton {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 80px;
-  font-size: 20px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  display: none; /* 初始化时隐藏按钮 */
-  opacity: 0; /* 初始时设置透明度为0 */
-  z-index: 1;
-  -webkit-tap-highlight-color: transparent; /* 禁用點擊高亮 */
-
-}
-
-#prevPageButton {
-  left: 10px;
-}
-
-#nextPageButton {
-  right: 10px;
-}
-
-#prevPageButton:hover, #nextPageButton:hover {
-  background-color: #0056b3;
-}
-
-  </style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+ </style>
 </head>
 <body>
   <div id="ebook-container">
     <div id="ebook-page">
       <div id="ebook-header"><strong>Chapter3-我與大衛的故事</strong></div>
+      
       <div id="inputSection">
-<label for="cardInput"><strong>請輸入撲克牌：</strong></label>
-<div id="cardButtons">
-  <button class="small-button" onclick="chooseCard('黑桃')">♠</button>
-  <button class="small-button" onclick="chooseCard('紅心')">♥</button>
-  <button class="small-button" onclick="chooseCard('方塊')">♦</button>
-  <button class="small-button" onclick="chooseCard('梅花')">♣</button>
-</div>
-<div id="cardButtons">
-  <button class="small-button" onclick="chooseCard('A')">A</button>
-  <button class="small-button" onclick="chooseCard('2')">2</button>
-  <button class="small-button" onclick="chooseCard('3')">3</button>
-  <button class="small-button" onclick="chooseCard('4')">4</button>
-  <button class="small-button" onclick="chooseCard('5')">5</button>
-</div>
-<div id="cardButtons">
-  <button class="small-button" onclick="chooseCard('6')">6</button>
-  <button class="small-button" onclick="chooseCard('7')">7</button>
-  <button class="small-button" onclick="chooseCard('8')">8</button>
-  <button class="small-button" onclick="chooseCard('9')">9</button>
-  <button class="small-button" onclick="chooseCard('10')">10</button>
-</div>
-<div id="cardButtons">
-  <button class="small-button" onclick="chooseCard('J')">J</button>
-  <button class="small-button" onclick="chooseCard('Q')">Q</button>
-  <button class="small-button" onclick="chooseCard('K')">K</button>
-</div>
-
-  <input type="text" id="cardInput">
-  <label for="number"><strong>請輸入數字：</strong></label>
-  <input type="number" id="number" min="1" max="52">
-  <!-- 新增數字按鈕 -->
-  <div id="numberButtons">
-    <button class="small-button" onclick="chooseNumber('1')">1</button>
-    <button class="small-button" onclick="chooseNumber('2')">2</button>
-    <button class="small-button" onclick="chooseNumber('3')">3</button>
-    <button class="small-button" onclick="chooseNumber('4')">4</button>
-    <button class="small-button" onclick="chooseNumber('5')">5</button>
-  </div>
-  <div id="numberButtons">
-    <button class="small-button" onclick="chooseNumber('6')">6</button>
-    <button class="small-button" onclick="chooseNumber('7')">7</button>
-    <button class="small-button" onclick="chooseNumber('8')">8</button>
-    <button class="small-button" onclick="chooseNumber('9')">9</button>
-    <button class="small-button" onclick="chooseNumber('0')">0</button>
-  </div>
-<br>
-<button class="clear-button" onclick="clearInput()">重新輸入</button> <!-- 新增的刪除按鈕 -->
-<br>
-        <button onclick="calculate()"><strong>計算</strong></button>
+        <label><strong>請輸入撲克牌：</strong></label>
+        <div class="btn-group">
+          <button class="small-button" onclick="chooseCard('黑桃')">♠</button>
+          <button class="small-button" onclick="chooseCard('紅心')">♥</button>
+          <button class="small-button" onclick="chooseCard('方塊')">♦</button>
+          <button class="small-button" onclick="chooseCard('梅花')">♣</button>
+        </div>
+        <div class="btn-group">
+          <button class="small-button" onclick="chooseCard('A')">A</button>
+          <button class="small-button" onclick="chooseCard('2')">2</button>
+          <button class="small-button" onclick="chooseCard('3')">3</button>
+          <button class="small-button" onclick="chooseCard('4')">4</button>
+          <button class="small-button" onclick="chooseCard('5')">5</button>
+          <button class="small-button" onclick="chooseCard('6')">6</button>
+          <button class="small-button" onclick="chooseCard('7')">7</button>
+          <button class="small-button" onclick="chooseCard('8')">8</button>
+          <button class="small-button" onclick="chooseCard('9')">9</button>
+          <button class="small-button" onclick="chooseCard('10')">10</button>
+          <button class="small-button" onclick="chooseCard('J')">J</button>
+          <button class="small-button" onclick="chooseCard('Q')">Q</button>
+          <button class="small-button" onclick="chooseCard('K')">K</button>
+        </div>
+        <input type="text" id="cardInput" readonly placeholder="點選按鈕">
+        
+        <label><strong>請輸入數字：</strong></label>
+        <div class="btn-group">
+          <button class="small-button" onclick="chooseNumber('1')">1</button>
+          <button class="small-button" onclick="chooseNumber('2')">2</button>
+          <button class="small-button" onclick="chooseNumber('3')">3</button>
+          <button class="small-button" onclick="chooseNumber('4')">4</button>
+          <button class="small-button" onclick="chooseNumber('5')">5</button>
+          <button class="small-button" onclick="chooseNumber('6')">6</button>
+          <button class="small-button" onclick="chooseNumber('7')">7</button>
+          <button class="small-button" onclick="chooseNumber('8')">8</button>
+          <button class="small-button" onclick="chooseNumber('9')">9</button>
+          <button class="small-button" onclick="chooseNumber('0')">0</button>
+        </div>
+        <input type="number" id="number" readonly placeholder="點選數字">
+        <br>
+        <button class="calc-btn" onclick="calculate()"><strong>計算結果</strong></button>
+        <br>
+        <button class="clear-button" onclick="clearInput()">重新輸入</button>
       </div>
-      <p id="result"></p>
+
       <div id="article">
         <div id="articleContent"></div>
       </div>
-      <div id="page-number"><strong>-第<span id="currentPageNumber">37</span>頁-</strong></div>
-      <div>
-    <button id="prevPageButton" onclick="previousPage()">上一頁</button>
-    <button id="nextPageButton" onclick="nextPage()">下一頁</button>
-      </div>
+
+      <div id="page-number"><strong>-第 <span id="currentPageNumber">37</span> 頁-</strong></div>
+      
+      <button id="prevPageButton" onclick="previousPage()" style="display:none">Prev</button>
+      <button id="nextPageButton" onclick="nextPage()" style="display:none">Next</button>
     </div>
   </div>
-  <script>
 
-var globalResultString = "";
-    var deckA = [
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" }
+<script>
+    // 原始牌序資料
+    var baseStack = [
+        {suit:"梅花",number:"4"},{suit:"紅心",number:"2"},{suit:"方塊",number:"7"},{suit:"梅花",number:"3"},
+        {suit:"紅心",number:"4"},{suit:"方塊",number:"6"},{suit:"黑桃",number:"A"},{suit:"紅心",number:"5"},
+        {suit:"黑桃",number:"9"},{suit:"黑桃",number:"2"},{suit:"紅心",number:"Q"},{suit:"方塊",number:"3"},
+        {suit:"梅花",number:"Q"},{suit:"紅心",number:"8"},{suit:"黑桃",number:"6"},{suit:"黑桃",number:"5"},
+        {suit:"紅心",number:"9"},{suit:"梅花",number:"K"},{suit:"方塊",number:"2"},{suit:"紅心",number:"J"},
+        {suit:"黑桃",number:"3"},{suit:"黑桃",number:"8"},{suit:"紅心",number:"6"},{suit:"梅花",number:"10"},
+        {suit:"方塊",number:"5"},{suit:"方塊",number:"K"},{suit:"梅花",number:"2"},{suit:"紅心",number:"3"},
+        {suit:"方塊",number:"8"},{suit:"梅花",number:"5"},{suit:"黑桃",number:"K"},{suit:"方塊",number:"J"},
+        {suit:"梅花",number:"8"},{suit:"黑桃",number:"10"},{suit:"紅心",number:"K"},{suit:"梅花",number:"J"},
+        {suit:"黑桃",number:"7"},{suit:"紅心",number:"10"},{suit:"方塊",number:"A"},{suit:"黑桃",number:"4"},
+        {suit:"紅心",number:"7"},{suit:"方塊",number:"4"},{suit:"梅花",number:"A"},{suit:"梅花",number:"9"},
+        {suit:"黑桃",number:"J"},{suit:"方塊",number:"Q"},{suit:"梅花",number:"7"},{suit:"黑桃",number:"Q"},
+        {suit:"方塊",number:"10"},{suit:"梅花",number:"6"},{suit:"紅心",number:"A"},{suit:"方塊",number:"9"}
     ];
 
-    var deckB = [
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" }
-    ];
-
-    var deckC = [
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" }
-    ];
-
-    var deckD = [
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" }
-    ];
-
-    var deckE = [
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" }
-    ];
-
-    var deckF = [
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" }
-    ];
-
-    var deckG = [
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" }
-    ];
-
-    var deckH = [
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" }
-    ];
-
-    var deckI = [
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" }
-    ];
-
-    var deckJ = [
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" }
-    ];
-
-    var deckK = [
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" }
-    ];
-
-    var deckL = [
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" },
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" }
-    ];
-
-    var deckM = [
-      { suit: "方塊", number: "10" },
-      { suit: "梅花", number: "6" },
-      { suit: "紅心", number: "A" },
-      { suit: "方塊", number: "9" },
-      { suit: "梅花", number: "4" },
-      { suit: "紅心", number: "2" },
-      { suit: "方塊", number: "7" },
-      { suit: "梅花", number: "3" },
-      { suit: "紅心", number: "4" },
-      { suit: "方塊", number: "6" },
-      { suit: "黑桃", number: "A" },
-      { suit: "紅心", number: "5" },
-      { suit: "黑桃", number: "9" },
-      { suit: "黑桃", number: "2" },
-      { suit: "紅心", number: "Q" },
-      { suit: "方塊", number: "3" },
-      { suit: "梅花", number: "Q" },
-      { suit: "紅心", number: "8" },
-      { suit: "黑桃", number: "6" },
-      { suit: "黑桃", number: "5" },
-      { suit: "紅心", number: "9" },
-      { suit: "梅花", number: "K" },
-      { suit: "方塊", number: "2" },
-      { suit: "紅心", number: "J" },
-      { suit: "黑桃", number: "3" },
-      { suit: "黑桃", number: "8" },
-      { suit: "紅心", number: "6" },
-      { suit: "梅花", number: "10" },
-      { suit: "方塊", number: "5" },
-      { suit: "方塊", number: "K" },
-      { suit: "梅花", number: "2" },
-      { suit: "紅心", number: "3" },
-      { suit: "方塊", number: "8" },
-      { suit: "梅花", number: "5" },
-      { suit: "黑桃", number: "K" },
-      { suit: "方塊", number: "J" },
-      { suit: "梅花", number: "8" },
-      { suit: "黑桃", number: "10" },
-      { suit: "紅心", number: "K" },
-      { suit: "梅花", number: "J" },
-      { suit: "黑桃", number: "7" },
-      { suit: "紅心", number: "10" },
-      { suit: "方塊", number: "A" },
-      { suit: "黑桃", number: "4" },
-      { suit: "紅心", number: "7" },
-      { suit: "方塊", number: "4" },
-      { suit: "梅花", number: "A" },
-      { suit: "梅花", number: "9" },
-      { suit: "黑桃", number: "J" },
-      { suit: "方塊", number: "Q" },
-      { suit: "梅花", number: "7" },
-      { suit: "黑桃", number: "Q" }
-    ];
-
-function clearInput() {
-  var cardInput = document.getElementById("cardInput");
-  var numberInput = document.getElementById("number");
-  cardInput.value = "";
-  numberInput.value = "";
-}
-
-  function chooseCard(value) {
-    var cardInput = document.getElementById("cardInput");
-    cardInput.value = cardInput.value + value;
-  }
-function chooseNumber(value) {
-  var numberInput = document.getElementById("number");
-  numberInput.value = numberInput.value+ value;
-}
-
-
-function calculate() {
-    var cardInput = document.getElementById("cardInput").value;
-    var selectedNumber = parseInt(document.getElementById("number").value);
-
-    var parsedCard = parseCardInput(cardInput);
-
-    var closestDeck = findClosestDeckBefore(parsedCard.suit, parsedCard.number, selectedNumber);
-    var closestDeckDifference = getClosestDeckDifference(parsedCard.suit, parsedCard.number, selectedNumber, closestDeck);
-
-    var extraMessage = getExtraMessage(closestDeckDifference);
-
-    globalResultString = "從" + getDeckTranslation(closestDeck) + "拿出一副撲克牌並且把牌交給我，大衛請我把牌取出，" + extraMessage;
-
-    // 更新牌组页数显示
-    var pageNumberElement = document.getElementById("currentPageNumber");
-    pageNumberElement.innerText = closestDeck.charCodeAt(0) - 64; // 将字母转换为对应的页数，A为1，B为2，以此类推
-
-    // 将前面段落的显示移除，只保留后面的答案段落
-    document.getElementById("result").innerHTML = "";
-    hideInputSection();
-
-  // 显示按钮
-  document.getElementById("prevPageButton").style.display = "block";
-  document.getElementById("nextPageButton").style.display = "block";
-
-    // 调用 showArticle 函数
-    showArticle();
-}
-
-
-
-    function getDeckTranslation(deck) {
-      var translations = {
-        "A": "窗台上",
-        "B": "書櫃中間",
-        "C": "酒櫃裡",
-        "D": "衣櫃裡",
-        "E": "手提包內",
-        "F": "口袋內",
-        "G": "椅子底下",
-        "H": "桌上的盒子內",
-        "I": "招財貓後面",
-        "J": "桌子下面的抽屜",
-        "K": "桌子側邊的抽屜",
-        "L": "電視正下方的抽屜",
-        "M": "電視正上方的櫃子"
-      };
-
-      return translations[deck] || "";
+    // 生成13副牌 A-M
+    var allDecks = {};
+    for (var i = 0; i < 13; i++) {
+        var key = String.fromCharCode(65 + i);
+        var offset = i * 4;
+        allDecks[key] = baseStack.slice(offset).concat(baseStack.slice(0, offset));
     }
 
-    function findClosestDeckBefore(suit, cardNumber, selectedNumber) {
-      var closestDeckIndex = getCardIndex(deckA, { suit, number: cardNumber });
-      var decks = [deckA, deckB, deckC, deckD, deckE, deckF, deckG, deckH, deckI, deckJ, deckK, deckL, deckM];
-      var minDifference = Infinity;
-      var closestDeck = "";
+    var globalResultString = "";
+    var currentPage = 1;
+    var storyBookPage = 37;
+    var userCard = "";
+    var userNum = 0;
 
-      for (var i = 0; i < decks.length; i++) {
-        var currentDeckIndex = getCardIndex(decks[i], { suit, number: cardNumber });
-        var difference = selectedNumber - currentDeckIndex;
-        if (difference >= 0 && difference < minDifference) {
-          minDifference = difference;
-          closestDeck = String.fromCharCode(65 + i); // 转换为对应的字母 A, B, C, ...
+    function chooseCard(v) { document.getElementById("cardInput").value += v; }
+    function chooseNumber(v) { document.getElementById("number").value += v; }
+    function clearInput() { document.getElementById("cardInput").value = ""; document.getElementById("number").value = ""; }
+
+    function calculate() {
+        var cardVal = document.getElementById("cardInput").value;
+        userNum = parseInt(document.getElementById("number").value);
+        var parsed = parseCard(cardVal);
+        userCard = cardVal;
+
+        if (!parsed || isNaN(userNum)) { alert("請完整輸入！"); return; }
+
+        let found = false;
+        for (let key in allDecks) {
+            let deck = allDecks[key];
+            let pos = getPos(deck, parsed);
+
+            // 正數：[廣告, 廣告, 52張]
+            if (pos + 2 === userNum) {
+                setCalcResult(key, "確認包含廣告牌在內", "正面朝下一張張往下發", userNum);
+                found = true; break;
+            }
+            if (pos === userNum) {
+                setCalcResult(key, "拿掉那兩張廣告牌後", "正面朝下一張張往下發", userNum);
+                found = true; break;
+            }
+            // 逆數：[52張, 鬼, 鬼] -> 總56或54
+            if (55 - pos === userNum) {
+                setCalcResult(key, "確認包含兩張鬼牌在內", "背面朝上一張張數起", userNum);
+                found = true; break;
+            }
+            if (53 - pos === userNum) {
+                setCalcResult(key, "拿掉兩張鬼牌後", "背面朝上一張張數起", userNum);
+                found = true; break;
+            }
         }
-      }
 
-      return closestDeck;
+        if(!found) { alert("此組合目前13副牌無法覆蓋，請調整數字。"); return; }
+
+        document.getElementById("inputSection").style.display = "none";
+        document.getElementById("prevPageButton").style.display = "block";
+        document.getElementById("nextPageButton").style.display = "block";
+        showArticle();
     }
 
-    function findClosestDeck(suit, cardNumber, selectedNumber) {
-      var deckAIndex = getCardIndex(deckA, { suit, number: cardNumber });
-      var deckBIndex = getCardIndex(deckB, { suit, number: cardNumber });
-      var deckCIndex = getCardIndex(deckC, { suit, number: cardNumber });
-      var deckDIndex = getCardIndex(deckD, { suit, number: cardNumber });
-      var deckEIndex = getCardIndex(deckE, { suit, number: cardNumber });
-      var deckFIndex = getCardIndex(deckF, { suit, number: cardNumber });
-      var deckGIndex = getCardIndex(deckG, { suit, number: cardNumber });
-      var deckHIndex = getCardIndex(deckH, { suit, number: cardNumber });
-      var deckIIndex = getCardIndex(deckI, { suit, number: cardNumber });
-      var deckJIndex = getCardIndex(deckJ, { suit, number: cardNumber });
-      var deckKIndex = getCardIndex(deckK, { suit, number: cardNumber });
-      var deckLIndex = getCardIndex(deckL, { suit, number: cardNumber });
-      var deckMIndex = getCardIndex(deckM, { suit, number: cardNumber });
-
-
-      var deckADifference = Math.abs(deckAIndex - selectedNumber);
-      var deckBDifference = Math.abs(deckBIndex - selectedNumber);
-      var deckCDifference = Math.abs(deckCIndex - selectedNumber);
-      var deckDDifference = Math.abs(deckDIndex - selectedNumber);
-      var deckEDifference = Math.abs(deckEIndex - selectedNumber);
-      var deckFDifference = Math.abs(deckFIndex - selectedNumber);
-      var deckGDifference = Math.abs(deckGIndex - selectedNumber);
-      var deckHDifference = Math.abs(deckHIndex - selectedNumber);
-      var deckIDifference = Math.abs(deckIIndex - selectedNumber);
-      var deckJDifference = Math.abs(deckJIndex - selectedNumber);
-      var deckKDifference = Math.abs(deckKIndex - selectedNumber);
-      var deckLDifference = Math.abs(deckLIndex - selectedNumber);
-      var deckMDifference = Math.abs(deckMIndex - selectedNumber);
-
-
-
-      var minDifference = Math.min(deckADifference, deckBDifference, deckCDifference, deckDDifference,deckEDifference,deckFDifference,deckGDifference,deckHDifference,deckIDifference,deckJDifference,deckKDifference,deckLDifference,deckMDifference);
-
-      if (minDifference === deckADifference) {
-        return "A";
-      } else if (minDifference === deckBDifference) {
-        return "B";
-      } else if (minDifference === deckCDifference) {
-        return "C";
-      } else if (minDifference === deckDDifference) {
-        return "D";
-      } else if (minDifference === deckEDifference) {
-        return "E";
-      } else if (minDifference === deckFDifference) {
-        return "F";
-      } else if (minDifference === deckGDifference) {
-        return "G";
-      } else if (minDifference === deckHDifference) {
-        return "H";
-      } else if (minDifference === deckIDifference) {
-        return "I";
-      } else if (minDifference === deckJDifference) {
-        return "J";
-      } else if (minDifference === deckKDifference) {
-        return "K";
-      } else if (minDifference === deckLDifference) {
-        return "L";
-      } else {
-        return "M";
-      }
+    function setCalcResult(k, action, direction, n) {
+        var locs = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
+        globalResultString = `起身走到${locs[k]}${globalResultString}拿出一副撲克牌並且把牌交給我，大衛請我把牌取出，${action}，讓我從${direction}到第${n}張`;
+        storyBookPage = k.charCodeAt(0) - 64 + 30; // 31-43
     }
-    function getCardIndex(deck, card) {
-      for (var i = 0; i < deck.length; i++) {
-        if (deck[i].suit === card.suit && deck[i].number === card.number) {
-          return i + 1;
+
+    function getPos(deck, t) {
+        for(var i=0; i<deck.length; i++) {
+            if(deck[i].suit === t.suit && deck[i].number === t.number) return i + 1;
         }
-      }
-      return 0;
+        return -1;
     }
 
-    function getClosestDeckDifference(suit, cardNumber, selectedNumber, closestDeck) {
-            var closestDeckIndex = getCardIndex((closestDeck === "A" ? deckA : closestDeck === "B" ? deckB : closestDeck === "C" ? deckC : closestDeck === "D" ? deckD : closestDeck === "E" ? deckE : closestDeck === "F" ? deckF : closestDeck === "G" ? deckG : closestDeck === "H" ? deckH : closestDeck === "I" ? deckI : closestDeck === "J" ? deckJ : closestDeck === "K" ? deckK : closestDeck === "L" ? deckL : deckM), { suit, number: cardNumber });
-      return Math.abs(closestDeckIndex - selectedNumber);
+    function parseCard(input) {
+        var m = input.match(/^(黑桃|紅心|方塊|梅花)([2-9]|10|A|J|Q|K)$/);
+        return m ? { suit: m[1], number: m[2] } : null;
     }
 
-    function parseCardInput(input) {
-      var matches = input.match(/^(黑桃|紅心|方塊|梅花)([2-9]|10|A|J|Q|K)$/);
-      if (matches) {
-        return {
-          suit: matches[1],
-          number: matches[2]
-        };
-      } else {
-        return null;
-      }
+    function showArticle() {
+        var content = document.getElementById("articleContent");
+        var header = document.getElementById("ebook-header");
+        var pgNum = document.getElementById("page-number");
+        var pgDisp = document.getElementById("currentPageNumber");
+
+        if (currentPage === 0) {
+            content.innerHTML = `<h1><br><br><br>Chapter3<br>我與大衛的故事</h1>`;
+            header.style.display = "none"; pgNum.style.display = "none";
+        } else if (currentPage === 1) {
+            content.innerHTML = `<p><br>大衛·巴格拉斯（David Berglas）</p><p>"聖殿級的ACAAN"</p><img src="book1.jpg" style="width:100%; border-radius:5px;"><p><br>ACAAN 是魔術師終其一生追求的聖杯...</p>`;
+            header.style.display = "block"; pgNum.style.display = "block";
+            pgDisp.innerText = 31;
+        } else if (currentPage === 2) {
+            content.innerHTML = `
+                <p><br>故事發生在1976年，當時我已認識大衛多年，但始終沒有機會能看到那個效果！</p>
+                <p>直到有一天，大衛邀請我去他家裡作客。記得當時我們聊得正愉快時...大衛突然讓我隨意說出一張牌，和一個 1-52 之間的數字。</p>
+                <p>我說了「${userCard}，${userNum}」。</p>
+                <p>大衛先是跟我分享了一個有趣的小故事後，便緩緩起身，${globalResultString}。他看著我說：1...2...3...4...一直發到第 ${userNum} 張。</p>
+                <p>你知道的...那張正是我的「${userCard}」！！！</p>
+                <p>我永遠忘不了那天!!! 多希望你們當時也能在場見證，這就是我親眼見證到的傳說中的 "巴格拉斯效果"。</p>
+            `;
+            pgDisp.innerText = storyBookPage;
+        } else if (currentPage === 3) {
+            content.innerHTML = `<p><br><br><br><br><center>".........我永遠忘不了那個男人........永遠......!!!"</center></p>`;
+            pgDisp.innerText = storyBookPage + 1;
+        } else if (currentPage === 4) {
+            content.innerHTML = `<h1><br><br><br>Chapter4<br>MY ACAAN</h1>`;
+            header.style.display = "none"; pgNum.style.display = "none";
+        }
+        document.getElementById("article").style.display = "block";
     }
 
-    function getExtraMessage(difference) {
-      if (difference === 0) {
-        return "拿掉鬼牌和廣告牌後";
-      } else if (difference === 1) {
-        return "拿掉鬼牌後";
-      } else if (difference === 2) {
-        return "拿掉廣告牌後";
-      } else {
-        return "讓把牌拿在手上";
-      }
-    }
+    function previousPage() { if (currentPage > 0) { currentPage--; showArticle(); } }
+    function nextPage() { if (currentPage < 4) { currentPage++; showArticle(); } }
 
-// 初始化当前页码为0
-var currentPage = 1; 
-
-function showArticle() {
-  var articleContent = document.getElementById("articleContent");
-  var headerElement = document.getElementById("ebook-header");
-  var pageNumberElement = document.getElementById("page-number");
-
-  if (currentPage === 0) {
-    articleContent.innerHTML = `<h1><br><br><br><br><br><br>Chapter3<br>&nbsp;&nbsp;&nbsp;&nbsp;我與大衛的故事&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br><br><br><br><br><br><br></h1>`;
-    headerElement.style.display = "none"; // 隐藏标题
-    pageNumberElement.style.display = "none"; // 隐藏页数
-  } else if (currentPage === 1) {
-    articleContent.innerHTML = `
-      <p><br><br>大衛·巴格拉斯（David Berglas）</p>
-      <p>"聖殿級的ACAAN"</p>
-      <img src="book1.jpg" alt="Description of image" style="width:100%; height:auto;">
-      <p><br></p>
-    `;
-    headerElement.style.display = "block"; // 显示标题
-    pageNumberElement.style.display = "block"; // 显示页数
-  } else if (currentPage === 2) {
-    articleContent.innerHTML = `
-      <p><br><br>故事發生在1976年，<br>當時我已認識大衛多年，<br>但始終沒有機會能看到那個效果！<br>直到有一天，大衛邀請我去他家裡作客。<br>記得當時我們聊得正愉快時...<br>大衛突然讓我隨意說出一張牌，<br>和一個1-52之間的數字<br>我說了方塊5，32。</p>
-      <p>大衛先是跟我分享了一個有趣的小故事後，<br>便緩緩起身，${globalResultString}，讓我從背面向上一張一張往下發到第32張，1...2...3...4...5...6......30...31....32....，<br>你知道的...那張正是方塊5！！！<br><br>我永遠忘不了那天!!!<br>多希望你們當時也能在場見證，<br>這就是我親眼見證到的傳說中的<br>"巴格拉斯效果"<br><br><br></p>
-    `;
-    headerElement.style.display = "block"; // 显示标题
-    pageNumberElement.style.display = "block"; // 显示页数
-  } else if (currentPage === 3) {
-    articleContent.innerHTML = `
-      <p><br><br><br><br><br><br><br><br><br><br><br><br><br>".........我永遠忘不了那個男人........永遠......!!!"<br><br><br><br><br><br><br><br><br><br><br><br><br></p>
-    `;
-    headerElement.style.display = "block"; // 显示标题
-    pageNumberElement.style.display = "block"; // 显示页数
-  } else if (currentPage === 4) {
-    articleContent.innerHTML = `<h1><br><br><br><br><br><br>Chapter4<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MY ACAAN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br><br><br><br><br><br><br></h1>`;
-    headerElement.style.display = "none"; // 隐藏标题
-    pageNumberElement.style.display = "none"; // 隐藏页数
-  }
-  
-  document.getElementById("article").style.display = "block";
-  updatePageNumber(); 
-}
-
-function previousPage() {
-  if (currentPage > 0) {
-    currentPage--;
-    showArticle();
-    updatePageNumber();
-  }
-}
-
-function nextPage() {
-  if (currentPage < 4) {
-    currentPage++;
-    showArticle();
-    updatePageNumber();
-  }
-}
-
-function updatePageNumber() {
-  var pageNumberElement = document.getElementById("currentPageNumber");
-  if (currentPage === 0 || currentPage === 4) {
-    pageNumberElement.innerText = "";
-  } else {
-    pageNumberElement.innerText = currentPage + 30;
-  }
-}
-
-
-
-    function hideInputSection() {
-      document.getElementById("inputSection").style.display = "none";
-    }
-
-	// 阻止 F12 開發者工具
-	document.addEventListener("keydown", function (e) {
-  	  if (e.keyCode == 123) {
-       	  e.preventDefault();
-          alert("此網頁禁止使用F12");
-        	}
-   	 });
-
-	// 禁用右鍵點擊
-	document.addEventListener("contextmenu", function (e) {
-          e.preventDefault();
-          alert("此網頁禁止使用右鍵");
-    		});
-
-	// 禁用 Ctrl+u 組合鍵
-	document.addEventListener("keydown", function (e) {
-    	if (e.ctrlKey && e.key === "u") {
-          e.preventDefault();
-          alert("此網頁禁止使用Ctrl+U 組合鍵");
-        	}
-    	});
-
-	// 禁用 Ctrl+U 組合鍵
-	document.addEventListener("keydown", function (e) {
-    	if (e.ctrlKey && e.key === "U") {
-          e.preventDefault();
-          alert("此網頁禁止使用Ctrl+U 組合鍵");
-        	}
-    	});
-  </script>
+    // 防護功能
+    document.addEventListener("keydown", e => { if (e.keyCode == 123 || (e.ctrlKey && e.key.toLowerCase() === 'u')) e.preventDefault(); });
+    document.addEventListener("contextmenu", e => e.preventDefault());
+</script>
 </body>
 </html>
