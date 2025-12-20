@@ -242,11 +242,11 @@
                 found = true; break;
             }
             if (55 - pos === userNumInput) {
-                setCalcResult(key, "確認包含那兩張鬼牌後", "正面朝上一張張數起", userNumInput);
+                setCalcResult(key, "確認包含那兩張鬼牌後", "正面向上一張張往下發", userNumInput);
                 found = true; break;
             }
             if (53 - pos === userNumInput) {
-                setCalcResult(key, "拿掉那兩張鬼牌後", "正面朝上一張張數起", userNumInput);
+                setCalcResult(key, "拿掉那兩張鬼牌後", "正面向上一張張往下發", userNumInput);
                 found = true; break;
             }
         }
@@ -261,7 +261,7 @@
 
     function setCalcResult(k, action, direction, n) {
         var locs = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
-        globalResultString = `起身走到${locs[k]}拿出一副撲克牌並且把牌交給我，大衛請我把牌取出，${action}，讓我從${direction}到第 ${n} 張`;
+        globalResultString = `起身走到${locs[k]}拿出一副撲克牌並且把牌交給我，大衛請我把牌取出，${action}，讓我從${direction}到第 32 張`;
         storyBookPage = k.charCodeAt(0) - 64 + 30; 
     }
 
@@ -295,7 +295,7 @@
                 <p><br>故事發生在1976年，當時我已認識大衛多年，但始終沒有機會能看到那個效果！</p>
                 <p>直到有一天，大衛邀請我去他家裡作客。記得當時我們聊得正愉快時...大衛突然讓我隨意說出一張牌，和一個 1-52 之間的數字。</p>
                 <p>我說了方塊5，32。</p>
-                <p>大衛先是跟我分享了一個有趣的小故事後，便緩緩起身，${globalResultString}，數到最後，翻開那一張牌...</p>
+                <p>大衛先是跟我分享了一個有趣的小故事後，便緩緩起身，${globalResultString}，數到第32張</p>
                 <p>你知道的...那張正是「方塊5」！！！</p>
                 <p>我永遠忘不了那天!!! 多希望你們當時也能在場見證，這就是我親眼見證到的傳說中的 "巴格拉斯效果"。</p>
             `;
