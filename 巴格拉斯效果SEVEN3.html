@@ -1,189 +1,202 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
  <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
  <meta name="apple-mobile-web-app-capable" content="yes">
- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ <meta name="apple-mobile-web-app-status-bar-style" content="default">
  <style>
     :root {
-        --paper: #fffaf0;
-        --ink: #2c2c2c;
-        --accent: #5d4037;
-        --shadow: rgba(0,0,0,0.15);
+        --paper-bg: #ffffff;
+        --text-color: #333333;
+        --accent: #007bff;
+        --spine-shadow: rgba(0, 0, 0, 0.05);
+    }
+
+    /* 禁止選取與高亮 */
+    * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
     }
 
     body { 
-        display: flex; justify-content: center; align-items: center; 
-        height: 100vh; margin: 0; padding: 0; 
-        background-color: #d1d1d1; /* 模擬深色桌面 */
-        font-family: "Noto Serif TC", "Songti TC", serif; /* 強制襯線體 */
+        margin: 0; padding: 0; 
+        background-color: #f7f7f7; 
+        font-family: "PingFang TC", "Microsoft JhengHei", serif; 
+        height: 100vh;
+        display: flex;
+        justify-content: center;
         overflow: hidden;
     }
-    
-    #phone-frame {
-        width: 100%; max-width: 414px; height: 100vh; max-height: 800px;
-        background: #000; border-radius: 40px; padding: 12px;
-        box-shadow: 0 50px 100px rgba(0,0,0,0.5);
-        box-sizing: border-box; position: relative;
-    }
 
-    /* 模擬手機狀態欄 */
-    #status-bar {
-        display: flex; justify-content: space-between; padding: 10px 30px 5px;
-        color: #666; font-size: 12px; font-family: sans-serif;
-    }
-
+    /* 電子書頁面容器 */
     #ebook-page { 
-        background-color: var(--paper); 
-        height: calc(100% - 40px);
-        margin: 0 auto;
-        padding: 40px 30px; 
+        background-color: var(--paper-bg); 
+        width: 100%;
+        max-width: 500px;
+        height: 100vh;
         position: relative; 
-        border-radius: 4px 25px 25px 4px; /* 模擬書本右側圓角 */
         box-sizing: border-box;
-        overflow: hidden;
+        padding: 40px 25px 60px 35px; /* 左側留裝訂位 */
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
     }
 
-    /* 模擬書脊裝訂凹槽與陰影 */
+    /* 模擬書脊裝訂線 */
     #ebook-page::before {
-        content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 100%;
-        background: linear-gradient(to right, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.05) 15%, transparent 100%);
-        z-index: 10;
-    }
-    #ebook-page::after {
-        content: ""; position: absolute; top: 0; left: 18px; width: 1px; height: 100%;
-        background: rgba(0,0,0,0.03); z-index: 10;
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 12px; height: 100%;
+        background: linear-gradient(to right, rgba(0,0,0,0.08) 0%, transparent 100%);
+        z-index: 5;
     }
 
     #ebook-header { 
-        text-align: center; font-size: 14px; margin-bottom: 35px; 
-        color: #999; letter-spacing: 4px; text-transform: uppercase;
+        text-align: center; 
+        font-size: 16px; 
+        color: #999;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        flex-shrink: 0;
     }
 
-    /* 輸入區 UI APP 化 */
-    #inputSection { background-color: rgba(0,0,0,0.03); padding: 20px 10px; border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); }
+    /* 輸入區塊 */
+    #inputSection { 
+        background-color: #fdfdfd; 
+        padding: 15px; 
+        border-radius: 12px; 
+        border: 1px solid #eee;
+    }
     .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
     .small-button { 
-        width: 42px; height: 42px; font-size: 20px; margin: 3px; cursor: pointer; 
-        border: none; border-radius: 50%; background: white; 
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s;
+        width: 44px; height: 44px; font-size: 20px; margin: 3px; cursor: pointer; 
+        border: 1px solid #ddd; border-radius: 8px; background: white; 
     }
-    .small-button:active { transform: scale(0.85); background: var(--accent); color: white; }
+    .small-button:active { background: var(--accent); color: white; }
     
     input { 
-        width: 85%; padding: 12px; border: none; border-bottom: 2px solid #ddd;
-        margin: 15px 0; text-align: center; font-size: 20px; 
-        background: transparent; font-weight: bold; color: var(--accent);
+        width: 85%; padding: 12px; border: 1px solid #eee; border-radius: 8px; 
+        margin: 10px 0; text-align: center; font-size: 18px; 
+        background: #fafafa; font-weight: bold; 
     }
     
     .calc-btn { 
-        background: var(--accent); color: #fff; border: none; 
-        padding: 15px 45px; border-radius: 30px; cursor: pointer; 
+        background-color: var(--accent); color: #fff; border: none; 
+        padding: 14px 40px; border-radius: 30px; cursor: pointer; 
         font-size: 18px; width: 85%; margin-top: 15px; font-weight: bold;
-        box-shadow: 0 4px 15px rgba(93, 64, 55, 0.4);
     }
+    
+    .clear-button { color: #aaa; border: none; background: none; font-size: 13px; cursor: pointer; margin-top: 15px; text-decoration: underline; }
 
-    /* 故事內文區：極致閱讀體驗 */
+    /* 故事區塊：支援滑動並隱藏捲動軸 */
     #article { 
-        display: none; text-align: justify; line-height: 2.2; 
-        font-size: 18px; color: var(--ink); 
-        height: 460px; overflow-y: auto; scrollbar-width: none;
+        display: none; 
+        flex-grow: 1;
+        overflow-y: auto; 
+        text-align: justify; 
+        line-height: 2.1; 
+        font-size: 18px; 
+        color: var(--text-color); 
+        padding-bottom: 40px;
+        -webkit-overflow-scrolling: touch;
     }
-    #article::-webkit-scrollbar { display: none; }
-    #article p { margin-bottom: 28px; text-indent: 2em; }
-    
-    #page-number { 
-        position: absolute; bottom: 25px; left: 0; right: 0;
-        font-size: 12px; text-align: center; color: #bbb; letter-spacing: 2px;
-    }
-    
-    /* 隱形翻頁區 */
-    #prevPageButton, #nextPageButton { 
-        position: absolute; top: 0; bottom: 0; width: 30%; 
-        background: transparent; border: none; cursor: pointer; z-index: 100;
-    }
-    #prevPageButton { left: 0; }
-    #nextPageButton { right: 0; }
+    #article::-webkit-scrollbar { display: none; } /* 隱藏捲動軸 */
+    #article p { margin-bottom: 25px; text-indent: 2em; }
 
-    /* 翻頁平移過渡 */
-    @keyframes slideIn {
-        from { opacity: 0; transform: translateX(20px); }
-        to { opacity: 1; transform: translateX(0); }
+    /* 頁碼固定在底部 */
+    #page-number { 
+        position: absolute;
+        bottom: env(safe-area-inset-bottom, 20px); /* 適應 iPhone X 底部 */
+        left: 0; right: 0;
+        font-size: 12px; 
+        text-align: center; 
+        font-weight: bold; 
+        color: #bbb;
+        letter-spacing: 1px;
     }
-    .page-active { animation: slideIn 0.5s ease-out forwards; }
+    
+    /* 點擊翻頁熱區 */
+    #prevPageArea, #nextPageArea { 
+        position: absolute; top: 0; bottom: 0; width: 30%; 
+        background: transparent; z-index: 100;
+    }
+    #prevPageArea { left: 0; }
+    #nextPageArea { right: 0; }
+
+    /* 動態切換效果 */
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
  </style>
 </head>
 <body>
 
-<div id="phone-frame">
-    <div id="status-bar">
-        <span>10:09</span>
-        <span><i class="icon">📶 🔋 100%</i></span>
-    </div>
-    <div id="ebook-page">
-      <div id="ebook-header">Chapter 3 — 傳奇見證錄</div>
-      
-      <div id="inputSection">
-        <div class="btn-group">
-          <button class="small-button" onclick="chooseCard('黑桃')">♠</button>
-          <button class="small-button" onclick="chooseCard('紅心')">♥</button>
-          <button class="small-button" onclick="chooseCard('方塊')">♦</button>
-          <button class="small-button" onclick="chooseCard('梅花')">♣</button>
-        </div>
-        <div class="btn-group">
-          <button class="small-button" onclick="chooseCard('A')">A</button>
-          <button class="small-button" onclick="chooseNumber('2')">2</button>
-          <button class="small-button" onclick="chooseNumber('3')">3</button>
-          <button class="small-button" onclick="chooseNumber('4')">4</button>
-          <button class="small-button" onclick="chooseNumber('5')">5</button>
-          <button class="small-button" onclick="chooseNumber('6')">6</button>
-          <button class="small-button" onclick="chooseNumber('7')">7</button>
-          <button class="small-button" onclick="chooseNumber('8')">8</button>
-          <button class="small-button" onclick="chooseNumber('9')">9</button>
-          <button class="small-button" onclick="chooseNumber('0')">0</button>
-          <button class="small-button" onclick="chooseCard('J')">J</button>
-          <button class="small-button" onclick="chooseCard('Q')">Q</button>
-          <button class="small-button" onclick="chooseCard('K')">K</button>
-        </div>
-        <input type="text" id="cardInput" readonly placeholder="TAP CARD">
-        
-        <div class="btn-group">
-          <button class="small-button" onclick="chooseNum('1')">1</button>
-          <button class="small-button" onclick="chooseNum('2')">2</button>
-          <button class="small-button" onclick="chooseNum('3')">3</button>
-          <button class="small-button" onclick="chooseNum('4')">4</button>
-          <button class="small-button" onclick="chooseNum('5')">5</button>
-          <button class="small-button" onclick="chooseNum('6')">6</button>
-          <button class="small-button" onclick="chooseNum('7')">7</button>
-          <button class="small-button" onclick="chooseNum('8')">8</button>
-          <button class="small-button" onclick="chooseNum('9')">9</button>
-          <button class="small-button" onclick="chooseNum('0')">0</button>
-        </div>
-        <input type="number" id="number" readonly placeholder="TAP NUMBER">
-        <br>
-        <button class="calc-btn" onclick="calculate()">啟動閱讀</button>
-        <br>
-        <button class="clear-button" onclick="clearInput()">RESET</button>
+  <div id="ebook-page">
+    <div id="ebook-header">Chapter 3 — 我與大衛的故事</div>
+    
+    <div id="inputSection">
+      <div class="btn-group">
+        <button class="small-button" onclick="chooseCard('黑桃')">♠</button>
+        <button class="small-button" onclick="chooseCard('紅心')">♥</button>
+        <button class="small-button" onclick="chooseCard('方塊')">♦</button>
+        <button class="small-button" onclick="chooseCard('梅花')">♣</button>
       </div>
-
-      <div id="article">
-        <div id="articleContent"></div>
+      <div class="btn-group">
+        <button class="small-button" onclick="chooseCard('A')">A</button>
+        <button class="small-button" onclick="chooseNum('2')">2</button>
+        <button class="small-button" onclick="chooseNum('3')">3</button>
+        <button class="small-button" onclick="chooseNum('4')">4</button>
+        <button class="small-button" onclick="chooseNum('5')">5</button>
+        <button class="small-button" onclick="chooseNum('6')">6</button>
+        <button class="small-button" onclick="chooseNum('7')">7</button>
+        <button class="small-button" onclick="chooseNum('8')">8</button>
+        <button class="small-button" onclick="chooseNum('9')">9</button>
+        <button class="small-button" onclick="chooseNum('10')">10</button>
+        <button class="small-button" onclick="chooseCard('J')">J</button>
+        <button class="small-button" onclick="chooseCard('Q')">Q</button>
+        <button class="small-button" onclick="chooseCard('K')">K</button>
       </div>
-
-      <div id="page-number"></div>
+      <input type="text" id="cardInput" readonly placeholder="選取牌組">
       
-      <button id="prevPageButton" onclick="previousPage()" style="display:none"></button>
-      <button id="nextPageButton" onclick="nextPage()" style="display:none"></button>
+      <div class="btn-group">
+        <button class="small-button" onclick="chooseNumInput('1')">1</button>
+        <button class="small-button" onclick="chooseNumInput('2')">2</button>
+        <button class="small-button" onclick="chooseNumInput('3')">3</button>
+        <button class="small-button" onclick="chooseNumInput('4')">4</button>
+        <button class="small-button" onclick="chooseNumInput('5')">5</button>
+        <button class="small-button" onclick="chooseNumInput('6')">6</button>
+        <button class="small-button" onclick="chooseNumInput('7')">7</button>
+        <button class="small-button" onclick="chooseNumInput('8')">8</button>
+        <button class="small-button" onclick="chooseNumInput('9')">9</button>
+        <button class="small-button" onclick="chooseNumInput('0')">0</button>
+      </div>
+      <input type="number" id="number" readonly placeholder="設定數字">
+      <br>
+      <button class="calc-btn" onclick="calculate()">啟動故事</button>
+      <br>
+      <button class="clear-button" onclick="clearInput()">重新輸入</button>
     </div>
-</div>
+
+    <div id="article">
+      <div id="articleContent" class="fade-in"></div>
+    </div>
+
+    <div id="page-number"></div>
+
+    <div id="prevPageArea" onclick="prev()" style="display:none"></div>
+    <div id="nextPageArea" onclick="next()" style="display:none"></div>
+  </div>
 
 <script>
-    var baseStack = [
-        {suit:"梅花",number:"4"},{suit:"紅心",number:"2"},{suit:"方塊",number:"7"},{suit:"梅花",number:"3"},
-        {suit:"紅心",number:"4"},{suit:"方塊",number:"6"},{suit:"黑桃",number:"A"},{suit:"紅心",number:"5"},
-        {suit:"黑桃",number:"9"},{suit:"黑桃",number:"2"},{suit:"紅心",number:"Q"},{suit:"方塊",number:"3"},
-        {suit:"梅花",number:"Q"},{suit:"紅心",number:"8"},{suit:"黑桃",number:"6"},{suit:"黑桃",number:"5"},
+    // --- 核心數據 (梅花4起手) ---
+    var stack = [
+        {suit:"梅花",num:"4"},{suit:"紅心",num:"2"},{suit:"方塊",num:"7"},{suit:"梅花",num:"3"},
+        {suit:"紅心",num:"4"},{suit:"方塊",num:"6"},{suit:"黑桃",num:"A"},{suit:"紅心",num:"5"},
+        {suit:"黑桃",num:"9"},{suit:"黑桃",num:"2"},{suit:"紅心",num:"Q"},{suit:"方塊",num:"3"},
+        {suit:"梅花",num:"Q"},{suit:"紅心",number:"8"},{suit:"黑桃",number:"6"},{suit:"黑桃",number:"5"},
         {suit:"紅心",number:"9"},{suit:"梅花",number:"K"},{suit:"方塊",number:"2"},{suit:"紅心",number:"J"},
         {suit:"黑桃",number:"3"},{suit:"黑桃",number:"8"},{suit:"紅心",number:"6"},{suit:"梅花",number:"10"},
         {suit:"方塊",number:"5"},{suit:"方塊",number:"K"},{suit:"梅花",number:"2"},{suit:"紅心",number:"3"},
@@ -197,114 +210,90 @@
 
     var allDecks = {};
     for (var i = 0; i < 13; i++) {
-        var key = String.fromCharCode(65 + i);
-        var offset = i * 4;
-        allDecks[key] = baseStack.slice(offset).concat(baseStack.slice(0, offset));
+        var k = String.fromCharCode(65 + i);
+        allDecks[k] = stack.slice(i * 4).concat(stack.slice(0, i * 4));
     }
 
-    var globalResultString = "";
-    var currentPage = 1;
-    var storyBookPage = 37;
-    var userNumInput = 0;
+    var resultAction = "";
+    var currentPage = 2; // 起始定在核心故事頁
+    var basePage = 37;
 
     function chooseCard(v) { document.getElementById("cardInput").value += v; }
-    function chooseNumber(v) { document.getElementById("cardInput").value += v; }
-    function chooseNum(v) { document.getElementById("number").value += v; }
+    function chooseNumInput(v) { document.getElementById("number").value += v; }
     function clearInput() { document.getElementById("cardInput").value = ""; document.getElementById("number").value = ""; }
 
     function calculate() {
-        var cardVal = document.getElementById("cardInput").value;
-        userNumInput = parseInt(document.getElementById("number").value);
-        var parsed = parseCard(cardVal);
-        if (!parsed || isNaN(userNumInput)) { alert("請輸入牌組與數字！"); return; }
+        var cv = document.getElementById("cardInput").value;
+        var nv = parseInt(document.getElementById("number").value);
+        var p = parseCard(cv);
+        if (!p || isNaN(nv)) { alert("請完整輸入！"); return; }
 
         let found = false;
-        for (let key in allDecks) {
-            let deck = allDecks[key];
-            let pos = getPos(deck, parsed);
-            if (pos + 2 === userNumInput) {
-                setRes(key, "確認包含兩張廣告牌後", "背面向下一張張往下發", userNumInput);
-                found = true; break;
-            }
-            if (pos === userNumInput) {
-                setRes(key, "拿掉那兩張廣告牌後", "背面向下一張張往下發", userNumInput);
-                found = true; break;
-            }
-            if (55 - pos === userNumInput) {
-                setRes(key, "確認包含那兩張鬼牌後", "正面向上一張張往下發", userNumInput);
-                found = true; break;
-            }
-            if (53 - pos === userNumInput) {
-                setRes(key, "拿掉那兩張鬼牌後", "正面向上一張張往下發", userNumInput);
-                found = true; break;
-            }
+        for (let k in allDecks) {
+            let deck = allDecks[k];
+            let pos = getPos(deck, p);
+            if (pos + 2 === nv) { setRes(k, "確認包含那兩張廣告牌後", "背面向下一張張往下發", nv); found = true; break; }
+            if (pos === nv) { setRes(k, "拿掉那兩張廣告牌後", "背面向下一張張往下發", nv); found = true; break; }
+            if (55 - pos === nv) { setRes(k, "確認包含那兩張鬼牌後", "正面向上一張張往下發", nv); found = true; break; }
+            if (53 - pos === nv) { setRes(k, "拿掉那兩張鬼牌後", "正面向上一張張往下發", nv); found = true; break; }
         }
-        if(!found) { alert("此組合超出了計算範疇。"); return; }
+
+        if(!found) { alert("此數字超出了目前 13 副牌的位移範圍。"); return; }
+
         document.getElementById("inputSection").style.display = "none";
-        document.getElementById("prevPageButton").style.display = "block";
-        document.getElementById("nextPageButton").style.display = "block";
-        showArticle();
+        document.getElementById("prevPageArea").style.display = "block";
+        document.getElementById("nextPageArea").style.display = "block";
+        showContent();
     }
 
     function setRes(k, act, dir, n) {
         var l = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
-        globalResultString = `起身走到${l[k]}拿出一副撲克牌並遞給我。他請我將牌取出，${act}，讓我從${dir}到第 32 張。`;
-        storyBookPage = k.charCodeAt(0) - 64 + 30; 
+        resultAction = `起身走到${l[k]}拿出一副撲克牌並交給我，大衛請我將其取出，${act}，讓我從${dir}到第 32 張`;
+        basePage = k.charCodeAt(0) - 64 + 30;
     }
 
-    function getPos(deck, t) {
-        for(var i=0; i<deck.length; i++) {
-            if(deck[i].suit === t.suit && deck[i].number === t.number) return i + 1;
-        }
+    function getPos(d, t) {
+        for(var i=0; i<d.length; i++) if(d[i].suit === t.s && d[i].num === t.n) return i + 1;
         return -1;
     }
 
-    function parseCard(input) {
-        var m = input.match(/^(黑桃|紅心|方塊|梅花)([2-9]|10|A|J|Q|K)$/);
-        return m ? { suit: m[1], number: m[2] } : null;
+    function parseCard(s) {
+        var m = s.match(/^(黑桃|紅心|方塊|梅花)([2-9]|10|A|J|Q|K)$/);
+        return m ? { s: m[1], n: m[2] } : null;
     }
 
-    function showArticle() {
-        var content = document.getElementById("articleContent");
-        var pgDisp = document.getElementById("page-number");
-        var articleDiv = document.getElementById("article");
-        
-        articleDiv.scrollTop = 0;
-        articleDiv.classList.remove("page-active");
-        void articleDiv.offsetWidth; 
-        articleDiv.classList.add("page-active");
+    function showContent() {
+        var c = document.getElementById("articleContent");
+        var p = document.getElementById("page-number");
+        var art = document.getElementById("article");
+        art.scrollTop = 0; // 換頁回頂部
 
-        if (currentPage === 0) {
-            content.innerHTML = `<h2 style="margin-top:180px; text-align:center; color: var(--accent);">Chapter 3 — <br>大衛·巴格拉斯</h2>`;
-            pgDisp.innerHTML = "";
-        } else if (currentPage === 1) {
-            content.innerHTML = `<p>大衛·巴格拉斯（David Berglas）是一位傳奇人物。在魔術界，他的名字幾乎與「不可能」劃上等號。</p><p>他創造的 ACAAN 效果被譽為魔術界的聖杯。而在我看來，那更像是一場精心編織的心理博弈。</p><div style="text-align:center; margin: 30px 0;"><img src="book1.jpg" style="width:90%; border-radius:4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"></div><p>大衛常說，真正的魔法並非發生在手中，而是發生在觀眾的腦海中。</p>`;
-            pgDisp.innerHTML = `— ${storyBookPage - 1} —`;
+        if (currentPage === 1) {
+            c.innerHTML = `<p><br>大衛·巴格拉斯（David Berglas）</p><p>「聖殿級的 ACAAN」</p><img src="book1.jpg" style="width:100%; border-radius:10px;"><p><br>在大衛的世界裡，這不只是魔術，更是純粹的奇蹟。每一張牌的落下，都像是預言的實現。</p>`;
+            p.innerHTML = `— ${basePage - 1} —`;
         } else if (currentPage === 2) {
-            content.innerHTML = `
-                <p>故事發生在 1976 年的倫敦。當時我已認識大衛多年，但始終未能親睹那個效果的真面目。直到那晚，大衛邀請我去他家裡作客。</p>
-                <p>我們坐在充滿老派氣息的書房裡，壁爐的火光搖曳。大衛突然直視著我的眼睛說：「隨意說出一張牌，以及一個 1 到 52 之間的數字。」</p>
+            c.innerHTML = `
+                <p><br>故事發生在 1976 年，當時我已認識大衛多年，但始終未能親眼目睹那個傳說中的奇蹟。直到那晚，大衛邀請我去他家裡作客。</p>
+                <p>我們聊得正愉快時，大衛突然看著我說：「隨意說一張牌，以及一個 1 到 52 之間的數字。」</p>
                 <p>我不假思索地回答：「方塊 5，32」。</p>
-                <p>大衛分享了一個趣聞後，便緩緩起身，${globalResultString} 我一張一張發著牌，數到第 32 張，指尖甚至能感受到空氣中的緊張感...</p>
-                <p>你知道的，那張牌正是「方塊 5」！！！</p>
-                <p>我永遠忘不了大衛當時的表情，那種淡然而神秘的微笑。這就是傳說中的「巴格拉斯效果」。</p>
+                <p>大衛聽完後只是神秘地笑了笑。他緩緩起身，${resultAction}。數到第 32 張時，空氣彷彿凝固了...</p>
+                <p>你知道的，那張正是「方塊 5」！！！</p>
+                <p>我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
             `;
-            pgDisp.innerHTML = `— ${storyBookPage} —`;
+            p.innerHTML = `— ${basePage} —`;
         } else if (currentPage === 3) {
-            content.innerHTML = `<p style="margin-top:200px; text-align:center; font-style:italic; color: #777;">「我永遠忘不了那個男人......永遠。」</p>`;
-            pgDisp.innerHTML = `— ${storyBookPage + 1} —`;
-        } else if (currentPage === 4) {
-            content.innerHTML = `<h2 style="margin-top:180px; text-align:center; color: var(--accent);">Chapter 4 — <br>未竟的奇蹟</h2>`;
-            pgDisp.innerHTML = "";
+            c.innerHTML = `<p style="margin-top:150px; text-align:center; font-style:italic;">「我永遠忘不了那個男人......永遠。」</p>`;
+            p.innerHTML = `— ${basePage + 1} —`;
         }
-        articleDiv.style.display = "block";
+        art.style.display = "block";
     }
 
-    function previousPage() { if (currentPage > 0) { currentPage--; showArticle(); } }
-    function nextPage() { if (currentPage < 4) { currentPage++; showArticle(); } }
+    function next() { if(currentPage < 3) { currentPage++; showContent(); } }
+    function prev() { if(currentPage > 1) { currentPage--; showContent(); } }
 
-    document.addEventListener("keydown", e => { if (e.keyCode == 123 || (e.ctrlKey && e.key.toLowerCase() === 'u')) e.preventDefault(); });
+    // 禁用右鍵與 F12
     document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("keydown", e => { if (e.keyCode == 123 || (e.ctrlKey && e.key.toLowerCase() === 'u')) e.preventDefault(); });
 </script>
 </body>
 </html>
