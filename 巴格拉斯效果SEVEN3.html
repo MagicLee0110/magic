@@ -51,7 +51,7 @@
         top: 55%; left: 50%;
         transform: translate(-50%, -50%) rotate(-30deg);
         font-size: 32px;
-        color: rgba(0,0,0,0.015); /* 極致淡化，若有若無 */
+        color: rgba(0,0,0,0.035); /* 極致淡化，若有若無 */
         white-space: nowrap;
         pointer-events: none;
         z-index: 1;
@@ -274,8 +274,8 @@
         for (let k in allDecks) {
             let deck = allDecks[k];
             let pos = getPos(deck, parsed);
-            if (pos + 2 === nv) { setRes(k, "背面向下一張張往下發", nv); found = true; break; }
-            if (pos === nv) { setRes(k, "拿掉兩張廣告牌後", "背面向下一張張往下發", nv); found = true; break; }
+            if (pos + 2 === nv) { setRes(k, "背面向上一張張往下發", nv); found = true; break; }
+            if (pos === nv) { setRes(k, "拿掉兩張廣告牌後", "背面向上一張張往下發", nv); found = true; break; }
             if (55 - pos === nv) { setRes(k, "正面向上一張張往下發", nv); found = true; break; }
             if (53 - pos === nv) { setRes(k, "拿掉兩張鬼牌後", "正面向上一張張往下發", nv); found = true; break; }
         }
@@ -325,11 +325,11 @@
             dot.style.left = "10%";
         } else if (currentPage === 2) {
             content.innerHTML = `
-                <p>這段故事發生在 1976 年。當時我已認識大衛多年，但始終未能親眼見到那個傳說中的奇蹟。直到那次，大衛邀請我去他家作客。</p>
-                <p>我們聊得正愉快時，大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
+                <p>這段故事發生在 1976 年。當時我已認識大衛多年，但始終未能親眼見到那個傳說中的奇蹟。直到那天，大衛邀請我去他家作客。</p>
+                <p>記得我們聊得正愉快時，大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
                 <p>我不假思索地回答：「方塊 5，32」。</p>
-                <p>大衛緩緩起身，${resultAction} 數到最後那一張牌時，空氣彷彿凝固了...</p>
-                <p>你知道的，那張牌正是「方塊 5」！我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
+                <p>大衛先是分享了一個有趣的小故事後，便緩緩起身，${resultAction} 數到最後那一張牌時，空氣彷彿凝固了...</p>
+                <p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天，這就是傳說中的「巴格拉斯效果」。</p>
             `;
             pgText.innerText = basePg;
             dot.style.left = "20%";
