@@ -260,9 +260,9 @@
         for (let k in allDecks) {
             let deck = allDecks[k];
             let pos = getPos(deck, parsed);
-            if (pos + 2 === nv) { setRes(k, "確認包含那兩張廣告牌後", "背面向下一張張往下發", nv); found = true; break; }
-            if (pos === nv) { setRes(k, "拿掉那兩張廣告牌後", "背面向下一張張往下發", nv); found = true; break; }
-            if (55 - pos === nv) { setRes(k, "確認包含那兩張鬼牌後", "正面向上一張張往下發", nv); found = true; break; }
+            if (pos + 2 === nv) { setRes(k,  "背面向上一張張往下發", nv); found = true; break; }
+            if (pos === nv) { setRes(k, "拿掉那兩張廣告牌後", "背面向上一張張往下發", nv); found = true; break; }
+            if (55 - pos === nv) { setRes(k,  "正面向上一張張往下發", nv); found = true; break; }
             if (53 - pos === nv) { setRes(k, "拿掉那兩張鬼牌後", "正面向上一張張往下發", nv); found = true; break; }
         }
         if(!found) { alert("此組合超出了計算範圍。"); return; }
@@ -279,7 +279,7 @@
 
     function setRes(k, act, dir, n) {
         var locs = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
-        resultAction = `起身走到${locs[k]}拿出一副撲克牌，大衛請我將其取出，${act}，讓我從${dir}到第 32 張。`;
+        resultAction = `起身從${locs[k]}拿出一副撲克牌，大衛請我將其取出，${act}，讓我從${dir}到第 32 張。`;
         basePg = k.charCodeAt(0) - 64 + 30;
     }
 
@@ -311,10 +311,10 @@
         } else if (currentPage === 2) {
             content.innerHTML = `
                 <p>故事發生在 1976 年。當時我已認識大衛多年，但始終未能親眼目睹那個傳說中的奇蹟。直到那次，大衛邀請我去他家裡作客。</p>
-                <p>我們在壁爐旁聊著天，大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
+                <p>記得在我們聊著正愉快時，大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
                 <p>我不假思索地回答：「方塊 5，32」。</p>
                 <p>大衛緩緩起身，${resultAction} 數到第 32 張時，空氣彷彿凝固了...</p>
-                <p>你知道的，那張牌正是「方塊 5」！！！我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
+                <p>你知道的，那張牌正是「方塊 5」！我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
             `;
             pgText.innerText = basePg;
             dot.style.left = "20%";
