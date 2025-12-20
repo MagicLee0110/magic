@@ -164,19 +164,19 @@
             let pos = getPos(deck, parsed);
 
             if (pos + 2 === userNumInput) {
-                setCalcResult(key, "確認包含那兩張廣告牌後", "背面向下一張張往下發", userNumInput);
+                setCalcResult(key, "", "背面向上一張張往下發", userNumInput);
                 found = true; break;
             }
             if (pos === userNumInput) {
-                setCalcResult(key, "拿掉那兩張廣告牌後", "背面向下一張張往下發", userNumInput);
+                setCalcResult(key, "拿掉廣告牌後", "背面向上一張張往下發", userNumInput);
                 found = true; break;
             }
             if (55 - pos === userNumInput) {
-                setCalcResult(key, "確認包含那兩張鬼牌後", "正面朝上一張張數起", userNumInput);
+                setCalcResult(key, "", "牌面向上一張張數起", userNumInput);
                 found = true; break;
             }
             if (53 - pos === userNumInput) {
-                setCalcResult(key, "拿掉那兩張鬼牌後", "正面朝上一張張數起", userNumInput);
+                setCalcResult(key, "拿掉那鬼牌後", "牌面朝上一張張網下發", userNumInput);
                 found = true; break;
             }
         }
