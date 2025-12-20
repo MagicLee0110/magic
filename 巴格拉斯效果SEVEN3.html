@@ -7,11 +7,11 @@
  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
  <style>
     :root {
-        --paper-bg: #fffdfb; 
-        --text-color: #2b2b2b;
+        --paper-bg: #fffdfb; /* 紙漿質感 */
+        --text-color: #3d3d3d; /* 修正：更淡一點的炭墨色，增加紙本感 */
+        --header-text: #888888; /* 頂部功能列顏色 */
         --accent-brown: #8b572a;
-        --ui-gray: #999;
-        --ui-fade: rgba(0,0,0,0.05);
+        --ui-fade: rgba(0,0,0,0.04);
     }
 
     /* 核心：消除點擊閃爍、文字選取與右鍵選單 */
@@ -45,42 +45,42 @@
         overflow: hidden;
     }
 
-    /* 專業浮水印 */
+    /* 專業低調浮水印 */
     #watermark {
         position: absolute;
         top: 50%; left: 50%;
         transform: translate(-50%, -50%) rotate(-35deg);
-        font-size: 40px;
-        color: rgba(0,0,0,0.03); 
+        font-size: 36px;
+        color: rgba(0,0,0,0.025); /* 極低透明度，若有若無 */
         white-space: nowrap;
         pointer-events: none;
         z-index: 1;
         font-weight: bold;
-        letter-spacing: 10px;
-        display: none; /* 進入閱讀模式才顯示 */
+        letter-spacing: 12px;
+        display: none;
     }
 
     /* 頂部 APP Bar */
     #app-header {
         flex-shrink: 0;
-        height: calc(50px + env(safe-area-inset-top, 0));
+        height: calc(55px + env(safe-area-inset-top, 0));
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: env(safe-area-inset-top, 0) 20px 0 20px;
         border-bottom: 1px solid var(--ui-fade);
-        color: var(--ui-gray);
+        color: var(--header-text);
         background: var(--paper-bg);
         z-index: 100;
     }
 
-    /* 內容區塊 */
+    /* 核心內文區塊 */
     #article { 
         flex: 1; 
         overflow-y: auto; 
-        padding: 25px 25px 40px 35px;
+        padding: 30px 25px 40px 35px;
         text-align: justify; 
-        line-height: 2.3; 
+        line-height: 2.3; /* 舒適的閱讀行高 */
         font-size: 18px; 
         color: var(--text-color); 
         position: relative;
@@ -89,12 +89,17 @@
         display: none;
     }
     #article::-webkit-scrollbar { display: none; }
-    #article p { margin-bottom: 28px; text-indent: 2em; font-family: "Noto Serif TC", serif; }
+    #article p { 
+        margin-bottom: 30px; 
+        text-indent: 2em; /* 兩格縮進 */
+        font-family: "Noto Serif TC", "Songti TC", serif; /* 使用襯線體更像書 */
+        letter-spacing: 0.5px;
+    }
 
-    /* 左側書脊陰影 */
+    /* 左側書脊陰影，營造立體摺痕感 */
     #ebook-app::after {
         content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 100%;
-        background: linear-gradient(to right, rgba(0,0,0,0.06) 0%, transparent 100%);
+        background: linear-gradient(to right, rgba(0,0,0,0.05) 0%, transparent 100%);
         pointer-events: none; z-index: 150;
     }
 
@@ -103,53 +108,62 @@
         flex-shrink: 0;
         background: var(--paper-bg);
         border-top: 1px solid var(--ui-fade);
-        padding: 10px 30px calc(20px + env(safe-area-inset-bottom, 10px)) 30px;
+        padding: 15px 30px calc(20px + env(safe-area-inset-bottom, 15px)) 30px;
         z-index: 100;
         display: none; 
     }
     .progress-container {
-        width: 100%; height: 2px; background: #eee;
+        width: 100%; height: 2px; background: #f0f0f0;
         position: relative; margin: 15px 0;
     }
     .progress-dot {
         width: 8px; height: 8px; background: var(--accent-brown);
         border-radius: 50%; position: absolute; top: -3px;
-        transition: left 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
     }
     .footer-info {
         display: flex; justify-content: center;
-        font-size: 10px; color: #bbb; letter-spacing: 2px; font-weight: bold;
+        font-size: 10px; color: #ccc; letter-spacing: 2px; font-weight: bold;
     }
 
-    /* 初始控制面板 */
-    #inputSection { flex: 1; padding: 20px; text-align: center; overflow-y: auto; z-index: 50; }
+    /* 初始控制介面 */
+    #inputSection { flex: 1; padding: 25px 20px; text-align: center; overflow-y: auto; z-index: 50; }
     .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
     .small-button { 
-        width: 44px; height: 44px; font-size: 18px; margin: 3px; cursor: pointer; 
+        width: 44px; height: 44px; font-size: 20px; margin: 3px; cursor: pointer; 
         border: 1px solid #ddd; border-radius: 10px; background: white; 
+        color: #555;
     }
-    .small-button:active { background: #eee; transform: scale(0.95); }
-    input { width: 85%; padding: 12px; border: 1px solid #eee; border-radius: 8px; margin: 15px 0; text-align: center; font-size: 18px; }
-    .calc-btn { background: var(--accent-brown); color: white; border: none; padding: 15px 45px; border-radius: 30px; font-size: 18px; font-weight: bold; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .small-button:active { background: #f5f5f5; transform: scale(0.95); }
+    input { 
+        width: 85%; padding: 14px; border: 1px solid #eee; border-radius: 12px; 
+        margin: 15px 0; text-align: center; font-size: 18px; color: var(--accent-brown);
+        font-weight: bold;
+    }
+    .calc-btn { 
+        background: var(--accent-brown); color: white; border: none; 
+        padding: 16px 50px; border-radius: 35px; font-size: 18px; font-weight: bold; 
+        margin-top: 20px; box-shadow: 0 4px 15px rgba(139, 87, 42, 0.2);
+    }
 
     /* 翻頁熱區 */
-    #prevPageArea, #nextPageArea { position: absolute; top: 10%; bottom: 15%; width: 30%; z-index: 200; display: none; }
+    #prevPageArea, #nextPageArea { position: absolute; top: 15%; bottom: 15%; width: 30%; z-index: 200; display: none; }
     #prevPageArea { left: 0; }
     #nextPageArea { right: 0; }
 
-    .fade-page { animation: fadeIn 0.5s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+    .fade-page { animation: fadeIn 0.6s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
  </style>
 </head>
 <body>
 
 <div id="ebook-app">
-    <div id="watermark">版權所有 · 翻印必究</div>
+    <div id="watermark">嚴禁外傳 · 內部初稿</div>
 
     <div id="app-header">
-        <span onclick="resetApp()" style="font-size: 28px; padding: 0 10px; cursor: pointer;">‹</span>
-        <span id="app-title" style="font-size: 12px; letter-spacing: 2px; color: #777;">書架</span>
-        <div style="font-size: 16px;">ᴀA&nbsp;&nbsp;🔖</div>
+        <span onclick="resetApp()" style="font-size: 30px; padding: 0 10px; cursor: pointer;">‹</span>
+        <span id="app-title" style="font-size: 13px; font-weight: bold; letter-spacing: 2px; color: #999;">書架</span>
+        <div style="font-size: 16px; opacity: 0.6;">ᴀA&nbsp;&nbsp;🔖</div>
     </div>
 
     <div id="inputSection">
@@ -169,12 +183,12 @@
         <button class="small-button" onclick="chooseNumInput('7')">7</button>
         <button class="small-button" onclick="chooseNumInput('8')">8</button>
         <button class="small-button" onclick="chooseNumInput('9')">9</button>
-        <button class="small-button" onclick="chooseNumInput('0')">0</button>
+        <button class="small-button" onclick="chooseNumInput('10')">10</button>
         <button class="small-button" onclick="chooseCard('J')">J</button>
         <button class="small-button" onclick="chooseCard('Q')">Q</button>
         <button class="small-button" onclick="chooseCard('K')">K</button>
       </div>
-      <input type="text" id="cardInput" readonly placeholder="SELECT STACK">
+      <input type="text" id="cardInput" readonly placeholder="設定堆疊記憶">
       <div class="btn-group">
         <button class="small-button" onclick="chooseNumber('1')">1</button>
         <button class="small-button" onclick="chooseNumber('2')">2</button>
@@ -187,7 +201,7 @@
         <button class="small-button" onclick="chooseNumber('9')">9</button>
         <button class="small-button" onclick="chooseNumber('0')">0</button>
       </div>
-      <input type="number" id="number" readonly placeholder="SET INDEX">
+      <input type="number" id="number" readonly placeholder="設定目標索引">
       <br>
       <button class="calc-btn" onclick="calculate()">啟動閱讀</button>
     </div>
@@ -238,7 +252,6 @@
     function chooseNumInput(v) { document.getElementById("cardInput").value += v; }
     function chooseNumber(v) { document.getElementById("number").value += v; }
     
-    // --- APP 重置功能 (整合進返回鍵) ---
     function resetApp() {
         document.getElementById("cardInput").value = "";
         document.getElementById("number").value = "";
@@ -255,14 +268,14 @@
         var cv = document.getElementById("cardInput").value;
         var nv = parseInt(document.getElementById("number").value);
         var parsed = parse(cv);
-        if (!parsed || isNaN(nv)) { alert("設定不正確！"); return; }
+        if (!parsed || isNaN(nv)) { alert("設定尚未完成"); return; }
         let found = false;
         for (let k in allDecks) {
             let deck = allDecks[k];
             let pos = getPos(deck, parsed);
-            if (pos + 2 === nv) { setRes(k,  "背面向上一張張往下發", nv); found = true; break; }
-            if (pos === nv) { setRes(k, "拿掉那兩張廣告牌後", "背面向上一張張往下發", nv); found = true; break; }
-            if (55 - pos === nv) { setRes(k,  "正面向上一張張往下發", nv); found = true; break; }
+            if (pos + 2 === nv) { setRes(k, "確認包含那兩張廣告牌後", "背面向下一張張往下發", nv); found = true; break; }
+            if (pos === nv) { setRes(k, "拿掉那兩張廣告牌後", "背面向下一張張往下發", nv); found = true; break; }
+            if (55 - pos === nv) { setRes(k, "確認包含那兩張鬼牌後", "正面向上一張張往下發", nv); found = true; break; }
             if (53 - pos === nv) { setRes(k, "拿掉那兩張鬼牌後", "正面向上一張張往下發", nv); found = true; break; }
         }
         if(!found) { alert("此組合超出了計算範圍。"); return; }
@@ -273,13 +286,13 @@
         document.getElementById("watermark").style.display = "block";
         document.getElementById("prevPageArea").style.display = "block";
         document.getElementById("nextPageArea").style.display = "block";
-        document.getElementById("app-title").innerText = "我與大衛的故事";
+        document.getElementById("app-title").innerText = "巴格拉斯與我";
         render();
     }
 
     function setRes(k, act, dir, n) {
         var locs = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
-        resultAction = `從${locs[k]}拿出一副撲克牌，大衛請我將其取出，${act}，讓我從${dir}到第 32 張。`;
+        resultAction = `起身走到${locs[k]}拿出一副撲克牌，大衛請我將其取出，${act}，讓我從${dir}到第 32 張。`;
         basePg = k.charCodeAt(0) - 64 + 30;
     }
 
@@ -305,21 +318,21 @@
         content.classList.add("fade-page");
 
         if (currentPage === 1) {
-            content.innerHTML = `<p>大衛·巴格拉斯（David Berglas），那個在魔術界被尊稱為傳奇的人。他最著名的 ACAAN 效果曾讓無數大師感到絕望。</p><div style="text-align:center; padding: 25px 0;"><img src="book1.jpg" style="width:95%; border-radius:4px; box-shadow:0 8px 25px rgba(0,0,0,0.15);"></div><p>大衛常說，ACAAN 不僅是關於巧合，而是一場精心設計的心靈博弈。在他面前，每一張牌都彷彿擁有了生命。</p>`;
+            content.innerHTML = `<p>大衛·巴格拉斯（David Berglas），那個在魔術界被尊稱為傳奇的人。他最著名的 ACAAN 效果曾讓無數大師感到絕望。</p><div style="text-align:center; padding: 25px 0;"><img src="book1.jpg" style="width:95%; border-radius:4px; box-shadow:0 8px 25px rgba(0,0,0,0.12);"></div><p>大衛常說，ACAAN 不僅是關於巧合，而是一場精心設計的心靈博弈。在他面前，每一張牌都彷彿擁有了生命。</p>`;
             pgText.innerText = basePg - 1;
             dot.style.left = "10%";
         } else if (currentPage === 2) {
             content.innerHTML = `
-                <p>故事發生在 1976 年。當時我已認識大衛多年，但始終未能親眼目睹那個傳說中的奇蹟。直到那次，大衛邀請我去他家裡作客。</p>
-                <p>記得在我們聊著正愉快時，大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
+                <p>故事發生在 1976 年。當時我已認識大衛多年，但始終未能親眼目睹那個傳說中的奇蹟。直到那次，大衛邀請我去他家作客。</p>
+                <p>我們在壁爐旁聊著天，大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
                 <p>我不假思索地回答：「方塊 5，32」。</p>
                 <p>大衛緩緩起身，${resultAction} 數到第 32 張時，空氣彷彿凝固了...</p>
-                <p>你知道的，那張牌正是「方塊 5」！我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
+                <p>你知道的，那張牌正是「方塊 5」！！！我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
             `;
             pgText.innerText = basePg;
             dot.style.left = "20%";
         } else if (currentPage === 3) {
-            content.innerHTML = `<p style="margin-top:220px; text-align:center; font-style:italic; color: #888; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p>`;
+            content.innerHTML = `<p style="margin-top:220px; text-align:center; font-style:italic; color: #999; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p>`;
             pgText.innerText = basePg + 1;
             dot.style.left = "30%";
         }
