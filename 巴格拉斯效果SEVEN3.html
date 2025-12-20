@@ -10,10 +10,11 @@
         --paper-bg: #fffdfb; 
         --text-color: #2b2b2b;
         --accent-brown: #8b572a;
+        --ui-gray: #999;
         --ui-fade: rgba(0,0,0,0.05);
     }
 
-    /* 消除所有手機端的預設點擊回饋與選取功能 */
+    /* 核心：消除點擊閃爍、文字選取與右鍵選單 */
     * {
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
@@ -45,7 +46,7 @@
     }
 
     /* 專業浮水印 */
-    .watermark {
+    #watermark {
         position: absolute;
         top: 50%; left: 50%;
         transform: translate(-50%, -50%) rotate(-35deg);
@@ -56,6 +57,7 @@
         z-index: 1;
         font-weight: bold;
         letter-spacing: 10px;
+        display: none; /* 進入閱讀模式才顯示 */
     }
 
     /* 頂部 APP Bar */
@@ -67,9 +69,9 @@
         align-items: center;
         padding: env(safe-area-inset-top, 0) 20px 0 20px;
         border-bottom: 1px solid var(--ui-fade);
-        color: #999;
+        color: var(--ui-gray);
         background: var(--paper-bg);
-        z-index: 10;
+        z-index: 100;
     }
 
     /* 內容區塊 */
@@ -84,6 +86,7 @@
         position: relative;
         z-index: 2;
         -webkit-overflow-scrolling: touch;
+        display: none;
     }
     #article::-webkit-scrollbar { display: none; }
     #article p { margin-bottom: 28px; text-indent: 2em; font-family: "Noto Serif TC", serif; }
@@ -92,16 +95,16 @@
     #ebook-app::after {
         content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 100%;
         background: linear-gradient(to right, rgba(0,0,0,0.06) 0%, transparent 100%);
-        pointer-events: none; z-index: 15;
+        pointer-events: none; z-index: 150;
     }
 
-    /* 底部進度列：修正範圍並移除多餘文字 */
+    /* 底部進度列 */
     #app-footer {
         flex-shrink: 0;
         background: var(--paper-bg);
         border-top: 1px solid var(--ui-fade);
         padding: 10px 30px calc(20px + env(safe-area-inset-bottom, 10px)) 30px;
-        z-index: 10;
+        z-index: 100;
         display: none; 
     }
     .progress-container {
@@ -114,12 +117,12 @@
         transition: left 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .footer-info {
-        display: flex; justify-content: center; /* 頁數居中顯示 */
+        display: flex; justify-content: center;
         font-size: 10px; color: #bbb; letter-spacing: 2px; font-weight: bold;
     }
 
-    /* 初始控制介面 */
-    #inputSection { flex: 1; padding: 20px; text-align: center; overflow-y: auto; }
+    /* 初始控制面板 */
+    #inputSection { flex: 1; padding: 20px; text-align: center; overflow-y: auto; z-index: 50; }
     .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
     .small-button { 
         width: 44px; height: 44px; font-size: 18px; margin: 3px; cursor: pointer; 
@@ -129,8 +132,8 @@
     input { width: 85%; padding: 12px; border: 1px solid #eee; border-radius: 8px; margin: 15px 0; text-align: center; font-size: 18px; }
     .calc-btn { background: var(--accent-brown); color: white; border: none; padding: 15px 45px; border-radius: 30px; font-size: 18px; font-weight: bold; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-    /* 翻頁透明點擊熱區 */
-    #prevPageArea, #nextPageArea { position: absolute; top: 10%; bottom: 15%; width: 30%; z-index: 100; }
+    /* 翻頁熱區 */
+    #prevPageArea, #nextPageArea { position: absolute; top: 10%; bottom: 15%; width: 30%; z-index: 200; display: none; }
     #prevPageArea { left: 0; }
     #nextPageArea { right: 0; }
 
@@ -141,11 +144,11 @@
 <body>
 
 <div id="ebook-app">
-    <div class="watermark">嚴禁外傳 · 內部初稿</div>
+    <div id="watermark">嚴禁外傳 · 內部初稿</div>
 
     <div id="app-header">
-        <span style="font-size: 22px;">‹</span>
-        <span style="font-size: 12px; letter-spacing: 2px; color: #777;">巴格拉斯與我</span>
+        <span onclick="resetApp()" style="font-size: 28px; padding: 0 10px; cursor: pointer;">‹</span>
+        <span id="app-title" style="font-size: 12px; letter-spacing: 2px; color: #777;">書架</span>
         <div style="font-size: 16px;">ᴀA&nbsp;&nbsp;🔖</div>
     </div>
 
@@ -171,7 +174,7 @@
         <button class="small-button" onclick="chooseCard('Q')">Q</button>
         <button class="small-button" onclick="chooseCard('K')">K</button>
       </div>
-      <input type="text" id="cardInput" readonly placeholder="SET SYMBOL">
+      <input type="text" id="cardInput" readonly placeholder="SELECT STACK">
       <div class="btn-group">
         <button class="small-button" onclick="chooseNumber('1')">1</button>
         <button class="small-button" onclick="chooseNumber('2')">2</button>
@@ -189,7 +192,7 @@
       <button class="calc-btn" onclick="calculate()">啟動閱讀</button>
     </div>
 
-    <div id="article" style="display:none;">
+    <div id="article">
       <div id="articleContent" class="fade-page"></div>
     </div>
 
@@ -200,8 +203,8 @@
         </div>
     </div>
 
-    <div id="prevPageArea" onclick="prev()" style="display:none"></div>
-    <div id="nextPageArea" onclick="next()" style="display:none"></div>
+    <div id="prevPageArea" onclick="prev()"></div>
+    <div id="nextPageArea" onclick="next()"></div>
 </div>
 
 <script>
@@ -234,7 +237,19 @@
     function chooseCard(v) { document.getElementById("cardInput").value += v; }
     function chooseNumInput(v) { document.getElementById("cardInput").value += v; }
     function chooseNumber(v) { document.getElementById("number").value += v; }
-    function clearInput() { document.getElementById("cardInput").value = ""; document.getElementById("number").value = ""; }
+    
+    // --- APP 重置功能 (整合進返回鍵) ---
+    function resetApp() {
+        document.getElementById("cardInput").value = "";
+        document.getElementById("number").value = "";
+        document.getElementById("inputSection").style.display = "block";
+        document.getElementById("article").style.display = "none";
+        document.getElementById("app-footer").style.display = "none";
+        document.getElementById("watermark").style.display = "none";
+        document.getElementById("prevPageArea").style.display = "none";
+        document.getElementById("nextPageArea").style.display = "none";
+        document.getElementById("app-title").innerText = "書架";
+    }
 
     function calculate() {
         var cv = document.getElementById("cardInput").value;
@@ -251,16 +266,20 @@
             if (53 - pos === nv) { setRes(k, "拿掉那兩張鬼牌後", "正面向上一張張往下發", nv); found = true; break; }
         }
         if(!found) { alert("此組合超出了計算範圍。"); return; }
+        
         document.getElementById("inputSection").style.display = "none";
+        document.getElementById("article").style.display = "block";
         document.getElementById("app-footer").style.display = "block";
+        document.getElementById("watermark").style.display = "block";
         document.getElementById("prevPageArea").style.display = "block";
         document.getElementById("nextPageArea").style.display = "block";
+        document.getElementById("app-title").innerText = "巴格拉斯與我";
         render();
     }
 
     function setRes(k, act, dir, n) {
         var locs = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
-        resultAction = `起身走到${locs[k]}拿出一副撲克牌，大衛請我將牌取出，${act}，讓我從${dir}到第 32 張。`;
+        resultAction = `起身走到${locs[k]}拿出一副撲克牌，大衛請我將其取出，${act}，讓我從${dir}到第 32 張。`;
         basePg = k.charCodeAt(0) - 64 + 30;
     }
 
@@ -304,7 +323,6 @@
             pgText.innerText = basePg + 1;
             dot.style.left = "30%";
         }
-        artDiv.style.display = "block";
     }
 
     function next() { if(currentPage < 3) { currentPage++; render(); } }
