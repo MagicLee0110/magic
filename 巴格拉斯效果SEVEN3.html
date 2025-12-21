@@ -275,9 +275,9 @@
             let deck = allDecks[k];
             let pos = getPos(deck, parsed);
             if (pos + 2 === nv) { setRes(k, "背面向上一張張往下發"); found = true; break; }
-            if (pos === nv) { setRes(k, "取出廣告牌後，背面向上一張張往下發"); found = true; break; }
+            if (pos === nv) { setRes(k, "拿掉廣告牌後，背面向上一張張往下發"); found = true; break; }
             if (55 - pos === nv) { setRes(k, "牌面向上一張一張往下發，使我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
-            if (53 - pos === nv) { setRes(k, "取出鬼牌後，牌面向上一張一張往下發，同時我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
+            if (53 - pos === nv) { setRes(k, "拿掉鬼牌後，牌面向上一張一張往下發，同時我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
         }
         if(!found) { alert("此組合超出了位移限制。"); return; }
         
