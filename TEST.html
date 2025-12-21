@@ -34,16 +34,16 @@
     .book-info { margin-top: 10px; font-size: 13px; color: #333; height: 36px; overflow: hidden; font-weight: 600; line-height: 1.3; }
     .book-progress { font-size: 11px; color: #999; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
 
-    /* --- 2. 商店視圖 --- */
+    /* --- 2. 商店視圖 (還原內容) --- */
     .shop-header { padding: 20px; font-size: 24px; font-weight: 800; }
     .shop-section { padding: 0 20px 20px; }
-    .shop-banner { width: 90%; height: 150px; background: linear-gradient(135deg, #6e8efb, #a777e3); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; padding: 20px; color: white; position: relative; overflow: hidden; }
-    .shop-item { display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f2f2f2; }
-    .shop-thumb { width: 60px; height: 90px; background: #eee; border-radius: 4px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .shop-banner { width: 100%; height: 140px; background: linear-gradient(135deg, #6e8efb, #a777e3); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; padding: 20px; color: white; position: relative; overflow: hidden; }
+    .shop-item { padding: 15px 20px; border-bottom: 1px solid #f2f2f2; display: flex; gap: 15px; background: #fff; }
+    .shop-thumb { width: 60px; height: 90px; background: #eee; border-radius: 4px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .shop-price { color: var(--ui-blue); font-weight: bold; margin-top: 5px; }
 
     /* --- 3. 設定視圖 --- */
-    .settings-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: white; border-bottom: 1px solid #f2f2f2; font-size: 16px; color: #333; }
+    .settings-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; background: white; border-bottom: 1px solid #f2f2f2; font-size: 16px; color: #333; }
     .settings-group { margin-top: 25px; border-top: 1px solid #f2f2f2; }
 
     /* --- 底部導覽欄 --- */
@@ -52,25 +52,30 @@
     .nav-item.active { color: var(--ui-blue); }
     .nav-icon { font-size: 22px; }
 
-    /* --- 彈窗視窗 (詳情/驗證/閱讀) --- */
+    /* --- 彈窗視窗 (格式固定) --- */
     #info-view, #magic-setup, #ebook-app { display: none; background: white; width: 100%; max-width: 500px; height: 100dvh; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 2000; overflow-y: auto; padding: 40px 25px; flex-direction: column; align-items: center; }
-    .read-btn { width: 100%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 10px; font-weight: bold; margin-top: auto; text-align: center; font-size: 16px; border: none; }
     .info-cover-box { width: 160px; height: 240px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; color: white; }
+    .read-btn { width: 100%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 10px; font-weight: bold; margin-top: auto; text-align: center; font-size: 16px; border: none; }
     
+    /* --- 驗證按鈕與輸入框格式鎖定 --- */
+    .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; width: 100%; }
     .small-button { width: 44px; height: 44px; font-size: 18px; margin: 3px; cursor: pointer; border: 1px solid #ddd; border-radius: 10px; background: white; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     input { width: 85%; padding: 12px; border: 1px solid #eee; border-radius: 8px; margin: 15px 0; text-align: center; font-size: 18px; color: var(--accent-brown); font-weight: bold; background: #fafafa; }
     .calc-btn { background: var(--accent-brown); color: white; border: none; padding: 16px; border-radius: 30px; font-size: 18px; font-weight: bold; margin-top: 15px; width: 85%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .reset-btn { background: none; border: 1px solid #ddd; color: #999; padding: 10px; border-radius: 20px; width: 60%; margin-top: 20px; font-size: 13px; }
+    .reset-btn { background: none; border: 1px solid #ddd; color: #999; padding: 10px; border-radius: 20px; width: 60%; margin-top: 20px; font-size: 13px; border: 1px solid #eee; }
 
-    /* 閱讀器排版 */
+    /* 閱讀器樣式 */
     #ebook-app { background-color: var(--paper-bg); padding: 0; }
     #app-header { flex-shrink: 0; height: calc(55px + env(safe-area-inset-top, 0)); display: flex; justify-content: space-between; align-items: center; padding: env(safe-area-inset-top, 0) 15px 0; border-bottom: 1px solid rgba(0,0,0,0.04); background: var(--paper-bg); width: 100%; }
-    #article { flex: 1; overflow-y: auto; padding: 30px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); }
+    #article { flex: 1; overflow-y: auto; padding: 30px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); position: relative; }
     #article p { margin-bottom: 35px; text-indent: 2em; font-family: "Noto Serif TC", serif; letter-spacing: 0.8px; }
-    #app-footer { flex-shrink: 0; background: var(--paper-bg); border-top: 1px solid rgba(0,0,0,0.04); padding: 15px 30px calc(15px + env(safe-area-inset-bottom, 10px)) 30px; width: 100%; }
     .progress-dot { width: 7px; height: 7px; background: var(--accent-brown); border-radius: 50%; position: absolute; top: -2.5px; transition: left 0.4s ease; }
-    #prevArea, #nextArea { position: absolute; top: 80px; bottom: 80px; width: 35%; z-index: 3000; }
+    .footer-info { display: flex; justify-content: center; font-size: 10px; color: #cccccc; letter-spacing: 2px; font-weight: bold; }
+    
+    /* 確保翻頁區域在最頂層 */
+    #prevArea, #nextArea { position: absolute; top: 70px; bottom: 70px; width: 35%; z-index: 5000; cursor: pointer; }
     #prevArea { left: 0; } #nextArea { right: 0; }
+    
     .drop-cap::first-letter { float: left; font-size: 52px; line-height: 0.8; padding: 6px 8px 0 0; color: var(--accent-brown); font-family: serif; }
     .master-note { background: rgba(139,87,42,0.02); border-left: 2px solid var(--accent-brown); padding: 15px; margin: 30px 0; font-size: 16px; font-style: italic; color: #999; }
  </style>
@@ -83,7 +88,7 @@
 </div>
 
 <div id="library-view" class="view-container active-view">
-    <div class="lib-header"><img src="Tree.png" class="header-logo">電子樹</div>
+    <div class="lib-header"><img src="Tree.png" class="header-logo">我的書櫃</div>
     <div class="lib-content"><div class="book-grid" id="mainGrid"></div></div>
 </div>
 
@@ -118,27 +123,27 @@
     <div style="align-self:flex-start; color:var(--ui-blue); font-size: 17px; padding: 10px 0;" onclick="closeInfo()">‹ 書櫃</div>
     <div id="info-cover-target" class="info-cover-box"></div>
     <h2 id="info-title" style="margin-top:25px; font-size:22px; text-align:center"></h2>
-    <p id="info-author" style="color:#888; font-size:14px; margin-top:5px;"></p>
+    <p id="info-author" style="color:#888; font-size:14px; margin-top:5px; text-align:center"></p>
     <p id="info-desc" style="color:#666; font-size:14px; margin-top:20px; text-align:justify; line-height:1.6; border-top:1px solid #eee; padding-top:20px;"></p>
-    <button class="read-btn" onclick="checkMagicFlow()">繼續閱讀</button>
+    <div class="read-btn" onclick="checkMagicFlow()">繼續閱讀</div>
 </div>
 
 <div id="magic-setup">
     <div style="align-self:flex-start; color:var(--ui-blue); font-size: 17px; padding: 10px 0;" onclick="closeSetup()">‹ 返回詳情</div>
     <h3 style="margin-top:30px">身份權限驗證</h3>
-    <div class="btn-group" style="margin-top: 20px;"><button class="small-button" onclick="chooseCard('黑桃')">♠</button><button class="small-button" onclick="chooseCard('紅心')">♥</button><button class="small-button" onclick="chooseCard('方塊')">♦</button><button class="small-button" onclick="chooseCard('梅花')">♣</button></div>
-    <div class="btn-group"><button class="small-button" onclick="chooseCard('A')">A</button><button class="small-button" onclick="chooseNumInput('2')">2</button><button class="small-button" onclick="chooseNumInput('3')">3</button><button class="small-button" onclick="chooseNumInput('4')">4</button><button class="small-button" onclick="chooseNumInput('5')">5</button><button class="small-button" onclick="chooseNumInput('6')">6</button><button class="small-button" onclick="chooseNumInput('7')">7</button><button class="small-button" onclick="chooseNumInput('8')">8</button><button class="small-button" onclick="chooseNumInput('9')">9</button><button class="small-button" onclick="chooseNumInput('10')">10</button><button class="small-button" onclick="chooseCard('J')">J</button><button class="small-button" onclick="chooseCard('Q')">Q</button><button class="small-button" onclick="chooseCard('K')">K</button></div>
-    <input type="text" id="cardInput" readonly placeholder="請點選撲克牌代碼">
-    <div class="btn-group"><button class="small-button" onclick="chooseNumber('1')">1</button><button class="small-button" onclick="chooseNumber('2')">2</button><button class="small-button" onclick="chooseNumber('3')">3</button><button class="small-button" onclick="chooseNumber('4')">4</button><button class="small-button" onclick="chooseNumber('5')">5</button><button class="small-button" onclick="chooseNumber('6')">6</button><button class="small-button" onclick="chooseNumber('7')">7</button><button class="small-button" onclick="chooseNumber('8')">8</button><button class="small-button" onclick="chooseNumber('9')">9</button><button class="small-button" onclick="chooseNumber('0')">0</button></div>
-    <input type="number" id="number" readonly placeholder="請輸入密鑰數字">
-    <button class="calc-btn" onclick="calculate()">驗證並開啟閱讀</button>
+    <div class="btn-group" style="margin-top: 20px;"><button class="small-button" onclick="inp('c','黑桃')">♠</button><button class="small-button" onclick="inp('c','紅心')">♥</button><button class="small-button" onclick="inp('c','方塊')">♦</button><button class="small-button" onclick="inp('c','梅花')">♣</button></div>
+    <div class="btn-group"><button class="small-button" onclick="inp('c','A')">A</button><button class="small-button" onclick="inp('c','2')">2</button><button class="small-button" onclick="inp('c','3')">3</button><button class="small-button" onclick="inp('c','4')">4</button><button class="small-button" onclick="inp('c','5')">5</button><button class="small-button" onclick="inp('c','6')">6</button><button class="small-button" onclick="inp('c','7')">7</button><button class="small-button" onclick="inp('c','8')">8</button><button class="small-button" onclick="inp('c','9')">9</button><button class="small-button" onclick="inp('c','10')">10</button><button class="small-button" onclick="inp('c','J')">J</button><button class="small-button" onclick="inp('c','Q')">Q</button><button class="small-button" onclick="inp('c','K')">K</button></div>
+    <input type="text" id="cardInput" readonly placeholder="請點選撲克牌">
+    <div class="btn-group"><button class="small-button" onclick="inp('n','1')">1</button><button class="small-button" onclick="inp('n','2')">2</button><button class="small-button" onclick="inp('n','3')">3</button><button class="small-button" onclick="inp('n','4')">4</button><button class="small-button" onclick="inp('n','5')">5</button><button class="small-button" onclick="inp('n','6')">6</button><button class="small-button" onclick="inp('n','7')">7</button><button class="small-button" onclick="inp('n','8')">8</button><button class="small-button" onclick="inp('n','9')">9</button><button class="small-button" onclick="inp('n','0')">0</button></div>
+    <input type="number" id="number" readonly placeholder="請點選數字">
+    <button class="calc-btn" onclick="calculate()">驗證權限並閱讀</button>
     <button class="reset-btn" onclick="clearInputs()">重新輸入</button>
 </div>
 
 <div id="ebook-app">
     <div id="app-header">
         <span onclick="exitReader()" style="font-size:32px; color:var(--ui-blue); font-weight:300; padding: 0 10px;">‹</span>
-        <span id="reader-book-title" style="font-size:12px; font-weight:bold; color:#555; letter-spacing:1px;"></span>
+        <span id="reader-book-title" style="font-size:12px; font-weight:bold; color:#aaa; letter-spacing:1px;"></span>
         <span style="font-size:18px; color:var(--ui-blue); padding-right:15px">ᴀA</span>
     </div>
     <div id="article"><div id="articleContent"></div></div>
@@ -151,7 +156,7 @@
 
 <script>
     const bookData = [
-        { id: 1, t: "思考，快與慢", a: "Daniel Kahneman", d: "認知偏差權威著作。", p: "未讀", bg: "linear-gradient(135deg, #2c3e50, #000)" },
+        { id: 1, t: "思考，快與慢", a: "Daniel Kahneman", d: "關於人類認知偏差的權威著作。", p: "未讀", bg: "linear-gradient(135deg, #2c3e50, #000)" },
         { id: 2, t: "影響力心理學", a: "Robert Cialdini", d: "揭開說服與服從的社會心理法則。", p: "未下載", bg: "linear-gradient(45deg, #ff5858, #f09819)" },
         { id: 3, t: "THE MAGIC SENTINEL", a: "David Berglas", d: "本章詳細記錄了大衛·巴格拉斯的即興奇蹟實錄。深入探討 ACAAN 的最終心理架構。", p: "36% 已讀", isM: true, bg: "linear-gradient(to bottom, #3d2b1f, #1a110a)", color: "#e5c100", b: "2px solid #cfa670" },
         { id: 4, t: "FBI 讀心術", a: "Joe Navarro", d: "前情報員親授破解身體語言的技術。", p: "已完讀", bg: "linear-gradient(to right, #434343, #000)" },
@@ -193,10 +198,18 @@
     }
 
     function showInfo(b) {
-        currentActiveBook = b; document.getElementById("info-title").innerText = b.t; document.getElementById("info-author").innerText = b.a; document.getElementById("info-desc").innerText = b.d;
-        const target = document.getElementById("info-cover-target"); target.style.background = b.bg; target.style.color = b.color || (b.black?'#333':'#fff'); target.innerText = b.t;
+        currentActiveBook = b; 
+        document.getElementById("info-title").innerText = b.t; 
+        document.getElementById("info-author").innerText = b.a; 
+        document.getElementById("info-desc").innerText = b.d;
+        // --- 封面還原代碼 ---
+        const target = document.getElementById("info-cover-target"); 
+        target.style.background = b.bg; 
+        target.style.color = b.color || (b.black?'#333':'#fff'); 
+        target.innerText = b.t;
         document.getElementById("info-view").style.display = "flex";
     }
+
     function closeInfo() { document.getElementById("info-view").style.display = "none"; }
     function openSetup() { document.getElementById("info-view").style.display = "none"; document.getElementById("magic-setup").style.display = "flex"; }
     function closeSetup() { document.getElementById("magic-setup").style.display = "none"; document.getElementById("info-view").style.display = "flex"; }
@@ -204,6 +217,9 @@
     function openReader() { document.getElementById("reader-book-title").innerText = currentActiveBook.t; document.getElementById("ebook-app").style.display = "flex"; render(); }
     function exitReader() { document.getElementById("ebook-app").style.display = "none"; if(currentActiveBook.isM) document.getElementById("magic-prog").innerText = "📖 " + currentPage + "% 已讀"; }
     function fullReset() { isCalculated = false; currentPage = 37; clearInputs(); alert("系統快取已清除"); }
+    
+    function inp(t, v) { if(t==='c') document.getElementById("cardInput").value += v; else document.getElementById("number").value += v; }
+    function clearInputs() { document.getElementById("cardInput").value = ""; document.getElementById("number").value = ""; }
 
     function calculate() {
         var cv = document.getElementById("cardInput").value, nv = parseInt(document.getElementById("number").value), parsed = parse(cv);
@@ -211,6 +227,7 @@
         let found = false;
         for (let k in allDecks) {
             let deck = allDecks[k], pos = getPos(deck, parsed);
+            // --- 原始 55 張位移算法 (2鬼+1廣) ---
             if (pos + 3 === nv) { setRes(k, "背面向上一張張往下發"); found = true; break; }
             if (pos + 2 === nv) { setRes(k, "拿掉廣告牌後，背面向上一張張往下發"); found = true; break; }
             if (pos + 1 === nv) { setRes(k, "拿掉廣告牌和一張鬼牌後，背面向上一張張往下發"); found = true; break; }
@@ -233,21 +250,17 @@
             if (p === 39) return `<p>接下來，我將分享透過這些年的研究，無數的夜晚，思索出的ACAAN理論模型。這涉及到對觀眾選擇路徑的徹底封鎖。</p>`;
             if (p === 40) return `<h2 style="text-align:center; margin-top:80px; color:var(--header-text); letter-spacing:3px;">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">第四章：屬於我的 ACAAN 最終實務</p>`;
         }
-        const dict = { T: ["潛意識結構","預期管理","行為分析","壓力手段","絕對位移","環境冷讀"], S: ["心靈魔術的核心在於對人類認知的重新架構。","所謂的自由意志，在特定環境下極易被操控。","利用環境中的噪音來遮蔽關鍵動作。"] };
-        return `<h2>${dict.T[p%6]}</h2><p class="drop-cap">${dict.S[p%3]}</p><p>本節討論的是如何利用環境光線與聲音頻率，在不經意間引導對方的數字選擇。這需要長期的練習與對人類微表情的精確捕捉...</p><div class="master-note">Archive Ref: #MN-${p*7}</div>`;
+        const dict = { T: ["潛意識結構","預期管理","行為分析","壓力手段","絕對位移","環境冷讀"], S: ["心靈魔術的核心在於對人類認知的重新架構。","所謂的自由意志，在特定環境下極易被操控。"] };
+        return `<h2>${dict.T[p%6]}</h2><p class="drop-cap">${dict.S[p%2]}</p><p>本節討論的是如何利用環境光線與聲音頻率，在不經意間引導對方的數字選擇。這需要長期的練習與對人類微表情的精確捕捉...</p><div class="master-note">Archive Ref: #MN-${p*7}</div>`;
     }
 
     function render() {
         var content = document.getElementById("articleContent"), pgText = document.getElementById("cur-p"), dot = document.getElementById("dot"), artDiv = document.getElementById("article");
-        artDiv.scrollTop = 0;
-        dot.style.left = currentPage + "%"; pgText.innerText = currentPage; content.innerHTML = getDynamicContent(currentPage);
+        artDiv.scrollTop = 0; content.innerHTML = getDynamicContent(currentPage);
+        dot.style.left = currentPage + "%"; pgText.innerText = currentPage;
     }
     function next() { if(currentPage < 100) { currentPage++; render(); } }
     function prev() { if(currentPage > 1) { currentPage--; render(); } }
-    function chooseCard(v) { document.getElementById("cardInput").value += v; }
-    function chooseNumInput(v) { document.getElementById("cardInput").value += v; }
-    function chooseNumber(v) { document.getElementById("number").value += v; }
-    function clearInputs() { document.getElementById("cardInput").value = ""; document.getElementById("number").value = ""; }
     document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
 </body>
