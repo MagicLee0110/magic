@@ -217,7 +217,7 @@
         <button class="small-button" onclick="chooseCard('Q')">Q</button>
         <button class="small-button" onclick="chooseCard('K')">K</button>
       </div>
-      <input type="text" id="cardInput" readonly placeholder="設定堆疊序列">
+      <input type="text" id="cardInput" readonly placeholder="請輸入撲克牌">
       <div class="btn-group">
         <button class="small-button" onclick="chooseNumber('1')">1</button>
         <button class="small-button" onclick="chooseNumber('2')">2</button>
@@ -230,7 +230,7 @@
         <button class="small-button" onclick="chooseNumber('9')">9</button>
         <button class="small-button" onclick="chooseNumber('0')">0</button>
       </div>
-      <input type="number" id="number" readonly placeholder="設定目標索引">
+      <input type="number" id="number" readonly placeholder="請輸入數字">
       <br>
       <button class="calc-btn" onclick="calculate()">啟動大師手稿</button>
     </div>
@@ -353,24 +353,24 @@
         pgText.innerText = physicalPage;
 
         if (currentPage === 1) {
-            content.innerHTML = `<h2 style="text-align:center; margin-top:60px; font-weight:300; letter-spacing:5px;">SECTION III</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown); letter-spacing:2px;">心理機率與絕對位移</h1><p class="drop-cap" style="margin-top:40px;">在本章中，我們將探討大衛·巴格拉斯如何利用觀看者的認知偏誤，在看似極端隨機的狀態下，達成物理位置的絕對精準。這不僅是手法，更是一場關於權威與服從的實驗。</p>`;
+            content.innerHTML = `<h2 style="text-align:center; margin-top:60px; font-weight:300; letter-spacing:5px;">SECTION III</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown); letter-spacing:2px;">巴格拉斯效果</h1><p class="drop-cap" style="margin-top:40px;">毫無疑問，這個果已經到達了"傳奇、的地位，這是一個如此不可能的效果，以至於魔術圈內最聰明的人都在絞盡腦汁地尋找解決辦法，甚至有些人根本不相信這個效果的存在，本章我將帶與你一同分享，這個傳奇的故事。</p>`;
         } else if (currentPage === 2) {
-            content.innerHTML = `<p>任何心靈魔術的聖杯——ACAAN，其核心祕密不在於撲克牌，而在於「數字的合法性」。當觀眾說出數字後，我們必須建立一套無懈可擊的邏輯來解釋接下來的動作。</p><div class="master-note">核心準則：在數牌之前，永遠要讓觀眾相信，牌組從未離開過他們的視線。沈默，是建立這層信任的最佳工具。</div>`;
+            content.innerHTML = `<p>心靈魔術的聖杯——ACAAN至今已擁有多年的歷史，隨便一張牌任意一個數字的巧合，世界各地的魔術師，他們都雍有屬於自己的ACAAN版本，而最具代表性的莫過於大衛·巴格拉斯（David Berglas），至今，還是沒有能一個魔術師，能夠解釋大衛是如何運作這個效果的。。</p><div class="master-note">Jon Racherbaumer在他的書<At The Table>中寫道，他將這種表演命名為"巴格拉斯效果"。</div>`;
         } else if (currentPage === 3) {
-            content.innerHTML = `<p>大衛·巴格拉斯（David Berglas）在他位於倫敦的私人檔案室中，曾展示過這個系統。這份記錄來自 1970 年代的現場實錄。</p><div class="book-image-container"><img src="book1.jpg" alt="Vintage Berglas Archive"><div class="img-caption">Fig 3.2 - 私人手稿中的 ACAAN 實驗場景錄像</div></div><p>他曾說：最好的位移，是發生在觀眾點頭同意的那一瞬間。</p>`;
+            content.innerHTML = `<p>大衛·巴格拉斯（David Berglas）魔術史上最神祕的名字。他曾讓無數大師感到絕望。</p><div class="book-image-container"><img src="book1.jpg" alt="Vintage Berglas Archive"><div class="img-caption">Fig 3.2 - 大衛·巴格拉斯</div></div><p>無數次有人解大衛解釋這個效果的秘密，但他總是拒絕，並不是為了隱藏這個效果的秘密，而是為了留下觀眾心中的奇蹟。</p>`;
         } else if (currentPage === 4) {
             content.innerHTML = `
-                <p class="drop-cap">故事發生在 1976 年。當時我已認識大衛多年，始終未能親眼目睹傳聞中的奇蹟。直到那次，大衛邀請我去他家作客。壁爐旁，氣氛輕鬆，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
+                <p class="drop-cap">故事發生在 1976 年。當時我已認識大衛多年，始終未能親眼目睹傳聞中的奇蹟。直到那次，大衛邀請我去他家作客。記得當時聊的正愉快時，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
                 <p>我不假思索地回答：「方塊 5，32」。</p>
-                <p>大衛分享了一個趣事後，緩緩起身，${resultAction} 當數到第 32 張時，空氣彷彿凝固了...</p>
-                <p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
+                <p>大衛先分享了一個有趣的小故事後，緩緩起身，${resultAction} 當數到第 32 張時，空氣彷彿凝固了...</p>
+                <p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天...這就是傳說中的「巴格拉斯效果」，多希望你們也能夠在場見證。</p>
             `;
         } else if (currentPage === 5) {
-            content.innerHTML = `<p style="margin-top:180px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><div class="master-note" style="text-align:center;">分析：大衛在此案例中使用了極其自然的環境道具位移法，值得所有學習者深思。</div>`;
+            content.innerHTML = `<p style="margin-top:180px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><div class="master-note" style="text-align:center;">至此後，我不斷地在尋找任何可能的答案...但一切都太不可能了，直到現在，我還是一點想法都沒有。</div>`;
         } else if (currentPage === 6) {
-            content.innerHTML = `<p>本案例的研究意義：大衛的技術不在於「如何達成」，而是在於「何時達成」。這涉及到心理節奏的掌控。</p><p>每一張落下的牌，都是在加強觀眾對「不可能」的確信。當最終目標揭曉，心靈牆壁會瞬間崩塌，這就是藝術。</p>`;
+            content.innerHTML = `<p>接下來，我將分享透過這些年的研究，無數的夜晚，思索出的ACAAN!</p>`;
         } else if (currentPage === 7) {
-            content.innerHTML = `<h2 style="text-align:center; margin-top:80px; color:var(--header-text); letter-spacing:3px;">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">下一章節：機率的欺騙——如何操縱未知的選擇</p>`;
+            content.innerHTML = `<h2 style="text-align:center; margin-top:80px; color:var(--header-text); letter-spacing:3px;">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">第四章：屬於我的ACAAN</p>`;
         }
     }
 
