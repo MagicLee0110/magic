@@ -232,8 +232,8 @@
             let deck = allDecks[k], pos = getPos(deck, parsed);
             if (pos + 3 === nv) { setRes(k, "背面向上一張張往下發"); found = true; break; }
             if (pos + 2 === nv) { setRes(k, "拿掉廣告牌後，背面向上一張張往下發"); found = true; break; }
-            if (pos + 1 === nv) { setRes(k, "拿掉廣告牌和一張鬼牌後，背面向上一張張往下發"); found = true; break; }
-            if (pos === nv) { setRes(k, "拿掉所有鬼牌和廣告牌後，背面向上一張張往下發"); found = true; break; }
+            if (pos + 1 === nv) { setRes(k, "拿掉鬼牌後，背面向上一張張往下發"); found = true; break; }
+            if (pos === nv) { setRes(k, "拿掉鬼牌和廣告牌後，背面向上一張張往下發"); found = true; break; }
         }
         if(!found) { alert("序號無效"); return; }
         isCalculated = true; document.getElementById("magic-setup").style.display = "none"; openReader();
