@@ -2,14 +2,11 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My iPhone Unlock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iPhone Simulator</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        :root {
-            /* 設定為 iOS 風格字體 */
-            --ios-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -20,215 +17,157 @@
 
         body {
             background-color: #000;
-            font-family: var(--ios-font);
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100vw;
             overflow: hidden;
         }
 
-        /* 手機容器 */
         .container {
             width: 100%;
             height: 100%;
-            /* 這裡使用一個近似你桌布的深紫色漸層作為基底 */
-            background: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
             position: relative;
-            overflow: hidden;
         }
 
-        /* 螢幕通用樣式 */
         .screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s;
         }
 
-        /* --- 1. 密碼鎖定畫面 (仿照你的 image_0.png) --- */
+        /* --- 鎖定畫面層 --- */
         #passcode-screen {
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            /* 為了更像截圖，這裡加一點毛玻璃效果 */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background-image: url('lock.png'); /* 使用你的截圖 */
+            z-index: 20;
         }
 
-        /* 狀態列模擬 (時間) */
-        .status-bar-sim {
-            width: 100%;
-            padding: 15px 25px;
-            font-size: 16px;
-            font-weight: 600;
+        /* 覆蓋在截圖圓點上的「動態圓點」 */
+        /* 根據你的截圖位置調整 top 值，讓它精確覆蓋原本的空心圓 */
+        .dots-overlay {
+            position: absolute;
+            top: 24.5%; /* 依照截圖比例調整 */
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: space-between;
-        }
-
-        /* 密碼輸入區塊 */
-        .passcode-area {
-            margin-top: 60px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .passcode-title {
-            font-size: 22px;
-            margin-bottom: 25px;
-            letter-spacing: 1px;
-        }
-
-        /* 四個圓點 */
-        .dots-container {
-            display: flex;
-            gap: 25px;
-            margin-bottom: 60px;
+            gap: 24px; /* 依照截圖圓點間距調整 */
         }
 
         .dot {
-            width: 14px;
-            height: 14px;
-            border: 2px solid white;
+            width: 13px;
+            height: 13px;
             border-radius: 50%;
-            transition: background-color 0.2s;
+            background: transparent;
+            transition: background 0.1s;
         }
         .dot.filled {
-            background-color: white;
+            background: white;
         }
 
-        /* 數字鍵盤 */
-        .keypad {
+        /* 透明鍵盤區：對齊截圖中的數字位置 */
+        .keypad-overlay {
+            position: absolute;
+            top: 35%; /* 數字鍵盤開始的位置 */
+            left: 50%;
+            transform: translateX(-50%);
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 25px 35px;
+            gap: 18px 32px; /* 數字鍵的間距 */
         }
 
-        .key {
-            width: 80px;
-            height: 80px;
+        .invisible-key {
+            width: 78px;
+            height: 78px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15); /* 半透明按鈕 */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 36px;
-            font-weight: 400;
+            background: rgba(255, 255, 255, 0); /* 完全透明 */
             cursor: pointer;
-            transition: background-color 0.1s;
         }
-        .key:active {
-            background: rgba(255, 255, 255, 0.4); /* 按下時變亮 */
-        }
-        .key span {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            margin-top: -5px;
+        /* 測試時可以把 0 改為 0.1 來看位置對不對 */
+        .invisible-key:active {
+            background: rgba(255, 255, 255, 0.2); 
         }
 
-        /* 底部按鈕 */
-        .bottom-buttons {
-            position: absolute;
-            bottom: 50px;
-            width: 85%;
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        /* --- 2. 主畫面 (直接使用你的 image_1.png 截圖) --- */
+        /* --- 主畫面層 --- */
         #home-screen {
-            z-index: 1;
-            /* 重要：直接使用你的截圖作為背景，確保完全一樣 */
-            background-image: url('image_1.jpg'); 
-            background-size: cover;
-            background-position: center;
-            opacity: 0; /* 一開始隱藏 */
-            transform: scale(1.1); /* 解鎖時的縮放效果 */
+            background-image: url('home.png'); /* 使用你的截圖 */
+            z-index: 10;
+            opacity: 0;
+            transform: scale(1.1);
         }
 
-        /* 解鎖後的狀態 */
-        .container.unlocked #passcode-screen {
+        /* 解鎖動畫 */
+        .unlocked #passcode-screen {
             opacity: 0;
             pointer-events: none;
-            transform: scale(1.1); /* 密碼盤放大淡出 */
+            transform: scale(1.2);
         }
-        .container.unlocked #home-screen {
+        .unlocked #home-screen {
             opacity: 1;
-            transform: scale(1); /* 主畫面縮放定位 */
+            transform: scale(1);
         }
 
+        /* 底部取消按鈕區 */
+        .cancel-btn {
+            position: absolute;
+            bottom: 45px;
+            right: 50px;
+            width: 80px;
+            height: 40px;
+            background: transparent;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container" id="iphone-container">
+    <div class="container" id="main-container">
         
         <div class="screen" id="passcode-screen">
-            <div class="status-bar-sim">
-                <div>11:34</div>
-                <div>IsI 90</div> </div>
-
-            <div class="passcode-area">
-                <div class="passcode-title">輸入密碼</div>
-                <div class="dots-container">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-
-                <div class="keypad">
-                    <div class="key" onclick="press(1)">1</div>
-                    <div class="key" onclick="press(2)">2<span>ABC</span></div>
-                    <div class="key" onclick="press(3)">3<span>DEF</span></div>
-                    <div class="key" onclick="press(4)">4<span>GHI</span></div>
-                    <div class="key" onclick="press(5)">5<span>JKL</span></div>
-                    <div class="key" onclick="press(6)">6<span>MNO</span></div>
-                    <div class="key" onclick="press(7)">7<span>PQRS</span></div>
-                    <div class="key" onclick="press(8)">8<span>TUV</span></div>
-                    <div class="key" onclick="press(9)">9<span>WXYZ</span></div>
-                    <div></div> <div class="key" onclick="press(0)">0</div>
-                    <div></div> </div>
+            <div class="dots-overlay">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
             </div>
 
-            <div class="bottom-buttons">
-                <div>緊急服務</div>
-                <div onclick="reset()">取消</div>
+            <div class="keypad-overlay">
+                <div class="invisible-key" onclick="press(1)"></div>
+                <div class="invisible-key" onclick="press(2)"></div>
+                <div class="invisible-key" onclick="press(3)"></div>
+                <div class="invisible-key" onclick="press(4)"></div>
+                <div class="invisible-key" onclick="press(5)"></div>
+                <div class="invisible-key" onclick="press(6)"></div>
+                <div class="invisible-key" onclick="press(7)"></div>
+                <div class="invisible-key" onclick="press(8)"></div>
+                <div class="invisible-key" onclick="press(9)"></div>
+                <div></div>
+                <div class="invisible-key" onclick="press(0)"></div>
             </div>
+
+            <div class="cancel-btn" onclick="reset()"></div>
         </div>
 
         <div class="screen" id="home-screen"></div>
+
     </div>
 
     <script>
         let currentPasscode = "";
-        const container = document.getElementById('iphone-container');
+        const container = document.getElementById('main-container');
         const dots = document.querySelectorAll('.dot');
 
-        // 按下數字鍵的處理
         function press(num) {
             if (currentPasscode.length < 4) {
                 currentPasscode += num;
                 updateDots();
-                
-                // 如果輸入滿 4 位數
                 if (currentPasscode.length === 4) {
-                    // 延遲一下下讓使用者看到最後一個點填滿，然後解鎖
                     setTimeout(unlock, 200);
                 }
             }
         }
 
-        // 更新圓點狀態
         function updateDots() {
             dots.forEach((dot, index) => {
                 if (index < currentPasscode.length) {
@@ -239,16 +178,19 @@
             });
         }
 
-        // 執行解鎖動作
         function unlock() {
             container.classList.add('unlocked');
         }
 
-        // 按下取消，重置密碼
         function reset() {
             currentPasscode = "";
             updateDots();
         }
+
+        // 防止網頁在手機上被隨意下拉刷新
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
