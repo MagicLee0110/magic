@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="default">
+ <style>
+    :root {
+        --paper-bg: #fffdfb; 
+        --text-color: #787878; 
+        --header-text: #666; 
+        --accent-brown: #8b572a;
+        --shelf-bg: #ffffff;
+        --ui-blue: #007aff;
+    }
+
+    * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; outline: none; box-sizing: border-box; }
+
+    html, body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang TC", "Microsoft JhengHei", sans-serif; overflow: hidden; }
+
+    /* --- 第一層：書櫃介面 (Library) --- */
+    #library-view {
+        background-color: var(--shelf-bg);
+        width: 100%; max-width: 500px; height: 100dvh;
+        margin: 0 auto; display: flex; flex-direction: column;
+        z-index: 300; position: relative;
+    }
+    .lib-header { height: 60px; display: flex; align-items: center; padding: env(safe-area-inset-top, 0) 20px 0; font-size: 20px; font-weight: bold; border-bottom: 1px solid #f0f0f0; }
+    
+    .lib-content { flex: 1; overflow-y: auto; padding: 20px; }
+    .book-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .book-card { display: flex; flex-direction: column; cursor: pointer; }
+    .book-cover { width: 100%; aspect-ratio: 2/3; background: #eee; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; font-weight: bold; }
+    .book-info { margin-top: 8px; font-size: 13px; color: #333; line-height: 1.4; height: 36px; overflow: hidden; }
+    .book-progress { font-size: 11px; color: #999; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
+    .cloud-icon { font-size: 10px; color: var(--ui-blue); }
+
+    /* 底部導航欄 */
+    .nav-bar { height: calc(60px + env(safe-area-inset-bottom, 0)); border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom, 0); background: #fafafa; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #999; }
+    .nav-item.active { color: var(--ui-blue); }
+    .nav-icon { font-size: 20px; }
+
+    /* --- 第二層：書籍資訊頁 (隱藏設定入口) --- */
+    #info-view { display: none; background: white; width: 100%; height: 100dvh; position: absolute; top: 0; left: 0; z-index: 400; padding: 40px 25px; flex-direction: column; align-items: center; }
+    .info-cover { width: 160px; aspect-ratio: 2/3; background: #2c1e16; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; color: #d4af37; padding: 15px; font-weight: bold; text-align: center; }
+    .info-title { font-size: 22px; font-weight: bold; margin-top: 25px; color: #333; }
+    .info-author { font-size: 14px; color: #007aff; margin-top: 10px; }
+    .info-desc { font-size: 14px; color: #666; margin-top: 20px; line-height: 1.6; text-align: justify; border-top: 1px solid #f0f0f0; padding-top: 20px; }
+    .read-btn { width: 100%; background: var(--ui-blue); color: white; padding: 15px; border-radius: 8px; font-weight: bold; margin-top: auto; text-align: center; font-size: 16px; }
+
+    /* --- 第三層：閱讀器模式 --- */
+    #ebook-app { background-color: var(--paper-bg); width: 100%; max-width: 500px; height: 100dvh; display: none; flex-direction: column; margin: 0 auto; position: relative; overflow: hidden; z-index: 500; }
+    #watermark { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 34px; color: rgba(0,0,0,0.04); white-space: nowrap; pointer-events: none; z-index: 1; font-weight: bold; letter-spacing: 12px; display: none; }
+    #app-header { flex-shrink: 0; height: calc(50px + env(safe-area-inset-top, 0)); display: flex; justify-content: space-between; align-items: center; padding: env(safe-area-inset-top, 0) 20px 0 20px; border-bottom: 1px solid rgba(0,0,0,0.04); color: var(--header-text); background: var(--paper-bg); z-index: 100; }
+    #article { flex: 1; overflow-y: auto; padding: 30px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); position: relative; z-index: 2; -webkit-overflow-scrolling: touch; display: none; }
+    #article::-webkit-scrollbar { display: none; }
+    #article p { margin-bottom: 35px; text-indent: 2em; font-family: "Noto Serif TC", serif; letter-spacing: 0.8px; }
+    #app-footer { flex-shrink: 0; background: var(--paper-bg); border-top: 1px solid rgba(0,0,0,0.04); padding: 15px 30px calc(25px + env(safe-area-inset-bottom, 15px)) 30px; z-index: 100; display: none; }
+    .progress-container { width: 100%; height: 2px; background: #f2f2f2; position: relative; margin-bottom: 12px; }
+    .progress-dot { width: 7px; height: 7px; background: var(--accent-brown); border-radius: 50%; position: absolute; top: -2.5px; transition: left 0.6s ease; }
+    .footer-info { display: flex; justify-content: center; font-size: 10px; color: #cccccc; letter-spacing: 2px; font-weight: bold; }
+
+    /* --- 第四層：魔術輸入設定 (隱藏介面) --- */
+    #magic-setup { flex: 1; padding: 25px 20px; text-align: center; overflow-y: auto; display: none; z-index: 600; background: white; }
+    .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+    .small-button { width: 44px; height: 44px; font-size: 20px; margin: 3px; cursor: pointer; border: 1px solid #eee; border-radius: 10px; background: white; color: #777; }
+    input { width: 85%; padding: 15px; border: 1px solid #f0f0f0; border-radius: 12px; margin: 15px 0; text-align: center; font-size: 18px; color: var(--accent-brown); font-weight: bold; }
+    .calc-btn { background: var(--accent-brown); color: white; border: none; padding: 16px 50px; border-radius: 35px; font-size: 18px; font-weight: bold; margin-top: 20px; }
+
+    #prevPageArea, #nextPageArea { position: absolute; top: 100px; bottom: 100px; width: 35%; z-index: 200; display: none; }
+    #prevPageArea { left: 0; } #nextPageArea { right: 0; }
+    .fade-page { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .drop-cap::first-letter { float: left; font-size: 50px; line-height: 1; padding: 4px 8px 0 0; color: var(--accent-brown); font-family: serif; }
+    .master-note { background: rgba(0,0,0,0.02); border-left: 2px solid var(--accent-brown); padding: 15px 20px; margin: 30px 0; font-size: 16px; font-style: italic; color: #999; }
+    .book-img { text-align: center; margin: 25px 0; padding: 10px; border: 1px solid rgba(0,0,0,0.02); }
+    .book-img img { max-width: 100%; filter: sepia(15%) contrast(90%); opacity: 0.85; }
+ </style>
+</head>
+<body>
+
+<div id="library-view">
+    <div class="lib-header">我的書櫃</div>
+    <div class="lib-content">
+        <div class="book-grid">
+            <div class="book-card" onclick="alert('本書正在雲端同步中...')">
+                <div class="book-cover" style="background: #4a5a6a; color: white;">認知心理學與人類行為</div>
+                <div class="book-info">認知心理學：從大腦神經到社會行為</div>
+                <div class="book-progress">9% 已讀 <span class="cloud-icon">☁️</span></div>
+            </div>
+            <div class="book-card" onclick="openBookInfo()">
+                <div class="book-cover" style="background: #2c1e16; color: #d4af37; border: 4px solid #241811;">THE MAGIC SENTINEL</div>
+                <div class="book-info">魔術哨兵：心靈位移與絕對認知的極限研究</div>
+                <div class="book-progress">36% 已讀 <span class="cloud-icon">☁️</span></div>
+            </div>
+            <div class="book-card" onclick="alert('本書尚未下載')">
+                <div class="book-cover" style="background: #6a4a4a; color: white;">高等機率統計：隨機過程研究</div>
+                <div class="book-info">機率與統計：從理論到實戰應用分析</div>
+                <div class="book-progress">未讀 <span class="cloud-icon">☁️</span></div>
+            </div>
+            <div class="book-card" onclick="alert('版本更新中')">
+                <div class="book-cover" style="background: #4a6a5a; color: white;">FBI 心理操縱術：微表情捕捉</div>
+                <div class="book-info">實戰心理學：掌握非語義溝通的關鍵細節</div>
+                <div class="book-progress">已完讀 <span class="cloud-icon">✔️</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="nav-bar">
+        <div class="nav-item active"><span class="nav-icon">📚</span><span>書櫃</span></div>
+        <div class="nav-item"><span class="nav-icon">🛒</span><span>商店</span></div>
+        <div class="nav-item"><span class="nav-icon">👤</span><span>設定</span></div>
+    </div>
+</div>
+
+<div id="info-view">
+    <div style="align-self: flex-start; color: var(--ui-blue); font-size: 16px;" onclick="closeBookInfo()">‹ 返回書櫃</div>
+    <div class="info-cover">THE MAGIC SENTINEL</div>
+    <div class="info-title">魔術哨兵 (Vol. III)</div>
+    <div class="info-author">作者：David Berglas 等 / 內部手稿</div>
+    <div class="info-desc">本手稿記錄了二十世紀最神祕的撲克牌位移技術。ACAAN (Any Card At Any Number) 曾被視為魔術界的聖杯，本章節重點探討 1976 年的大衛實錄案例。</div>
+    <div class="read-btn" onclick="openSetup()">繼續閱讀</div>
+</div>
+
+<div id="magic-setup">
+    <div style="text-align:left; color:#999; margin-bottom: 20px;" onclick="closeSetup()">‹ 返回詳情</div>
+    <h3 style="margin-bottom: 20px;">驗證閱讀權限</h3>
+    <div class="btn-group">
+        <button class="small-button" onclick="chooseCard('黑桃')">♠</button>
+        <button class="small-button" onclick="chooseCard('紅心')">♥</button>
+        <button class="small-button" onclick="chooseCard('方塊')">♦</button>
+        <button class="small-button" onclick="chooseCard('梅花')">♣</button>
+    </div>
+    <div class="btn-group">
+        <button class="small-button" onclick="chooseCard('A')">A</button>
+        <button class="small-button" onclick="chooseNumInput('2')">2</button>
+        <button class="small-button" onclick="chooseNumInput('3')">3</button>
+        <button class="small-button" onclick="chooseNumInput('4')">4</button>
+        <button class="small-button" onclick="chooseNumInput('5')">5</button>
+        <button class="small-button" onclick="chooseNumInput('6')">6</button>
+        <button class="small-button" onclick="chooseNumInput('7')">7</button>
+        <button class="small-button" onclick="chooseNumInput('8')">8</button>
+        <button class="small-button" onclick="chooseNumInput('9')">9</button>
+        <button class="small-button" onclick="chooseNumInput('10')">10</button>
+        <button class="small-button" onclick="chooseCard('J')">J</button>
+        <button class="small-button" onclick="chooseCard('Q')">Q</button>
+        <button class="small-button" onclick="chooseCard('K')">K</button>
+    </div>
+    <input type="text" id="cardInput" readonly placeholder="設定目標堆疊">
+    <div class="btn-group">
+        <button class="small-button" onclick="chooseNumber('1')">1</button>
+        <button class="small-button" onclick="chooseNumber('2')">2</button>
+        <button class="small-button" onclick="chooseNumber('3')">3</button>
+        <button class="small-button" onclick="chooseNumber('4')">4</button>
+        <button class="small-button" onclick="chooseNumber('5')">5</button>
+        <button class="small-button" onclick="chooseNumber('6')">6</button>
+        <button class="small-button" onclick="chooseNumber('7')">7</button>
+        <button class="small-button" onclick="chooseNumber('8')">8</button>
+        <button class="small-button" onclick="chooseNumber('9')">9</button>
+        <button class="small-button" onclick="chooseNumber('0')">0</button>
+    </div>
+    <input type="number" id="number" readonly placeholder="設定索引偏好">
+    <button class="calc-btn" onclick="calculate()">啟動全屏閱讀</button>
+</div>
+
+<div id="ebook-app">
+    <div id="watermark">版權所有 · 嚴禁傳播</div>
+    <div id="app-header">
+        <span onclick="resetApp()" style="font-size: 32px; padding: 0 10px; cursor: pointer; font-weight: 300;">‹</span>
+        <span id="app-title" style="font-size: 13px; font-weight: bold; letter-spacing: 2px; color: #d0d0d0;">THE MAGIC SENTINEL</span>
+        <div style="font-size: 16px; opacity: 0.4;">ᴀA&nbsp;&nbsp;🔖</div>
+    </div>
+    <div id="article">
+      <div id="articleContent" class="fade-page"></div>
+    </div>
+    <div id="app-footer">
+        <div class="progress-container"><div class="progress-dot" id="dot"></div></div>
+        <div class="footer-info"><span>第 <span id="cur-p"></span> 頁 / 共 100 頁</span></div>
+    </div>
+    <div id="prevPageArea" onclick="prev()"></div>
+    <div id="nextPageArea" onclick="next()"></div>
+</div>
+
+<script>
+    var stack = [{suit:"梅花",number:"4"},{suit:"紅心",number:"2"},{suit:"方塊",number:"7"},{suit:"梅花",number:"3"},{suit:"紅心",number:"4"},{suit:"方塊",number:"6"},{suit:"黑桃",number:"A"},{suit:"紅心",number:"5"},{suit:"黑桃",number:"9"},{suit:"黑桃",number:"2"},{suit:"紅心",number:"Q"},{suit:"方塊",number:"3"},{suit:"梅花",number:"Q"},{suit:"紅心",number:"8"},{suit:"黑桃",number:"6"},{suit:"黑桃",number:"5"},{suit:"紅心",number:"9"},{suit:"梅花",number:"K"},{suit:"方塊",number:"2"},{suit:"紅心",number:"J"},{suit:"黑桃",number:"3"},{suit:"黑桃",number:"8"},{suit:"紅心",number:"6"},{suit:"梅花",number:"10"},{suit:"方塊",number:"5"},{suit:"方塊",number:"K"},{suit:"梅花",number:"2"},{suit:"紅心",number:"3"},{suit:"方塊",number:"8"},{suit:"梅花",number:"5"},{suit:"黑桃",number:"K"},{suit:"方塊",number:"J"},{suit:"梅花",number:"8"},{suit:"黑桃",number:"10"},{suit:"紅心",number:"K"},{suit:"梅花",number:"J"},{suit:"黑桃",number:"7"},{suit:"紅心",number:"10"},{suit:"方塊",number:"A"},{suit:"黑桃",number:"4"},{suit:"紅心",number:"7"},{suit:"方塊",number:"4"},{suit:"梅花",number:"A"},{suit:"梅花",number:"9"},{suit:"黑桃",number:"J"},{suit:"方塊",number:"Q"},{suit:"梅花",number:"7"},{suit:"黑桃",number:"Q"},{suit:"方塊",number:"10"},{suit:"梅花",number:"6"},{suit:"紅心",number:"A"},{suit:"方塊",number:"9"}];
+    var allDecks = {};
+    for (var i = 0; i < 13; i++) { allDecks[String.fromCharCode(65 + i)] = stack.slice(i * 4).concat(stack.slice(0, i * 4)); }
+
+    var resultAction = "", currentPage = 37;
+
+    // UI 切換邏輯
+    function openBookInfo() { document.getElementById("library-view").style.display = "none"; document.getElementById("info-view").style.display = "flex"; }
+    function closeBookInfo() { document.getElementById("info-view").style.display = "none"; document.getElementById("library-view").style.display = "block"; }
+    function openSetup() { document.getElementById("info-view").style.display = "none"; document.getElementById("magic-setup").style.display = "block"; }
+    function closeSetup() { document.getElementById("magic-setup").style.display = "none"; document.getElementById("info-view").style.display = "flex"; }
+    
+    function chooseCard(v) { document.getElementById("cardInput").value += v; }
+    function chooseNumInput(v) { document.getElementById("cardInput").value += v; }
+    function chooseNumber(v) { document.getElementById("number").value += v; }
+    
+    function resetApp() {
+        document.getElementById("ebook-app").style.display = "none";
+        document.getElementById("library-view").style.display = "block";
+        document.getElementById("cardInput").value = "";
+        document.getElementById("number").value = "";
+    }
+
+    function calculate() {
+        var cv = document.getElementById("cardInput").value, nv = parseInt(document.getElementById("number").value), parsed = parse(cv);
+        if (!parsed || isNaN(nv)) { alert("請正確輸入權限參數"); return; }
+        let found = false;
+        for (let k in allDecks) {
+            let deck = allDecks[k], pos = getPos(deck, parsed);
+            if (pos + 2 === nv) { setRes(k, "背面向上一張張往下發"); found = true; break; }
+            if (pos === nv) { setRes(k, "拿掉廣告牌後，背面向上一張張往下發"); found = true; break; }
+            if (55 - pos === nv) { setRes(k, "牌面向上一張一張往下發，使我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
+            if (53 - pos === nv) { setRes(k, "拿掉鬼牌後，牌面向上一張一張往下發，同時我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
+        }
+        if(!found) { alert("此序列超出了讀取範圍。"); return; }
+        document.getElementById("magic-setup").style.display = "none";
+        document.getElementById("ebook-app").style.display = "flex";
+        document.getElementById("article").style.display = "block";
+        document.getElementById("app-footer").style.display = "block";
+        document.getElementById("watermark").style.display = "block";
+        document.getElementById("prevPageArea").style.display = "block";
+        document.getElementById("nextPageArea").style.display = "block";
+        currentPage = 37; render();
+    }
+
+    function setRes(k, act) {
+        var locs = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
+        resultAction = `從${locs[k]}拿出一副撲克牌，大衛請我將牌取出，${act}，發到第 32 張`;
+    }
+
+    function getPos(d, t) { for(var i=0; i<d.length; i++) if(d[i].suit === t.s && d[i].number === t.number) return i + 1; return -1; }
+    function parse(s) { var m = s.match(/^(黑桃|紅心|方塊|梅花)([2-9]|10|A|J|Q|K)$/); return m ? { s: m[1], number: m[2] } : null; }
+
+    const dict = {
+        T: ["潛意識結構分析","機率學的心理偽裝","非語義溝通實務","符號學的表演維度","絕對公平之假象","認知斷層實驗","沈默的權威建立","視覺殘影操縱術","時間感知的重構學","壓力下的選擇引導","冷讀術的深度架構","環境變數與控制","預期管理機制","虛假記憶的植入法","雙重現實的邏輯鏈"],
+        S1: ["心靈魔術的核心不在於手法，而在於認知的重構。","我們必須承認，所謂的自由意志在特定環境下極易被操控。","真正的魔法發生在那些觀眾尚未察覺的心理縫隙中。","大師曾強調，位移不僅是物理動作，更是意識的錯位。","心靈感應並非超能力，而是一種對環境細節的極致利用策略。"],
+        S2: ["利用環境中的自然噪音遮蔽關鍵動作，是 19 世紀以來心靈師的祕密。","當觀眾說出數字時，你的眼神交會頻率將直接決定其確信程度。","在看似隨機的排列中，人類大腦會自動填補符合邏輯的解釋。","冷讀的核心在於對普遍共性的精確捕捉，而非盲目猜測。","建立一個絕對封閉且公平的場域，是達成 ACAAN 聖杯的先決條件。"],
+        N: ["注意：嚴禁在同一批觀眾前重複使用相同的暗示邏輯。","註解：此技術在 1976 年的私人記錄中有詳細的心理變量分析。","大師筆記：沈默是建立場域控制最強大的武器。","警告：過度依賴此技術可能導致觀眾產生嚴重的認知偏誤。"]
+    };
+
+    function getDynamicContent(p) {
+        if (p === 1) return `<div id="book-cover" style="background:#2c1e16;color:#d4af37;"><div class="cover-title">THE MAGIC<br>SENTINEL</div><div class="cover-subtitle">心靈位移與絕對認知的極限研究<br>VOL. III — INTERNAL USE</div></div>`;
+        if (p === 35) return `<p>大衛·巴格拉斯（David Berglas）被譽為當代最神祕的心理學表演家。下圖記錄了他操作傳奇 ACAAN 之前的準備神情。</p><div class="book-img"><img src="book1.jpg" alt="Photo"></div><p>他曾強調，心靈魔術最核心的祕密是：「在不可能發生的瞬間，給予最合理的解釋。」</p>`;
+        if (p === 37) return `<p class="drop-cap">那是我第一次親眼見證這項奇蹟。大衛先分享了一個有趣的故事後，便緩緩起身，${resultAction}。當數到最後那一張牌時，空氣彷彿凝固了...</p><p>你知道的...那張牌正是「方塊 5」！那一刻，我意識到自己正在親眼見證傳說中的「巴格拉斯效果」。</p><div class="master-note">分析：此動作之關鍵在於地點與拿取動作的絕對自然，讓位移在光天化日下完成。</div>`;
+        
+        let t = dict.T[p % dict.T.length];
+        let s1 = dict.S1[(p * 3) % dict.S1.length];
+        let s2 = dict.S2[(p + 17) % dict.S2.length];
+        let n = dict.N[(p + 5) % dict.N.length];
+        return `<h2>${t}</h2><p class="drop-cap">${s1}</p><p>${s2}</p><div class="master-note">${n}</div><p>我們必須認識到，這種心理維度的操縱是區分愛好者與大師的分水嶺。</p>`;
+    }
+
+    function render() {
+        var content = document.getElementById("articleContent"), pgText = document.getElementById("cur-p"), dot = document.getElementById("dot"), artDiv = document.getElementById("article");
+        artDiv.scrollTop = 0; content.classList.remove("fade-page"); void content.offsetWidth; content.classList.add("fade-page");
+        dot.style.left = currentPage + "%"; pgText.innerText = currentPage;
+        content.innerHTML = getDynamicContent(currentPage);
+    }
+
+    function next() { if(currentPage < 100) { currentPage++; render(); } }
+    function prev() { if(currentPage > 1) { currentPage--; render(); } }
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("keydown", e => { if (e.keyCode == 123 || (e.ctrlKey && e.key.toLowerCase() === 'u')) e.preventDefault(); });
+</script>
+</body>
+</html>
