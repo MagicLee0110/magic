@@ -8,7 +8,6 @@
  <title>電子樹APP</title>
  <link rel="apple-touch-icon" href="Tree.png">
  <link rel="icon" href="Tree.png" type="image/png">
- <link rel="apple-touch-icon" href="Tree.png">
  <style>
     :root {
         --paper-bg: #fffdfb; --text-color: #787878; --header-text: #bbbbbb; --accent-brown: #8b572a; --shelf-bg: #ffffff; --ui-blue: #007aff; --ui-gray: #f2f2f7;
@@ -223,9 +222,8 @@
     function parse(s) { var m = s.match(/^(黑桃|紅心|方塊|梅花)([2-9]|10|A|J|Q|K)$/); return m ? { s: m[1], number: m[2] } : null; }
 
     function getDynamicContent(p) {
-        if (p === 34) return `<h2 style="text-align:center; margin-top:60px; font-weight:300; letter-spacing:5px;">SECTION III</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown); letter-spacing:2px;">巴格拉斯效果</h1><p class="drop-cap" style="margin-top:40px;">毫無疑問，這個效果已經到達了「傳奇」的地位。這是一個如此不可能的效果，以至於魔術圈內最聰明的人都在絞盡腦汁地尋找解決辦法，甚至有些人根本不相信這個效果的存在，本章我將帶與你一同分享，這個傳奇的故事。</p>`;
-        if (p === 35) return `<p>心靈魔術的聖杯——ACAAN至今已擁有多年的歷史，隨便一張牌任意一個數字的巧合，世界各地的魔術師都擁有屬於自己的ACAAN版本。最具代表性的莫過於大衛·巴格拉斯（David Berglas）。</p><div class="book-img"><img src="book1.jpg" alt="Photo"></div><p>至今依然沒有一個魔術師能完全解釋大衛是如何運作這個效果的。大衛總是拒絕解釋秘密，是為了留下觀眾心中的奇蹟。</p>`;
-        if (p === 36) return `<p>在那倫敦的午後，壁爐旁的對話依然清晰。大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。大衛聽完後，露出了那個標誌性的神祕微笑。</p>`;
+        if (p === 35) return `<h2 style="text-align:center; margin-top:60px; font-weight:300; letter-spacing:5px;">SECTION III</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown); letter-spacing:2px;">巴格拉斯效果</h1><p class="drop-cap" style="margin-top:40px;">毫無疑問，這個效果已經到達了「傳奇」的地位。這是一個如此不可能的效果，以至於魔術圈內最聰明的人都在絞盡腦汁地尋找解決辦法，甚至有些人根本不相信這個效果的存在，本章我將帶與你一同分享，這個傳奇的故事。</p>`;
+        if (p === 36) return `<p>心靈魔術的聖杯——ACAAN至今已擁有多年的歷史，隨便一張牌任意一個數字的巧合，世界各地的魔術師都擁有屬於自己的ACAAN版本。最具代表性的莫過於大衛·巴格拉斯（David Berglas）。</p><div class="book-img"><img src="book1.jpg" alt="Photo"></div><p>至今依然沒有一個魔術師能完全解釋大衛是如何運作這個效果的。大衛總是拒絕解釋秘密，是為了留下觀眾心中的奇蹟。</p>`;
         if (p === 37) return `<p class="drop-cap">故事發生在 1976 年。當時我已認識大衛多年，始終未能親眼目睹傳聞中的奇蹟。直到那次，大衛邀請我去他家作客。記得當時聊的正愉快時，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。</p><p>大衛先分享了一個有趣的小故事後，便緩緩起身，${resultAction} 當數到第 32 張時，空氣仿佛凝固了...</p><p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天...這就是傳說中的「巴格拉斯效果」，多希望你們也能夠在場見證。</p>`;
         if (p === 38) return `<p style="margin-top:180px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><div class="master-note" style="text-align:center;">至此後，我不斷地在尋找任何可能的答案...但一切都太不可能了，直到現在，我還是一點想法都沒有。</div>`;
         if (p === 39) return `<p>接下來，我將分享透過這些年的研究，無數的夜晚，思索出的ACAAN理論模型。這涉及到對觀眾選擇路徑的徹底封鎖。</p>`;
@@ -245,4 +243,3 @@
 </script>
 </body>
 </html>
-
