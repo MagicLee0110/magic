@@ -7,12 +7,13 @@
  <meta name="apple-mobile-web-app-status-bar-style" content="default">
  <style>
     :root {
-        --paper-bg: #fffdfb; --text-color: #787878; --header-text: #666; --accent-brown: #8b572a; --shelf-bg: #ffffff; --ui-blue: #007aff;
+        --paper-bg: #fffdfb; --text-color: #787878; --header-text: #bbbbbb; --accent-brown: #8b572a; --shelf-bg: #ffffff; --ui-blue: #007aff;
     }
+    /* 徹底消除手機端點擊回饋 */
     * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; outline: none; box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, sans-serif; overflow: hidden; }
 
-    /* --- 第一層：書櫃介面 --- */
+    /* --- 書櫃介面 --- */
     #library-view { background-color: var(--shelf-bg); width: 100%; max-width: 500px; height: 100dvh; margin: 0 auto; display: flex; flex-direction: column; z-index: 300; position: relative; }
     .lib-header { height: 60px; display: flex; align-items: center; padding: env(safe-area-inset-top, 0) 20px 0; font-size: 20px; font-weight: bold; border-bottom: 1px solid #f0f0f0; }
     .lib-content { flex: 1; overflow-y: auto; padding: 20px; }
@@ -20,21 +21,22 @@
     .book-card { display: flex; flex-direction: column; cursor: pointer; }
     .book-cover {
         width: 100%; aspect-ratio: 2/3; border-radius: 6px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); position: relative; overflow: hidden;
-        display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-size: 14px; font-weight: bold; color: white;
+        display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-size: 15px; font-weight: bold; color: white;
     }
     .book-cover::after { content: ''; position: absolute; top:0; left:0; width: 8px; height:100%; background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(0,0,0,0.1)); }
     .book-info { margin-top: 10px; font-size: 13px; color: #333; height: 36px; overflow: hidden; font-weight: 500; }
-    .book-progress { font-size: 11px; color: #999; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .book-progress { font-size: 11px; color: #999; margin-top: 4px; }
+    
     .nav-bar { height: calc(60px + env(safe-area-inset-bottom, 0)); border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom, 0); background: #fafafa; }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #999; }
     .nav-item.active { color: var(--ui-blue); }
 
-    /* --- 第二層：書籍詳情 --- */
+    /* --- 書籍詳情 --- */
     #info-view { display: none; background: white; width: 100%; height: 100dvh; position: absolute; top: 0; left: 0; z-index: 400; padding: 40px 25px; flex-direction: column; align-items: center; }
     .info-cover { width: 160px; height: 240px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-weight: bold; text-align: center; }
-    .read-btn { width: 100%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 8px; font-weight: bold; margin-top: auto; text-align: center; font-size: 16px; }
+    .read-btn { width: 100%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 8px; font-weight: bold; margin-top: auto; text-align: center; }
 
-    /* --- 第三層：經典輸入設定 (恢復原本美觀樣式) --- */
+    /* --- 經典輸入介面 (完全恢復您原本的樣式) --- */
     #magic-setup { flex: 1; padding: 25px 20px; text-align: center; overflow-y: auto; display: none; z-index: 600; background: white; width:100%; height:100dvh; position:absolute; top:0; left:0; }
     .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
     .small-button { 
@@ -52,24 +54,26 @@
         border-radius: 30px; font-size: 18px; font-weight: bold; margin-top: 15px; 
         box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 85%;
     }
-    .reset-btn { background: none; border: 1px solid #ccc; color: #999; padding: 10px 20px; border-radius: 20px; font-size: 14px; margin-top: 20px; width: 60%; }
+    .reset-btn { background: none; border: 1px solid #ddd; color: #bbb; padding: 10px; border-radius: 20px; width: 60%; margin-top: 20px; font-size: 13px; }
 
-    /* --- 第四層：全屏閱讀器 --- */
+    /* --- 閱讀器樣式 (完全恢復您原本的內容樣式) --- */
     #ebook-app { background-color: var(--paper-bg); width: 100%; max-width: 500px; height: 100dvh; display: none; flex-direction: column; margin: 0 auto; position: relative; overflow: hidden; z-index: 500; }
     #app-header { flex-shrink: 0; height: calc(55px + env(safe-area-inset-top, 0)); display: flex; justify-content: space-between; align-items: center; padding: env(safe-area-inset-top, 0) 15px 0; border-bottom: 1px solid rgba(0,0,0,0.04); background: var(--paper-bg); }
     #article { flex: 1; overflow-y: auto; padding: 25px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); -webkit-overflow-scrolling: touch; }
     #article p { margin-bottom: 35px; text-indent: 2em; font-family: "Noto Serif TC", serif; letter-spacing: 0.8px; }
     #app-footer { flex-shrink: 0; background: var(--paper-bg); border-top: 1px solid rgba(0,0,0,0.04); padding: 15px 30px calc(15px + env(safe-area-inset-bottom, 10px)) 30px; }
+    .progress-container { width:100%; height:2px; background:#f2f2f2; position:relative; margin-bottom:12px; }
     .progress-dot { width: 7px; height: 7px; background: var(--accent-brown); border-radius: 50%; position: absolute; top: -2.5px; transition: left 0.6s ease; }
+    .footer-info { display: flex; justify-content: center; font-size: 10px; color: #cccccc; letter-spacing: 2px; font-weight: bold; }
     
     #prevArea, #nextArea { position: absolute; top: 80px; bottom: 80px; width: 35%; z-index: 1000; }
     #prevArea { left: 0; } #nextArea { right: 0; }
     .fade-page { animation: fadeIn 0.6s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    .drop-cap::first-letter { float: left; font-size: 50px; line-height: 1; padding: 4px 8px 0 0; color: var(--accent-brown); font-family: serif; }
+    .drop-cap::first-letter { float: left; font-size: 52px; line-height: 1; padding-top: 4px; padding-right: 8px; color: var(--accent-brown); font-family: "Noto Serif TC", serif; }
     .master-note { background: rgba(0,0,0,0.02); border-left: 2px solid var(--accent-brown); padding: 15px; margin: 30px 0; font-size: 16px; font-style: italic; color: #999; }
-    .book-img { text-align: center; margin: 25px 0; }
-    .book-img img { max-width: 100%; filter: sepia(15%); opacity: 0.85; }
+    .book-img { text-align: center; margin: 25px 0; padding: 10px; border: 1px solid rgba(0,0,0,0.02); }
+    .book-img img { max-width: 100%; filter: sepia(15%) contrast(90%); opacity: 0.85; }
  </style>
 </head>
 <body>
@@ -78,8 +82,8 @@
     <div class="lib-header">我的書櫃</div>
     <div class="lib-content">
         <div class="book-grid">
-            <div class="book-card" onclick="alert('同步中...')">
-                <div class="book-cover" style="background:linear-gradient(135deg, #4a5a6a, #2c3e50)">暗示的心理機制</div>
+            <div class="book-card" onclick="alert('雲端同步中...')">
+                <div class="book-cover" style="background:linear-gradient(135deg, #3d4a5d, #232d3a)">暗示的心理機制</div>
                 <div class="book-info">認知心理學應用</div><div class="book-progress">未讀</div>
             </div>
             <div class="book-card" onclick="handleBookClick()">
@@ -129,13 +133,12 @@
     <div class="btn-group">
         <button class="small-button" onclick="chooseCard('A')">A</button><button class="small-button" onclick="chooseNumInput('2')">2</button><button class="small-button" onclick="chooseNumInput('3')">3</button><button class="small-button" onclick="chooseNumInput('4')">4</button><button class="small-button" onclick="chooseNumInput('5')">5</button><button class="small-button" onclick="chooseNumInput('6')">6</button><button class="small-button" onclick="chooseNumInput('7')">7</button><button class="small-button" onclick="chooseNumInput('8')">8</button><button class="small-button" onclick="chooseNumInput('9')">9</button><button class="small-button" onclick="chooseNumInput('10')">10</button><button class="small-button" onclick="chooseCard('J')">J</button><button class="small-button" onclick="chooseCard('Q')">Q</button><button class="small-button" onclick="chooseCard('K')">K</button>
     </div>
-    <input type="text" id="cardInput" readonly placeholder="SET STACK">
+    <input type="text" id="cardInput" readonly placeholder="請點選撲克牌">
     <div class="btn-group">
         <button class="small-button" onclick="chooseNumber('1')">1</button><button class="small-button" onclick="chooseNumber('2')">2</button><button class="small-button" onclick="chooseNumber('3')">3</button><button class="small-button" onclick="chooseNumber('4')">4</button><button class="small-button" onclick="chooseNumber('5')">5</button><button class="small-button" onclick="chooseNumber('6')">6</button><button class="small-button" onclick="chooseNumber('7')">7</button><button class="small-button" onclick="chooseNumber('8')">8</button><button class="small-button" onclick="chooseNumber('9')">9</button><button class="small-button" onclick="chooseNumber('0')">0</button>
     </div>
-    <input type="number" id="number" readonly placeholder="SET INDEX">
-    <button class="calc-btn" onclick="calculate()">啟動閱讀權限</button>
-    <br>
+    <input type="number" id="number" readonly placeholder="請點選數字">
+    <button class="calc-btn" onclick="calculate()">啟動大師手稿</button>
     <button class="reset-btn" onclick="clearInputs()">重新輸入</button>
 </div>
 
@@ -147,9 +150,7 @@
     </div>
     <div id="article"><div id="articleContent" class="fade-page"></div></div>
     <div id="app-footer">
-        <div class="progress-container" style="width:100%; height:2px; background:#f2f2f2; position:relative; margin-bottom:12px;">
-            <div class="progress-dot" id="dot"></div>
-        </div>
+        <div class="progress-container"><div class="progress-dot" id="dot"></div></div>
         <div class="footer-info">第 <span id="cur-p"></span> 頁 / 共 100 頁</div>
     </div>
     <div id="prevArea" onclick="prev()"></div><div id="nextArea" onclick="next()"></div>
@@ -161,7 +162,6 @@
 
     var resultAction = "", currentPage = 37, isCalculated = false;
 
-    // 頁面切換與記憶邏輯
     function handleBookClick() {
         if (isCalculated) {
             document.getElementById("library-view").style.display = "none";
@@ -176,7 +176,7 @@
     function closeInfo() { document.getElementById("info-view").style.display = "none"; document.getElementById("library-view").style.display = "flex"; }
     function openSetup() { document.getElementById("info-view").style.display = "none"; document.getElementById("magic-setup").style.display = "block"; }
     function closeSetup() { document.getElementById("magic-setup").style.display = "none"; document.getElementById("info-view").style.display = "flex"; }
-    function fullReset() { isCalculated = false; currentPage = 37; clearInputs(); alert("書架已同步更新"); }
+    function fullReset() { isCalculated = false; currentPage = 37; clearInputs(); alert("書架資料已更新"); }
 
     function chooseCard(v) { document.getElementById("cardInput").value += v; }
     function chooseNumInput(v) { document.getElementById("cardInput").value += v; }
@@ -185,7 +185,7 @@
 
     function calculate() {
         var cv = document.getElementById("cardInput").value, nv = parseInt(document.getElementById("number").value), parsed = parse(cv);
-        if (!parsed || isNaN(nv)) { alert("驗證錯誤"); return; }
+        if (!parsed || isNaN(nv)) { alert("請正確驗證讀取權限"); return; }
         let found = false;
         for (let k in allDecks) {
             let deck = allDecks[k], pos = getPos(deck, parsed);
@@ -194,7 +194,7 @@
             if (55 - pos === nv) { setRes(k, "牌面向上一張一張往下發，使我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
             if (53 - pos === nv) { setRes(k, "拿掉鬼牌後，牌面向上一張一張往下發，同時我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
         }
-        if(!found) { alert("序號無效"); return; }
+        if(!found) { alert("此代碼無效"); return; }
         isCalculated = true; document.getElementById("magic-setup").style.display = "none"; document.getElementById("ebook-app").style.display = "flex"; render();
     }
 
@@ -206,19 +206,19 @@
     function parse(s) { var m = s.match(/^(黑桃|紅心|方塊|梅花)([2-9]|10|A|J|Q|K)$/); return m ? { s: m[1], number: m[2] } : null; }
 
     const dict = {
-        T: ["認知失調理論","預期管理機制","深度冷讀術","雙重現實架構","行為心理學應用","機率論與潛意識","視覺殘影操縱","沈默的命令","絕對位移邏輯","場域控制技術","虛假記憶植入","認知斷層實驗","微表情精確捕捉","符號學的表演化","心理強制技術"],
+        T: ["認知失調理論","預期管理機制","深度冷讀術","雙重現實架構","行為心理學應用","機率論與潛意識","視覺殘影操縱","沈默的命令","絕對位移邏輯","場域控制技術","虛假記憶植入","認知斷層實驗","微表情精確捕捉","符號學的表演化"],
         S1: ["心靈魔術的核心不在於手法，而在於認知的重構。","我們必須承認，所謂的自由意志在特定環境下極易被操控。","真正的魔法發生在那些觀眾尚未察覺的心理縫隙中。","大師曾強調，位移不僅是物理動作，更是意識的錯位。","心靈感應並非超能力，而是一種對環境細節的極致利用策略。"],
         S2: ["利用環境中的自然噪音遮蔽關鍵動作，是 19 世紀以來心靈師的祕密。","當觀眾說出數字時，你的眼神交會頻率將直接決定其確信程度。","在看似隨機的排列中，人類大腦會自動填補符合邏輯的解釋。","冷讀的核心在於對普遍共性的精確捕捉，而非盲目猜測。","建立一個絕對封閉且公平的場域，是達成 ACAAN 聖杯的先決條件。"]
     };
 
     function getDynamicContent(p) {
-        if (p === 34) return `<h2 style="text-align:center; margin-top:60px;">Chapter 3</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown);">傳奇的見證錄</h1><p style="text-align:center; margin-top:40px;">記錄 1976 年與大衛·巴格拉斯的一場歷史交鋒。</p>`;
-        if (p === 35) return `<p>心靈魔術的聖杯——ACAAN至今已擁有多年的歷史，隨便一張牌任意一個數字的巧合，世界各地的魔術師都擁有屬於自己的ACAAN版本。最具代表性的莫過於大衛·巴格拉斯（David Berglas）。</p><div class="book-img"><img src="book1.jpg" alt="Archive"></div><p>至今依然沒有一個魔術師能完全解釋大衛是如何運作這個效果的。大衛總是拒絕解釋秘密，是為了留下觀眾心中的奇蹟。</p>`;
+        if (p === 34) return `<h2 style="text-align:center; margin-top:60px; font-weight:300; letter-spacing:5px;">SECTION III</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown); letter-spacing:2px;">巴格拉斯效果</h1><p class="drop-cap" style="margin-top:40px;">毫無疑問，這個效果已經到達了「傳奇」的地位。這是一個如此不可能的效果，以至於魔術圈內最聰明的人都在絞盡腦汁地尋找解決辦法，甚至有些人根本不相信這個效果的存在，本章我將帶與你一同分享，這個傳奇的故事。</p>`;
+        if (p === 35) return `<p>心靈魔術的聖杯——ACAAN至今已擁有多年的歷史，隨便一張牌任意一個數字的巧合，世界各地的魔術師都擁有屬於自己的ACAAN版本。最具代表性的莫過於大衛·巴格拉斯（David Berglas）。</p><div class="book-img"><img src="book1.jpg" alt="Photo"></div><p>至今依然沒有一個魔術師能完全解釋大衛是如何運作這個效果的。大衛總是拒絕解釋秘密，是為了留下觀眾心中的奇蹟。</p>`;
         if (p === 36) return `<p>在那倫敦的午後，壁爐旁的對話依然清晰。大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。大衛聽完後，露出了那個標誌性的神祕微笑。</p>`;
-        if (p === 37) return `<p class="drop-cap">那是奇蹟發生的瞬間。大衛先分享了一個有趣的小故事後，便緩緩起身，${resultAction} 當數到第 32 張時，空氣仿佛凝固了...</p><p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天...這就是傳說中的「巴格拉斯效果」，多希望你們也能夠在場見證。</p>`;
+        if (p === 37) return `<p class="drop-cap">故事發生在 1976 年。當時我已認識大衛多年，始終未能親眼目睹傳聞中的奇蹟。直到那次，大衛邀請我去他家作客。記得當時聊的正愉快時，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。</p><p>大衛先分享了一個有趣的小故事後，便緩緩起身，${resultAction} 當數到第 32 張時，空氣仿佛凝固了...</p><p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天...這就是傳說中的「巴格拉斯效果」，多希望你們也能夠在場見證。</p>`;
         if (p === 38) return `<p style="margin-top:180px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><div class="master-note" style="text-align:center;">至此後，我不斷地在尋找任何可能的答案...但一切都太不可能了，直到現在，我還是一點想法都沒有。</div>`;
         if (p === 39) return `<p>接下來，我將分享透過這些年的研究，無數的夜晚，思索出的ACAAN理論模型。這涉及到對觀眾選擇路徑的徹底封鎖。</p>`;
-        if (p === 40) return `<h2 style="text-align:center; margin-top:80px; color:var(--header-text);">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">第四章：屬於我的 ACAAN 最終實務</p>`;
+        if (p === 40) return `<h2 style="text-align:center; margin-top:80px; color:var(--header-text); letter-spacing:3px;">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">第四章：屬於我的 ACAAN 最終實務</p>`;
         
         let t = dict.T[p % dict.T.length], s1 = dict.S1[(p * 3) % dict.S1.length], s2 = dict.S2[(p + 17) % dict.S2.length];
         return `<h2>${t}</h2><p class="drop-cap">${s1}</p><p>${s2}</p><div class="master-note">Archive Ref: #MN-${p*7}</div><p>我們必須認識到，這種心理維度的操縱是區分愛好者與大師的分水嶺。</p>`;
