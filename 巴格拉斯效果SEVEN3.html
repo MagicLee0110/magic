@@ -8,13 +8,13 @@
  <style>
     :root {
         --paper-bg: #fffdfb; 
-        --text-color: #787878; /* 雅灰色墨水感 */
+        --text-color: #787878; /* 雅灰色，極致模擬紙本墨水 */
         --header-text: #bbbbbb; 
         --accent-brown: #8b572a;
         --ui-fade: rgba(0,0,0,0.04);
     }
 
-    /* 徹底消除手機端點擊回饋、高亮與文字選取 */
+    /* 徹底消除手機端點擊回饋 */
     * {
         -webkit-tap-highlight-color: transparent !important;
         -webkit-touch-callout: none;
@@ -27,12 +27,12 @@
     html, body { 
         margin: 0; padding: 0; 
         height: 100%; width: 100%;
-        background-color: #111; 
+        background-color: #000; 
         font-family: "PingFang TC", "Microsoft JhengHei", serif; 
         overflow: hidden;
     }
 
-    /* APP 容器 */
+    /* APP 主容器 */
     #ebook-app { 
         background-color: var(--paper-bg); 
         width: 100%;
@@ -45,22 +45,22 @@
         overflow: hidden;
     }
 
-    /* 專業浮水印：清晰但低調 */
+    /* 浮水印：稍微加深質感 */
     #watermark {
         position: absolute;
         top: 55%; left: 50%;
         transform: translate(-50%, -50%) rotate(-30deg);
-        font-size: 34px;
-        color: rgba(0,0,0,0.04); /* 修正：稍微加深質感 */
+        font-size: 32px;
+        color: rgba(0,0,0,0.04); 
         white-space: nowrap;
         pointer-events: none;
         z-index: 1;
         font-weight: bold;
-        letter-spacing: 12px;
+        letter-spacing: 15px;
         display: none;
     }
 
-    /* 頂部 APP Bar */
+    /* 頂部導航列 */
     #app-header {
         flex-shrink: 0;
         height: calc(55px + env(safe-area-inset-top, 0));
@@ -74,13 +74,13 @@
         z-index: 100;
     }
 
-    /* 內容區塊 */
+    /* 核心內容區塊 */
     #article { 
         flex: 1; 
         overflow-y: auto; 
         padding: 30px 25px 60px 35px;
         text-align: justify; 
-        line-height: 2.3; 
+        line-height: 2.4; 
         font-size: 18px; 
         color: var(--text-color); 
         position: relative;
@@ -89,37 +89,59 @@
         display: none;
     }
     #article::-webkit-scrollbar { display: none; }
+
+    /* 首字下沉效果 */
+    .drop-cap::first-letter {
+        float: left;
+        font-size: 52px;
+        line-height: 1;
+        padding-top: 4px;
+        padding-right: 8px;
+        color: var(--accent-brown);
+        font-family: "Noto Serif TC", serif;
+    }
+
     #article p { 
         margin-bottom: 35px; 
         text-indent: 2em; 
         font-family: "Noto Serif TC", "Songti TC", serif;
-        letter-spacing: 0.6px;
+        letter-spacing: 0.8px;
     }
 
-    /* 圖片印刷感樣式 */
+    /* 大師教學註解 */
+    .master-note {
+        background: rgba(139, 87, 42, 0.02);
+        border-left: 2px solid var(--accent-brown);
+        padding: 15px 20px;
+        margin: 40px 0;
+        font-size: 16px;
+        font-style: italic;
+        color: #999;
+    }
+
+    /* 圖片印刷樣式 */
     .book-image-container {
         text-align: center;
-        margin: 25px 0;
-        padding: 8px;
-        background: rgba(0,0,0,0.01);
-        border: 1px solid rgba(0,0,0,0.03);
+        margin: 35px 0;
+        padding: 10px;
+        border: 0.5px solid rgba(0,0,0,0.05);
     }
     .book-image-container img {
         max-width: 100%;
         height: auto;
-        opacity: 0.85;
-        filter: sepia(12%) contrast(90%); /* 模擬紙張印刷感 */
+        opacity: 0.8;
+        filter: sepia(15%) contrast(85%) brightness(105%);
     }
-    .img-caption { font-size: 12px; color: #ccc; margin-top: 8px; font-style: italic; }
+    .img-caption { font-size: 11px; color: #ccc; margin-top: 12px; letter-spacing: 2px; }
 
-    /* 左側書脊陰影 */
+    /* 書脊立體摺痕 */
     #ebook-app::after {
-        content: ""; position: absolute; top: 0; left: 0; width: 16px; height: 100%;
+        content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 100%;
         background: linear-gradient(to right, rgba(0,0,0,0.05) 0%, transparent 100%);
         pointer-events: none; z-index: 150;
     }
 
-    /* 底部進度列 */
+    /* 底部進度條：全書 100 頁規模 */
     #app-footer {
         flex-shrink: 0;
         background: var(--paper-bg);
@@ -128,47 +150,38 @@
         z-index: 100;
         display: none; 
     }
-    .progress-container {
-        width: 100%; height: 2px; background: #f2f2f2;
-        position: relative; margin-bottom: 12px;
-    }
+    .progress-container { width: 100%; height: 2px; background: #f4f4f4; position: relative; margin-bottom: 15px; }
     .progress-dot {
-        width: 7px; height: 7px; background: var(--accent-brown);
-        border-radius: 50%; position: absolute; top: -2.5px;
-        transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        width: 6px; height: 6px; background: var(--accent-brown);
+        border-radius: 50%; position: absolute; top: -2px;
+        transition: left 0.8s cubic-bezier(0.19, 1, 0.22, 1);
     }
-    .footer-info {
-        display: flex; justify-content: center;
-        font-size: 10px; color: #cccccc; letter-spacing: 2px; font-weight: bold;
-    }
+    .footer-info { display: flex; justify-content: center; font-size: 10px; color: #d0d0d0; letter-spacing: 3px; font-weight: bold; }
 
-    /* 初始面板介面 */
+    /* 設定控制面板介面 */
     #inputSection { flex: 1; padding: 25px 20px; text-align: center; overflow-y: auto; z-index: 50; }
     .btn-group { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
     .small-button { 
         width: 44px; height: 44px; font-size: 20px; margin: 3px; cursor: pointer; 
-        border: 1px solid #eee; border-radius: 10px; background: white; 
-        color: #777;
+        border: 1px solid #eee; border-radius: 10px; background: white; color: #777;
     }
     .small-button:active { background: #fafafa; transform: scale(0.95); }
     input { 
         width: 85%; padding: 15px; border: 1px solid #f0f0f0; border-radius: 12px; 
-        margin: 15px 0; text-align: center; font-size: 18px; color: var(--accent-brown);
-        background: #fff; font-weight: bold;
+        margin: 15px 0; text-align: center; font-size: 18px; color: var(--accent-brown); font-weight: bold;
     }
     .calc-btn { 
-        background: var(--accent-brown); color: white; border: none; 
-        padding: 16px 50px; border-radius: 35px; font-size: 18px; font-weight: bold; 
-        margin-top: 20px; box-shadow: 0 4px 12px rgba(139, 87, 42, 0.15);
+        background: var(--accent-brown); color: white; border: none; padding: 16px 50px; border-radius: 35px; 
+        font-size: 18px; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 15px rgba(139, 87, 42, 0.15);
     }
 
-    /* 翻頁透明熱區 */
-    #prevPageArea, #nextPageArea { position: absolute; top: 60px; bottom: 80px; width: 30%; z-index: 200; display: none; }
+    /* 翻頁透明感應熱區 */
+    #prevPageArea, #nextPageArea { position: absolute; top: 15%; bottom: 15%; width: 35%; z-index: 200; display: none; }
     #prevPageArea { left: 0; }
     #nextPageArea { right: 0; }
 
-    .fade-page { animation: fadeIn 0.6s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-page { animation: fadeIn 0.7s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
  </style>
 </head>
 <body>
@@ -178,7 +191,7 @@
 
     <div id="app-header">
         <span onclick="resetApp()" style="font-size: 32px; padding: 0 10px; cursor: pointer; font-weight: 300;">‹</span>
-        <span id="app-title" style="font-size: 13px; font-weight: bold; letter-spacing: 2px; color: #d0d0d0;">書架</span>
+        <span id="app-title" style="font-size: 12px; font-weight: bold; letter-spacing: 2px; color: #d0d0d0;">COLLECTION</span>
         <div style="font-size: 16px; opacity: 0.5;">ᴀA&nbsp;&nbsp;🔖</div>
     </div>
 
@@ -219,7 +232,7 @@
       </div>
       <input type="number" id="number" readonly placeholder="設定目標索引">
       <br>
-      <button class="calc-btn" onclick="calculate()">啟動閱讀模式</button>
+      <button class="calc-btn" onclick="calculate()">啟動大師手稿</button>
     </div>
 
     <div id="article">
@@ -229,7 +242,7 @@
     <div id="app-footer">
         <div class="progress-container"><div class="progress-dot" id="dot"></div></div>
         <div class="footer-info">
-            <span>CHAPTER 3 / PAGE <span id="cur-p"></span></span>
+            <span>CHAPTER III / <span id="cur-p"></span> OF 100</span>
         </div>
     </div>
 
@@ -261,7 +274,7 @@
     }
 
     var resultAction = "";
-    var currentPage = 4; // 啟動後直接設定為第4頁（核心揭曉頁）
+    var currentPage = 4; // 啟動直接進入核心案例
     var basePg = 37;
 
     function chooseCard(v) { document.getElementById("cardInput").value += v; }
@@ -277,7 +290,7 @@
         document.getElementById("watermark").style.display = "none";
         document.getElementById("prevPageArea").style.display = "none";
         document.getElementById("nextPageArea").style.display = "none";
-        document.getElementById("app-title").innerText = "書架";
+        document.getElementById("app-title").innerText = "私人目錄";
         currentPage = 4;
     }
 
@@ -285,7 +298,7 @@
         var cv = document.getElementById("cardInput").value;
         var nv = parseInt(document.getElementById("number").value);
         var parsed = parse(cv);
-        if (!parsed || isNaN(nv)) { alert("設定尚未完成"); return; }
+        if (!parsed || isNaN(nv)) { alert("手稿序列設定未完成"); return; }
         let found = false;
         for (let k in allDecks) {
             let deck = allDecks[k];
@@ -295,7 +308,7 @@
             if (55 - pos === nv) { setRes(k, "牌面向上一張一張往下發，使我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
             if (53 - pos === nv) { setRes(k, "拿掉鬼牌後，牌面向上一張一張往下發，同時我可以清楚的看見每一張撲克牌的牌面"); found = true; break; }
         }
-        if(!found) { alert("此組合超出了位移限制。"); return; }
+        if(!found) { alert("此序列超出了計算路徑。"); return; }
         
         document.getElementById("inputSection").style.display = "none";
         document.getElementById("article").style.display = "block";
@@ -303,8 +316,7 @@
         document.getElementById("watermark").style.display = "block";
         document.getElementById("prevPageArea").style.display = "block";
         document.getElementById("nextPageArea").style.display = "block";
-        document.getElementById("app-title").innerText = "我與大衛的故事";
-        currentPage = 4; // 確保啟動時就在核心頁面
+        document.getElementById("app-title").innerText = "INTERNAL MANUSCRIPT - V3";
         render();
     }
 
@@ -335,34 +347,30 @@
         void content.offsetWidth; 
         content.classList.add("fade-page");
 
-        dot.style.left = (currentPage * 10) + "%";
+        // 100 頁進度計算：核心頁面落在 35%~45% 左右
+        var physicalPage = basePg + (currentPage - 4);
+        dot.style.left = physicalPage + "%";
+        pgText.innerText = physicalPage;
 
         if (currentPage === 1) {
-            content.innerHTML = `<h2 style="text-align:center; margin-top:80px; font-weight:300;">Chapter 3</h2><h1 style="text-align:center; font-size:28px; color:var(--accent-brown);">傳奇的見證錄</h1><p style="text-align:center; margin-top:40px;">這是一段塵封已久的回憶，記錄著我與那位被譽為魔術界「聖杯」的大師——大衛·巴格拉斯的交集。</p>`;
-            pgText.innerText = basePg - 3;
+            content.innerHTML = `<h2 style="text-align:center; margin-top:60px; font-weight:300; letter-spacing:5px;">SECTION III</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown); letter-spacing:2px;">心理機率與絕對位移</h1><p class="drop-cap" style="margin-top:40px;">在本章中，我們將探討大衛·巴格拉斯如何利用觀看者的認知偏誤，在看似極端隨機的狀態下，達成物理位置的絕對精準。這不僅是手法，更是一場關於權威與服從的實驗。</p>`;
         } else if (currentPage === 2) {
-            content.innerHTML = `<p>在正式開始這段故事前，我們必須先理解 ACAAN（Any Card At Any Number）在魔術界的地位。這被稱為聖殿級的效果，而在大衛面前，這一切看起來更像是純粹的奇蹟。</p><p>多年來，無數魔術師試圖拆解他的手法，但最終都只能感嘆那不僅是技術，更是一場關於心理與機率的極限博弈。</p>`;
-            pgText.innerText = basePg - 2;
+            content.innerHTML = `<p>任何心靈魔術的聖杯——ACAAN，其核心祕密不在於撲克牌，而在於「數字的合法性」。當觀眾說出數字後，我們必須建立一套無懈可擊的邏輯來解釋接下來的動作。</p><div class="master-note">核心準則：在數牌之前，永遠要讓觀眾相信，牌組從未離開過他們的視線。沈默，是建立這層信任的最佳工具。</div>`;
         } else if (currentPage === 3) {
-            content.innerHTML = `<p>大衛·巴格拉斯是一位優雅且神祕的傳奇人物。當他看著你時，你彷彿能感覺到他正在讀取你的靈魂。</p><div class="book-image-container"><img src="book1.jpg" alt="David Berglas"><div class="img-caption">攝於 1976 年的大衛·巴格拉斯</div></div><p>他曾對我說過一句話：「真正的魔法，發生在那些你看不見的縫隙裡。」</p>`;
-            pgText.innerText = basePg - 1;
+            content.innerHTML = `<p>大衛·巴格拉斯（David Berglas）在他位於倫敦的私人檔案室中，曾展示過這個系統。這份記錄來自 1970 年代的現場實錄。</p><div class="book-image-container"><img src="book1.jpg" alt="Vintage Berglas Archive"><div class="img-caption">Fig 3.2 - 私人手稿中的 ACAAN 實驗場景錄像</div></div><p>他曾說：最好的位移，是發生在觀眾點頭同意的那一瞬間。</p>`;
         } else if (currentPage === 4) {
             content.innerHTML = `
-                <p>故事發生在 1976 年的一個午後。那是我多年來第一次被邀請去大衛家作客。我們聊得正愉快時，大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
-                <p>我當時不假思索地回答：「方塊 5，32」。</p>
-                <p>大衛先是分享了一個有趣的小故事後，便緩緩起身，${resultAction} 當數到第 32 張時，空氣彷彿凝固了...</p>
-                <p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天，這就是傳說中的「巴格拉斯效果」。</p>
+                <p class="drop-cap">故事發生在 1976 年。當時我已認識大衛多年，始終未能親眼目睹傳聞中的奇蹟。直到那次，大衛邀請我去他家作客。壁爐旁，氣氛輕鬆，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
+                <p>我不假思索地回答：「方塊 5，32」。</p>
+                <p>大衛分享了一個趣事後，緩緩起身，${resultAction} 當數到第 32 張時，空氣彷彿凝固了...</p>
+                <p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
             `;
-            pgText.innerText = basePg;
         } else if (currentPage === 5) {
-            content.innerHTML = `<p style="margin-top:200px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><p style="text-align:center; opacity: 0.5;">那場奇蹟之後，我陷入了長久的思考，試圖理解大衛究竟是如何在那樣自然的狀態下完成這一切的。</p>`;
-            pgText.innerText = basePg + 1;
+            content.innerHTML = `<p style="margin-top:180px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><div class="master-note" style="text-align:center;">分析：大衛在此案例中使用了極其自然的環境道具位移法，值得所有學習者深思。</div>`;
         } else if (currentPage === 6) {
-            content.innerHTML = `<p>魔術的迷人之處不在於解答，而在於那個「無法被解答」的瞬間。大衛帶給我的影響不僅僅是技巧，更是一種對表演藝術的極致尊重。</p><p>每一副牌在他手中都有了生命，每一次發牌都是命運的交錯。而我們能做的，僅僅是屏息見證。</p>`;
-            pgText.innerText = basePg + 2;
+            content.innerHTML = `<p>本案例的研究意義：大衛的技術不在於「如何達成」，而是在於「何時達成」。這涉及到心理節奏的掌控。</p><p>每一張落下的牌，都是在加強觀眾對「不可能」的確信。當最終目標揭曉，心靈牆壁會瞬間崩塌，這就是藝術。</p>`;
         } else if (currentPage === 7) {
-            content.innerHTML = `<h2 style="text-align:center; margin-top:80px; color:var(--header-text);">End of Chapter 3</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 30%;"><p style="text-align:center; font-size:14px; opacity: 0.5;">下章預告：追尋奇蹟的旅程：從倫敦到拉斯維加斯</p>`;
-            pgText.innerText = basePg + 3;
+            content.innerHTML = `<h2 style="text-align:center; margin-top:80px; color:var(--header-text); letter-spacing:3px;">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">下一章節：機率的欺騙——如何操縱未知的選擇</p>`;
         }
     }
 
