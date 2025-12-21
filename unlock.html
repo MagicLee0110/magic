@@ -43,7 +43,7 @@
             transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s;
         }
 
-        /* --- 1. 密碼畫面 (黑色背景) --- */
+        /* --- 1. 密碼畫面 --- */
         #passcode-screen {
             background-color: #000;
             z-index: 20;
@@ -53,7 +53,7 @@
         }
 
         .passcode-header {
-            margin-top: 15vh; /* 調整此高度以避開手機上方的動態島 */
+            margin-top: 15vh; /* 調整此高度以對齊動態島下方 */
             text-align: center;
         }
 
@@ -67,7 +67,7 @@
         .dots {
             display: flex;
             gap: 22px;
-            margin-bottom: 55px;
+            margin-bottom: 50px;
         }
 
         .dot {
@@ -93,7 +93,7 @@
             width: 82px;
             height: 82px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.12); /* 模仿 iOS 數字鍵色澤 */
+            background: rgba(255, 255, 255, 0.12);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -113,17 +113,18 @@
             letter-spacing: 1px;
         }
 
+        /* 底部文字按鈕 (修正位置) */
         .footer {
             position: absolute;
-            bottom: 50px;
+            bottom: 100px; /* 已從 50px 移上來到 100px，避免被卡掉 */
             width: 85%;
             display: flex;
             justify-content: space-between;
             font-size: 17px;
-            padding: 0 10px;
+            padding: 0 15px;
         }
 
-        /* --- 2. 主畫面 (裁切後的截圖) --- */
+        /* --- 2. 主畫面 --- */
         #home-screen {
             background-image: url('image_4.jpg');
             background-size: cover;
@@ -214,11 +215,10 @@
             updateDots();
         }
 
-        // 禁止 iOS 系統下拉與滾動回彈
+        // 禁止 iOS 的彈性滾動與下拉刷新
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
     </script>
 </body>
 </html>
-
