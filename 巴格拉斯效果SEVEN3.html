@@ -8,13 +8,13 @@
  <style>
     :root {
         --paper-bg: #fffdfb; 
-        --text-color: #606060; /* 修正：更淡的墨灰色，模擬真實電子書質感 */
-        --header-text: #aaaaaa; 
+        --text-color: #787878; /* 雅灰色內文 */
+        --header-text: #bbbbbb; 
         --accent-brown: #8b572a;
         --ui-fade: rgba(0,0,0,0.04);
     }
 
-    /* 消除所有手機端的預設點擊回饋、高亮與文字選取 */
+    /* 徹底消除點擊閃爍、文字選取與右鍵選單 */
     * {
         -webkit-tap-highlight-color: transparent !important;
         -webkit-touch-callout: none;
@@ -45,18 +45,18 @@
         overflow: hidden;
     }
 
-    /* 專業浮水印：更淡、更低調 */
+    /* 專業浮水印：稍微加深質感 */
     #watermark {
         position: absolute;
         top: 55%; left: 50%;
         transform: translate(-50%, -50%) rotate(-30deg);
-        font-size: 32px;
-        color: rgba(0,0,0,0.035); /* 極致淡化，若有若無 */
+        font-size: 34px;
+        color: rgba(0,0,0,0.04); /* 修正：稍微加深的鋼印感 */
         white-space: nowrap;
         pointer-events: none;
         z-index: 1;
         font-weight: bold;
-        letter-spacing: 15px;
+        letter-spacing: 12px;
         display: none;
     }
 
@@ -78,7 +78,7 @@
     #article { 
         flex: 1; 
         overflow-y: auto; 
-        padding: 30px 25px 50px 35px;
+        padding: 30px 25px 60px 35px;
         text-align: justify; 
         line-height: 2.3; 
         font-size: 18px; 
@@ -99,11 +99,11 @@
     /* 書脊裝訂立體感 */
     #ebook-app::after {
         content: ""; position: absolute; top: 0; left: 0; width: 16px; height: 100%;
-        background: linear-gradient(to right, rgba(0,0,0,0.05) 0%, transparent 100%);
+        background: linear-gradient(to right, rgba(0,0,0,0.04) 0%, transparent 100%);
         pointer-events: none; z-index: 150;
     }
 
-    /* 底部進度列：適配釘選模式 */
+    /* 底部進度列 */
     #app-footer {
         flex-shrink: 0;
         background: var(--paper-bg);
@@ -123,7 +123,7 @@
     }
     .footer-info {
         display: flex; justify-content: center;
-        font-size: 10px; color: #cccccc; letter-spacing: 2px; font-weight: bold;
+        font-size: 10px; color: #dddddd; letter-spacing: 2px; font-weight: bold;
     }
 
     /* 初始面板介面 */
@@ -132,7 +132,7 @@
     .small-button { 
         width: 44px; height: 44px; font-size: 20px; margin: 3px; cursor: pointer; 
         border: 1px solid #eee; border-radius: 10px; background: white; 
-        color: #666;
+        color: #777;
     }
     .small-button:active { background: #fafafa; transform: scale(0.95); }
     input { 
@@ -143,7 +143,7 @@
     .calc-btn { 
         background: var(--accent-brown); color: white; border: none; 
         padding: 16px 50px; border-radius: 35px; font-size: 18px; font-weight: bold; 
-        margin-top: 20px; box-shadow: 0 4px 12px rgba(139, 87, 42, 0.15);
+        margin-top: 20px; box-shadow: 0 4px 12px rgba(139, 87, 42, 0.1);
     }
 
     /* 翻頁透明感應熱區 */
@@ -162,8 +162,8 @@
 
     <div id="app-header">
         <span onclick="resetApp()" style="font-size: 32px; padding: 0 10px; cursor: pointer; font-weight: 300;">‹</span>
-        <span id="app-title" style="font-size: 13px; font-weight: bold; letter-spacing: 2px; color: #bbbbbb;">書架</span>
-        <div style="font-size: 16px; opacity: 0.5;">ᴀA&nbsp;&nbsp;🔖</div>
+        <span id="app-title" style="font-size: 13px; font-weight: bold; letter-spacing: 2px; color: #d0d0d0;">書架</span>
+        <div style="font-size: 16px; opacity: 0.4;">ᴀA&nbsp;&nbsp;🔖</div>
     </div>
 
     <div id="inputSection">
@@ -188,7 +188,7 @@
         <button class="small-button" onclick="chooseCard('Q')">Q</button>
         <button class="small-button" onclick="chooseCard('K')">K</button>
       </div>
-      <input type="text" id="cardInput" readonly placeholder="請輸入撲克牌">
+      <input type="text" id="cardInput" readonly placeholder="請點選撲克牌">
       <div class="btn-group">
         <button class="small-button" onclick="chooseNumber('1')">1</button>
         <button class="small-button" onclick="chooseNumber('2')">2</button>
@@ -201,7 +201,7 @@
         <button class="small-button" onclick="chooseNumber('9')">9</button>
         <button class="small-button" onclick="chooseNumber('0')">0</button>
       </div>
-      <input type="number" id="number" readonly placeholder="請輸入數字">
+      <input type="number" id="number" readonly placeholder="請點選數字">
       <br>
       <button class="calc-btn" onclick="calculate()">啟動閱讀模式</button>
     </div>
@@ -262,7 +262,7 @@
         document.getElementById("prevPageArea").style.display = "none";
         document.getElementById("nextPageArea").style.display = "none";
         document.getElementById("app-title").innerText = "書架";
-        document.getElementById("app-title").style.color = "#bbbbbb";
+        document.getElementById("app-title").style.color = "#d0d0d0";
     }
 
     function calculate() {
@@ -274,10 +274,10 @@
         for (let k in allDecks) {
             let deck = allDecks[k];
             let pos = getPos(deck, parsed);
-            if (pos + 2 === nv) { setRes(k, "背面向上一張一張往下發", nv); found = true; break; }
-            if (pos === nv) { setRes(k, "拿掉兩張廣告牌後", "背面向上一張張往下發", nv); found = true; break; }
-            if (55 - pos === nv) { setRes(k, "牌面向上一張一張往下發，使我可以清楚的看見每一張撲克牌都是不同的，", nv); found = true; break; }
-            if (53 - pos === nv) { setRes(k, "拿掉兩張鬼牌後", "牌面向上一張一張往下發，同時我可以清楚的看見每一張撲克牌都是不同的，", nv); found = true; break; }
+            if (pos + 2 === nv) { setRes(k, "背面向上一張張往下發"); found = true; break; }
+            if (pos === nv) { setRes(k, "拿掉兩張廣告牌後，背面向上一張張往下發"); found = true; break; }
+            if (55 - pos === nv) { setRes(k, "牌面向上一張一張往下發，使我可以清楚的看見每一張撲克牌都是不同的"); found = true; break; }
+            if (53 - pos === nv) { setRes(k, "拿掉兩張鬼牌後，牌面向上一張一張往下發，同時我可以清楚的看見每一張撲克牌都是不同的"); found = true; break; }
         }
         if(!found) { alert("此組合超出了位移限制。"); return; }
         
@@ -288,11 +288,12 @@
         document.getElementById("prevPageArea").style.display = "block";
         document.getElementById("nextPageArea").style.display = "block";
         document.getElementById("app-title").innerText = "我與大衛的故事";
-        document.getElementById("app-title").style.color = "#999999";
+        document.getElementById("app-title").style.color = "#bbbbbb";
         render();
     }
 
-    function setRes(k, act, dir, n) {
+    // 修正核心：將 dir 位置固定為字串 "發"
+    function setRes(k, act) {
         var locs = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"};
         resultAction = `從${locs[k]}拿出一副撲克牌，大衛請我將牌取出，${act}，發到第 32 張，`;
         basePg = k.charCodeAt(0) - 64 + 30;
@@ -320,21 +321,21 @@
         content.classList.add("fade-page");
 
         if (currentPage === 1) {
-            content.innerHTML = `<p>大衛·巴格拉斯（David Berglas），魔術史上最神祕的名字。他曾讓無數大師感到絕望。</p><div style="text-align:center; padding: 25px 0;"><img src="book1.jpg" style="width:95%; border-radius:4px; box-shadow:0 8px 25px rgba(0,0,0,0.12); opacity: 0.9;"></div><p>ACAAN 是一場心靈與機率的極限交鋒。在他面前，撲克牌彷彿有了生命。</p>`;
+            content.innerHTML = `<p>大衛·巴格拉斯（David Berglas），魔術史上最神祕的名字。他曾讓無數大師感到絕望。</p><div style="text-align:center; padding: 25px 0;"><img src="book1.jpg" style="width:95%; border-radius:4px; box-shadow:0 8px 25px rgba(0,0,0,0.1); opacity: 0.85;"></div><p>ACAAN 是一場心靈與機率的極限交鋒。在他面前，撲克牌彷彿有了生命。</p>`;
             pgText.innerText = basePg - 1;
             dot.style.left = "10%";
         } else if (currentPage === 2) {
             content.innerHTML = `
-                <p>這段故事發生在 1976 年。當時我已認識大衛多年，但始終未能親眼見到那個傳說中的奇蹟。直到那天，大衛邀請我去他家作客。</p>
+                <p>這段故事發生在 1976 年。當時我已認識大衛多年，但始終未能親眼見到那個傳說中的奇蹟。直到那次，大衛邀請我去他家作客。</p>
                 <p>記得我們聊得正愉快時，大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p>
                 <p>我不假思索地回答：「方塊 5，32」。</p>
                 <p>大衛先是分享了一個有趣的小故事後，便緩緩起身，${resultAction} 當數到第 32 張時，空氣彷彿凝固了...</p>
-                <p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天，這就是傳說中的「巴格拉斯效果」。</p>
+                <p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天。這就是傳說中的「巴格拉斯效果」。</p>
             `;
             pgText.innerText = basePg;
             dot.style.left = "20%";
         } else if (currentPage === 3) {
-            content.innerHTML = `<p style="margin-top:220px; text-align:center; font-style:italic; color: #aaaaaa; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p>`;
+            content.innerHTML = `<p style="margin-top:220px; text-align:center; font-style:italic; color: #bbbbbb; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p>`;
             pgText.innerText = basePg + 1;
             dot.style.left = "30%";
         }
