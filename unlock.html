@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iPhone Lock Simulator</title>
+    <title>iPhone Simulator</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
@@ -20,11 +20,12 @@
         }
 
         body {
-            background-color: #000; /* 背景全黑 */
+            background-color: #000;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
             font-family: var(--ios-font);
+            color: white;
         }
 
         .container {
@@ -33,46 +34,43 @@
             position: relative;
         }
 
+        /* 螢幕基礎樣式 */
         .screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s;
         }
 
-        /* --- 1. 輸入密碼視窗 (純黑背景) --- */
+        /* --- 1. 密碼畫面 (黑色背景 + 元素上移) --- */
         #passcode-screen {
             background-color: #000;
             z-index: 20;
             display: flex;
             flex-direction: column;
             align-items: center;
+            /* 調整 padding-top 可以控制整個內容的上移程度 */
+            padding-top: 10vh; 
         }
 
-        /* 內容整體上移 */
-        .passcode-content {
-            margin-top: 20%; /* 調整此數值可讓內容整體上下移動 */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
+        .passcode-header {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
-        .passcode-title {
-            color: white;
-            font-size: 22px;
+        .title {
+            font-size: 20px;
             font-weight: 400;
-            margin-bottom: 30px;
-            letter-spacing: 1px;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
         }
 
-        /* 密碼圓點 */
+        /* 密碼點 */
         .dots {
             display: flex;
-            gap: 25px;
-            margin-bottom: 55px;
+            gap: 22px;
         }
 
         .dot {
@@ -80,7 +78,7 @@
             height: 13px;
             border: 1.5px solid white;
             border-radius: 50%;
-            transition: background 0.15s;
+            transition: background 0.1s;
         }
 
         .dot.filled {
@@ -91,25 +89,24 @@
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px 32px;
+            gap: 15px 30px;
         }
 
         .key {
-            width: 78px;
-            height: 78px;
+            width: 82px;
+            height: 82px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.12); /* 微微發光的灰色按鈕 */
-            color: white;
+            background: rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 34px;
+            font-size: 36px;
             cursor: pointer;
         }
 
         .key:active {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.4);
         }
 
         .key span {
@@ -119,21 +116,19 @@
             letter-spacing: 1px;
         }
 
-        /* 底部按鈕 */
-        .bottom-actions {
+        /* 底部文字 */
+        .footer {
             position: absolute;
-            bottom: 55px;
-            width: 75%;
+            bottom: 60px;
+            width: 80%;
             display: flex;
             justify-content: space-between;
-            color: white;
             font-size: 17px;
-            font-weight: 400;
         }
 
-        /* --- 2. 主畫面 (你的截圖) --- */
+        /* --- 2. 主畫面 (你的 image_1.jpg) --- */
         #home-screen {
-            background-image: url('image_1.jpg');
+            background-image: url('image_1.jpg'); /* 已更新為 jpg */
             background-size: cover;
             background-position: center;
             z-index: 10;
@@ -141,11 +136,11 @@
             transform: scale(1.1);
         }
 
-        /* 解鎖後的動畫狀態 */
+        /* 解鎖動畫效果 */
         .unlocked #passcode-screen {
             opacity: 0;
             pointer-events: none;
-            transform: scale(1.15);
+            transform: scale(1.2);
         }
 
         .unlocked #home-screen {
@@ -159,33 +154,29 @@
     <div class="container" id="main-container">
         
         <div class="screen" id="passcode-screen">
-            <div class="passcode-content">
-                <div class="passcode-title">輸入密碼</div>
-                
+            <div class="passcode-header">
+                <div class="title">輸入密碼</div>
                 <div class="dots">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-
-                <div class="keypad">
-                    <div class="key" onclick="press(1)">1</div>
-                    <div class="key" onclick="press(2)">2<span>ABC</span></div>
-                    <div class="key" onclick="press(3)">3<span>DEF</span></div>
-                    <div class="key" onclick="press(4)">4<span>GHI</span></div>
-                    <div class="key" onclick="press(5)">5<span>JKL</span></div>
-                    <div class="key" onclick="press(6)">6<span>MNO</span></div>
-                    <div class="key" onclick="press(7)">7<span>PQRS</span></div>
-                    <div class="key" onclick="press(8)">8<span>TUV</span></div>
-                    <div class="key" onclick="press(9)">9<span>WXYZ</span></div>
-                    <div></div>
-                    <div class="key" onclick="press(0)">0</div>
-                    <div></div>
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 </div>
             </div>
 
-            <div class="bottom-actions">
+            <div class="keypad">
+                <div class="key" onclick="press(1)">1</div>
+                <div class="key" onclick="press(2)">2<span>ABC</span></div>
+                <div class="key" onclick="press(3)">3<span>DEF</span></div>
+                <div class="key" onclick="press(4)">4<span>GHI</span></div>
+                <div class="key" onclick="press(5)">5<span>JKL</span></div>
+                <div class="key" onclick="press(6)">6<span>MNO</span></div>
+                <div class="key" onclick="press(7)">7<span>PQRS</span></div>
+                <div class="key" onclick="press(8)">8<span>TUV</span></div>
+                <div class="key" onclick="press(9)">9<span>WXYZ</span></div>
+                <div style="width:82px"></div>
+                <div class="key" onclick="press(0)">0</div>
+                <div style="width:82px"></div>
+            </div>
+
+            <div class="footer">
                 <div>緊急服務</div>
                 <div onclick="reset()">取消</div>
             </div>
@@ -205,7 +196,6 @@
                 currentPasscode += num;
                 updateDots();
                 if (currentPasscode.length === 4) {
-                    // 輸入完成後稍微延遲 0.2 秒再解鎖，效果較真實
                     setTimeout(unlock, 200);
                 }
             }
@@ -213,11 +203,8 @@
 
         function updateDots() {
             dots.forEach((dot, index) => {
-                if (index < currentPasscode.length) {
-                    dot.classList.add('filled');
-                } else {
-                    dot.classList.remove('filled');
-                }
+                if (index < currentPasscode.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
             });
         }
 
@@ -230,9 +217,8 @@
             updateDots();
         }
 
-        // 禁止 iOS 網頁下拉回彈與滑動刷新
+        // 禁止 iOS 的彈性滾動，讓它更像原生 App
         document.addEventListener('touchmove', function(e) {
-            if (e.touches.length > 1) return;
             e.preventDefault();
         }, { passive: false });
     </script>
