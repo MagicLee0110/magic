@@ -34,7 +34,6 @@
             position: relative;
         }
 
-        /* 螢幕基礎樣式 */
         .screen {
             position: absolute;
             top: 0;
@@ -44,33 +43,31 @@
             transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s;
         }
 
-        /* --- 1. 密碼畫面 (黑色背景 + 元素上移) --- */
+        /* --- 1. 密碼畫面 (黑色背景) --- */
         #passcode-screen {
             background-color: #000;
             z-index: 20;
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* 調整 padding-top 可以控制整個內容的上移程度 */
-            padding-top: 10vh; 
         }
 
         .passcode-header {
+            margin-top: 15vh; /* 調整此高度以避開手機上方的動態島 */
             text-align: center;
-            margin-bottom: 40px;
         }
 
         .title {
-            font-size: 20px;
+            font-size: 21px;
             font-weight: 400;
-            margin-bottom: 25px;
+            margin-bottom: 28px;
             letter-spacing: 0.5px;
         }
 
-        /* 密碼點 */
         .dots {
             display: flex;
             gap: 22px;
+            margin-bottom: 55px;
         }
 
         .dot {
@@ -89,14 +86,14 @@
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px 30px;
+            gap: 18px 32px;
         }
 
         .key {
             width: 82px;
             height: 82px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12); /* 模仿 iOS 數字鍵色澤 */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -106,7 +103,7 @@
         }
 
         .key:active {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .key span {
@@ -116,19 +113,19 @@
             letter-spacing: 1px;
         }
 
-        /* 底部文字 */
         .footer {
             position: absolute;
-            bottom: 60px;
-            width: 80%;
+            bottom: 50px;
+            width: 85%;
             display: flex;
             justify-content: space-between;
             font-size: 17px;
+            padding: 0 10px;
         }
 
-        /* --- 2. 主畫面 (你的 image_1.jpg) --- */
+        /* --- 2. 主畫面 (裁切後的截圖) --- */
         #home-screen {
-            background-image: url('image_1.jpg'); /* 已更新為 jpg */
+            background-image: url('home_cropped.png');
             background-size: cover;
             background-position: center;
             z-index: 10;
@@ -217,7 +214,7 @@
             updateDots();
         }
 
-        // 禁止 iOS 的彈性滾動，讓它更像原生 App
+        // 禁止 iOS 系統下拉與滾動回彈
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
