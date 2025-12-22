@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iPhone Simulator</title>
+    <title>iPhone Unlock Simulator</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
@@ -43,24 +43,40 @@
             transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s;
         }
 
-        /* --- 1. 密碼畫面 --- */
+        /* --- 1. 鎖定密碼畫面 (桌布風格) --- */
         #passcode-screen {
-            background-color: #000;
+            background-image: url('lock_bg.png'); /* 使用你提供的紫色解鎖截圖作為底圖 */
+            background-size: cover;
+            background-position: center;
             z-index: 20;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
+        /* 為了對齊截圖中的文字和圓圈，我們建立一個透明的互動層 */
+        .interactive-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* 這裡可以視情況加上輕微的黑色半透明遮罩，讓數字鍵更明顯 */
+            background: rgba(0, 0, 0, 0.1); 
+        }
+
         .passcode-header {
-            margin-top: 15vh; /* 調整此高度以對齊動態島下方 */
+            margin-top: 18vh; /* 調整此高度以避開動態島並對齊標題 */
             text-align: center;
         }
 
         .title {
             font-size: 21px;
             font-weight: 400;
-            margin-bottom: 28px;
+            margin-bottom: 25px;
             letter-spacing: 0.5px;
         }
 
@@ -82,18 +98,21 @@
             background: white;
         }
 
-        /* 數字鍵盤 */
+        /* 數字鍵盤：大小與間距模擬真實 iOS */
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 18px 32px;
+            gap: 16px 32px;
         }
 
         .key {
             width: 82px;
             height: 82px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.12);
+            /* 毛玻璃效果按鍵 */
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -103,7 +122,7 @@
         }
 
         .key:active {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.4);
         }
 
         .key span {
@@ -113,20 +132,21 @@
             letter-spacing: 1px;
         }
 
-        /* 底部文字按鈕 (修正位置) */
+        /* 底部文字按鈕 (大幅上移修正) */
         .footer {
             position: absolute;
-            bottom: 100px; /* 已從 50px 移上來到 100px，避免被卡掉 */
-            width: 85%;
+            bottom: 110px; /* 從底部往上推 110px，確保不被卡掉 */
+            width: 82%;
             display: flex;
             justify-content: space-between;
             font-size: 17px;
-            padding: 0 15px;
+            font-weight: 400;
+            padding: 0 5px;
         }
 
-        /* --- 2. 主畫面 --- */
+        /* --- 2. 主畫面 (裁切後的截圖) --- */
         #home-screen {
-            background-image: url('image_4.jpg');
+            background-image: url('home_cropped.png');
             background-size: cover;
             background-position: center;
             z-index: 10;
@@ -134,11 +154,11 @@
             transform: scale(1.1);
         }
 
-        /* 解鎖動畫效果 */
+        /* 解鎖動畫 */
         .unlocked #passcode-screen {
             opacity: 0;
             pointer-events: none;
-            transform: scale(1.2);
+            transform: scale(1.15);
         }
 
         .unlocked #home-screen {
@@ -152,31 +172,33 @@
     <div class="container" id="main-container">
         
         <div class="screen" id="passcode-screen">
-            <div class="passcode-header">
-                <div class="title">輸入密碼</div>
-                <div class="dots">
-                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="interactive-layer">
+                <div class="passcode-header">
+                    <div class="title">輸入密碼</div>
+                    <div class="dots">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="keypad">
-                <div class="key" onclick="press(1)">1</div>
-                <div class="key" onclick="press(2)">2<span>ABC</span></div>
-                <div class="key" onclick="press(3)">3<span>DEF</span></div>
-                <div class="key" onclick="press(4)">4<span>GHI</span></div>
-                <div class="key" onclick="press(5)">5<span>JKL</span></div>
-                <div class="key" onclick="press(6)">6<span>MNO</span></div>
-                <div class="key" onclick="press(7)">7<span>PQRS</span></div>
-                <div class="key" onclick="press(8)">8<span>TUV</span></div>
-                <div class="key" onclick="press(9)">9<span>WXYZ</span></div>
-                <div style="width:82px"></div>
-                <div class="key" onclick="press(0)">0</div>
-                <div style="width:82px"></div>
-            </div>
+                <div class="keypad">
+                    <div class="key" onclick="press(1)">1</div>
+                    <div class="key" onclick="press(2)">2<span>ABC</span></div>
+                    <div class="key" onclick="press(3)">3<span>DEF</span></div>
+                    <div class="key" onclick="press(4)">4<span>GHI</span></div>
+                    <div class="key" onclick="press(5)">5<span>JKL</span></div>
+                    <div class="key" onclick="press(6)">6<span>MNO</span></div>
+                    <div class="key" onclick="press(7)">7<span>PQRS</span></div>
+                    <div class="key" onclick="press(8)">8<span>TUV</span></div>
+                    <div class="key" onclick="press(9)">9<span>WXYZ</span></div>
+                    <div style="width:82px"></div>
+                    <div class="key" onclick="press(0)">0</div>
+                    <div style="width:82px"></div>
+                </div>
 
-            <div class="footer">
-                <div>緊急服務</div>
-                <div onclick="reset()">取消</div>
+                <div class="footer">
+                    <div>緊急服務</div>
+                    <div onclick="reset()">取消</div>
+                </div>
             </div>
         </div>
 
@@ -215,7 +237,7 @@
             updateDots();
         }
 
-        // 禁止 iOS 的彈性滾動與下拉刷新
+        // 禁止 iOS 頁面下拉與滾動，增加 App 感
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
