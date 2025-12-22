@@ -2,11 +2,12 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>My iPhone Unlock</title>
     <style>
         :root {
-            /* 設定為 iOS 風格字體 */
             --ios-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -18,27 +19,22 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            background-color: #000;
+        /* 讓背景直接從 body 開始填滿，避免邊緣出現黑邊 */
+        body, html {
+            background: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
             font-family: var(--ios-font);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 100%;
+            width: 100%;
             overflow: hidden;
         }
 
-        /* 手機容器 */
         .container {
             width: 100%;
             height: 100%;
-            /* 這裡使用一個近似你桌布的深紫色漸層作為基底 */
-            background: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
             position: relative;
             overflow: hidden;
         }
 
-        /* 螢幕通用樣式 */
         .screen {
             position: absolute;
             top: 0;
@@ -59,16 +55,15 @@
             -webkit-backdrop-filter: blur(10px);
         }
 
-        /* 狀態列模擬 (移除文字後保留上方間距) */
+        /* 使用 env(safe-area-inset-top) 自動適應瀏海高度，內容不會被擋住但背景會延伸上去 */
         .status-bar-sim {
             width: 100%;
-            padding: 15px 25px;
-            height: 50px; /* 固定高度保留上方留白 */
+            padding-top: env(safe-area-inset-top); 
+            height: calc(env(safe-area-inset-top) + 20px);
         }
 
-        /* 密碼輸入區塊 */
         .passcode-area {
-            margin-top: 60px;
+            margin-top: 40px; /* 稍微下移，避開瀏海區域 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -80,7 +75,6 @@
             letter-spacing: 1px;
         }
 
-        /* 四個圓點 */
         .dots-container {
             display: flex;
             gap: 25px;
@@ -98,23 +92,22 @@
             background-color: white;
         }
 
-        /* 數字鍵盤 */
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 25px 35px;
+            gap: 20px 30px;
         }
 
         .key {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 400;
             cursor: pointer;
             transition: background-color 0.1s;
@@ -123,20 +116,20 @@
             background: rgba(255, 255, 255, 0.4);
         }
         .key span {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             letter-spacing: 2px;
             margin-top: -5px;
         }
 
-        /* 底部按鈕 */
         .bottom-buttons {
             position: absolute;
-            bottom: 50px;
-            width: 85%;
+            /* 適應底部安全區域（如 iPhone 的橫條） */
+            bottom: calc(env(safe-area-inset-bottom) + 40px);
+            width: 80%;
             display: flex;
             justify-content: space-between;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 500;
         }
 
@@ -150,7 +143,6 @@
             transform: scale(1.1);
         }
 
-        /* 解鎖後的狀態 */
         .container.unlocked #passcode-screen {
             opacity: 0;
             pointer-events: none;
@@ -211,7 +203,6 @@
             if (currentPasscode.length < 4) {
                 currentPasscode += num;
                 updateDots();
-                
                 if (currentPasscode.length === 4) {
                     setTimeout(unlock, 200);
                 }
