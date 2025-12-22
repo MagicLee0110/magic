@@ -15,7 +15,14 @@
             --main-gradient: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* 關鍵修正：禁用選取、拷貝選單、放大鏡 */
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            -webkit-touch-callout: none; /* 禁用長按選單 */
+            -webkit-user-select: none;   /* 禁用文字選取 */
+            user-select: none;
+        }
 
         html, body {
             margin: 0; padding: 0; width: 100%; height: 100%;
@@ -24,7 +31,6 @@
             background-attachment: fixed;
             overflow: hidden;
             font-family: var(--ios-font);
-            user-select: none;
             transition: background 0.3s ease;
         }
 
@@ -46,22 +52,18 @@
         .key span { font-size: 10px; font-weight: 600; letter-spacing: 2px; margin-top: -3px; }
         .bottom-buttons { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 50px); width: 70%; max-width: 280px; display: flex; justify-content: space-between; font-size: 17px; }
 
-        /* 2. 主畫面 (已移除圖標) */
-        #home-screen { 
-            z-index: 5; background-image: url('image_1.png'); background-size: cover; background-position: center; 
-            opacity: 0; transform: scale(1.1); pointer-events: none;
-        }
+        /* 2. 主畫面 */
+        #home-screen { z-index: 5; background-image: url('image_1.png'); background-size: cover; background-position: center; opacity: 0; transform: scale(1.1); pointer-events: none; }
 
-        /* 3. 計算機 (真運算版 + 反白特效) */
+        /* 3. 計算機 */
         #calc-screen { z-index: 15; background-color: #000; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: env(safe-area-inset-bottom); opacity: 0; pointer-events: none; }
         .calc-display { color: white; font-size: 75px; text-align: right; padding: 20px; font-weight: 300; overflow: hidden; white-space: nowrap; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; }
         
-        /* 計算機按鈕通用樣式 */
-        .calc-btn { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; color: white; cursor: pointer; transition: background 0.1s; }
+        .calc-btn { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; color: white; cursor: pointer; transition: background 0.1s; position: relative; }
         
-        /* 按下去時的反白效果 */
-        .calc-btn:active { background-color: #d1d1d1 !important; color: #000 !important; }
+        /* 修正後的反白效果：點擊時變為亮灰色 */
+        .calc-btn.btn-active { background-color: #d1d1d1 !important; color: #000 !important; }
 
         .calc-btn.gray { background-color: #a5a5a5; color: black; }
         .calc-btn.dark { background-color: #333333; }
@@ -93,9 +95,7 @@
         .show-calc { background: #000 !important; background-image: none !important; }
     </style>
 </head>
-<body>
-
-    <div class="container" id="iphone-container">
+<body ontouchstart=""> <div class="container" id="iphone-container">
         <div class="screen" id="passcode-screen">
             <div class="passcode-area">
                 <div class="passcode-title" onclick="openAdmin()">輸入密碼</div>
@@ -114,30 +114,30 @@
 
         <div class="screen" id="calc-screen">
             <div class="calc-display" id="calc-display">0</div>
-            <div class="calc-grid">
-                <div class="calc-btn gray" id="ac-btn">AC</div>
-                <div class="calc-btn gray" onclick="calcAction('posneg')">+/-</div>
-                <div class="calc-btn gray" onclick="calcAction('percent')">%</div>
-                <div class="calc-btn orange" onclick="calcOp('/')">÷</div>
+            <div class="calc-grid" id="calc-buttons-container">
+                <div class="calc-btn gray" data-type="ac" id="ac-btn">AC</div>
+                <div class="calc-btn gray" data-type="action" data-val="posneg">+/-</div>
+                <div class="calc-btn gray" data-type="action" data-val="percent">%</div>
+                <div class="calc-btn orange" data-type="op" data-val="/">÷</div>
                 
-                <div class="calc-btn dark" onclick="calcNum('7')">7</div>
-                <div class="calc-btn dark" onclick="calcNum('8')">8</div>
-                <div class="calc-btn dark" onclick="calcNum('9')">9</div>
-                <div class="calc-btn orange" onclick="calcOp('*')">×</div>
+                <div class="calc-btn dark" data-type="num" data-val="7">7</div>
+                <div class="calc-btn dark" data-type="num" data-val="8">8</div>
+                <div class="calc-btn dark" data-type="num" data-val="9">9</div>
+                <div class="calc-btn orange" data-type="op" data-val="*">×</div>
                 
-                <div class="calc-btn dark" onclick="calcNum('4')">4</div>
-                <div class="calc-btn dark" onclick="calcNum('5')">5</div>
-                <div class="calc-btn dark" onclick="calcNum('6')">6</div>
-                <div class="calc-btn orange" onclick="calcOp('-')">−</div>
+                <div class="calc-btn dark" data-type="num" data-val="4">4</div>
+                <div class="calc-btn dark" data-type="num" data-val="5">5</div>
+                <div class="calc-btn dark" data-type="num" data-val="6">6</div>
+                <div class="calc-btn orange" data-type="op" data-val="-">−</div>
                 
-                <div class="calc-btn dark" onclick="calcNum('1')">1</div>
-                <div class="calc-btn dark" onclick="calcNum('2')">2</div>
-                <div class="calc-btn dark" onclick="calcNum('3')">3</div>
-                <div class="calc-btn orange" onclick="calcOp('+')">+</div>
+                <div class="calc-btn dark" data-type="num" data-val="1">1</div>
+                <div class="calc-btn dark" data-type="num" data-val="2">2</div>
+                <div class="calc-btn dark" data-type="num" data-val="3">3</div>
+                <div class="calc-btn orange" data-type="op" data-val="+">+</div>
                 
-                <div class="calc-btn dark zero" onclick="calcNum('0')">0</div>
-                <div class="calc-btn dark" onclick="calcNum('.')">.</div>
-                <div class="calc-btn orange" onclick="calcEqual()">=</div>
+                <div class="calc-btn dark zero" data-type="num" data-val="0">0</div>
+                <div class="calc-btn dark" data-type="num" data-val=".">.</div>
+                <div class="calc-btn orange" data-type="equal">=</div>
             </div>
         </div>
 
@@ -158,7 +158,7 @@
         let customTriggerCode = "0000"; 
         let isTriggered = false; 
         let historyLog = []; 
-        let unlockDelay = 0;
+        let unlockDelay = 3;
         let currentBG = 0;
         const bgPresets = [
             { top: '#2a2a3a', grad: 'linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a)' },
@@ -171,7 +171,7 @@
         const calcDisplay = document.getElementById('calc-display');
         const metaTheme = document.getElementById('meta-theme-color');
 
-        function init() { initDots(); renderBgSelector(); applyBG(0); setupACLongPress(); }
+        function init() { initDots(); renderBgSelector(); applyBG(0); setupCalculatorEvents(); }
 
         // --- 密碼邏輯 ---
         function initDots() {
@@ -204,7 +204,7 @@
             const dotsBox = document.getElementById('dots-box');
             setTimeout(() => {
                 dotsBox.classList.add('shake');
-                setTimeout(() => { dotsBox.classList.remove('shake'); reset(); }, 300);
+                setTimeout(() => { dotsBox.classList.remove('shake'); currentPasscode = ""; updateDots(); }, 300);
             }, 100);
         }
         function unlock() {
@@ -216,7 +216,6 @@
                 }
             }, unlockDelay * 1000);
         }
-        function reset() { currentPasscode = ""; updateDots(); }
 
         // --- 真實計算機功能 ---
         let calcVal = '0';
@@ -225,7 +224,50 @@
         let waitingForNext = false;
 
         function updateCalcDisplay() { calcDisplay.innerText = calcVal; }
-        
+
+        function setupCalculatorEvents() {
+            const btns = document.querySelectorAll('.calc-btn');
+            let acTimer;
+
+            btns.forEach(btn => {
+                // 統一處理按壓回饋 (反白)
+                btn.addEventListener('touchstart', (e) => {
+                    btn.classList.add('btn-active');
+                    
+                    // 特殊處理 AC 長按
+                    if (btn.id === 'ac-btn') {
+                        acTimer = setTimeout(lockAgain, 1000);
+                    }
+                });
+
+                btn.addEventListener('touchend', (e) => {
+                    btn.classList.remove('btn-active');
+                    if (btn.id === 'ac-btn') clearTimeout(acTimer);
+                    
+                    // 執行功能
+                    const type = btn.dataset.type;
+                    const val = btn.dataset.val;
+
+                    if (type === 'num') calcNum(val);
+                    if (type === 'op') calcOp(val);
+                    if (type === 'equal') calcEqual();
+                    if (type === 'action') calcAction(val);
+                    if (type === 'ac') {
+                        if (waitingForNext || calcVal !== '0') {
+                            calcVal = '0'; prevVal = null; currentOp = null; waitingForNext = false;
+                            updateCalcDisplay();
+                        }
+                    }
+                    e.preventDefault(); // 防止點擊穿透或雙擊縮放
+                });
+
+                btn.addEventListener('touchcancel', () => {
+                    btn.classList.remove('btn-active');
+                    clearTimeout(acTimer);
+                });
+            });
+        }
+
         function calcNum(n) {
             if (waitingForNext) { calcVal = n; waitingForNext = false; }
             else { calcVal = calcVal === '0' && n !== '.' ? n : calcVal + n; }
@@ -259,28 +301,12 @@
             updateCalcDisplay();
         }
 
-        // --- 長按 AC 重置 ---
-        function setupACLongPress() {
-            const acBtn = document.getElementById('ac-btn');
-            let acTimer;
-            
-            acBtn.addEventListener('touchstart', (e) => {
-                acTimer = setTimeout(lockAgain, 1000);
-            });
-            acBtn.addEventListener('touchend', () => {
-                clearTimeout(acTimer);
-                if (waitingForNext || calcVal !== '0') {
-                    calcVal = '0'; prevVal = null; currentOp = null; waitingForNext = false;
-                    updateCalcDisplay();
-                }
-            });
-            acBtn.addEventListener('mousedown', () => { acTimer = setTimeout(lockAgain, 1000); });
-            acBtn.addEventListener('mouseup', () => clearTimeout(acTimer));
-        }
-
         function lockAgain() {
             document.body.classList.remove('unlocked', 'show-calc');
-            isTriggered = false; reset(); applyBG(currentBG);
+            isTriggered = false;
+            currentPasscode = "";
+            updateDots();
+            applyBG(currentBG);
         }
 
         // --- 後台管理 ---
@@ -315,4 +341,3 @@
     </script>
 </body>
 </html>
-
