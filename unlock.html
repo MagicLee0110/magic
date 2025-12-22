@@ -65,12 +65,10 @@
         .calc-btn { 
             aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; 
             font-size: 32px; color: white; cursor: pointer; 
-            /* 使用更自然的物理彈跳感緩動 */
             transition: background 0.1s, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s; 
             position: relative; z-index: 2;
         }
         
-        /* JavaScript 控制的反白狀態 */
         .calc-btn.btn-active { background-color: #d1d1d1 !important; color: #000 !important; }
 
         .calc-btn.gray { background-color: #a5a5a5; color: black; }
@@ -153,7 +151,7 @@
         <div id="admin-screen">
             <h2 style="margin-bottom: 20px;">後台管理</h2>
             <div class="admin-section"><div class="admin-label">選擇背景</div><div class="bg-grid" id="bg-selector"></div></div>
-            <div class="admin-section"><div class="admin-label">計算機延遲: <span id="delay-val">3</span> 秒</div><input type="range" min="0" max="10" value="3" class="admin-slider" id="delay-slider" oninput="updateDelay(this.value)"></div>
+            <div class="admin-section"><div class="admin-label">計算機開啟延遲: <span id="delay-val">3</span> 秒</div><input type="range" min="0" max="10" value="3" class="admin-slider" id="delay-slider" oninput="updateDelay(this.value)"></div>
             <div class="admin-section">
                 <div class="admin-label">自定義驚喜文字 (/ 0 =)</div>
                 <input type="text" class="admin-input" id="surprise-input" value="生日快樂" onchange="updateSurprise(this.value)">
@@ -165,7 +163,6 @@
     </div>
 
     <script>
-        // --- 全域變數 ---
         let currentPasscode = "";
         let passcodeLength = 4;
         let customTriggerCode = "0000"; 
@@ -174,14 +171,8 @@
         let unlockDelay = 3;
         let surpriseText = "生日快樂";
         let currentBG = 0;
-        let gravityState = 0; // 0:正常, 1:左下, 2:右下
-        
-        const bgPresets = [
-            { top: '#2a2a3a', grad: 'linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a)' },
-            { top: '#121212', grad: 'linear-gradient(to bottom, #121212, #222222, #333333)' },
-            { top: '#0f172a', grad: 'linear-gradient(to bottom, #0f172a, #1e293b, #334155)' },
-            { top: '#000000', grad: 'linear-gradient(to bottom, #000000, #1a1a1a)' }
-        ];
+        let gravityState = 0; 
+        let isTransitioning = false; // 避免延遲期間重複點擊
 
         const container = document.getElementById('iphone-container');
         const calcDisplay = document.getElementById('calc-display');
@@ -189,7 +180,6 @@
 
         function init() { initDots(); renderBgSelector(); applyBG(0); setupCalculatorEvents(); }
 
-        // --- 密碼與解鎖 ---
         function initDots() {
             const dotsBox = document.getElementById('dots-box');
             dotsBox.innerHTML = '';
@@ -234,7 +224,6 @@
         }
         function resetPass() { currentPasscode = ""; updateDots(); }
 
-        // --- 計算機功能 ---
         let calcVal = '0';
         let prevVal = null;
         let currentOp = null;
@@ -316,12 +305,17 @@
             updateCalcDisplay();
         }
 
-        // --- 重力集中核心邏輯 ---
+        // --- 核心更新：2 秒延遲重力 ---
         let lastDisplayTap = 0;
         function handleDisplayTap(e) {
             const now = Date.now();
-            if (now - lastDisplayTap < 300) {
-                cycleGravity();
+            if (now - lastDisplayTap < 300 && !isTransitioning) {
+                isTransitioning = true;
+                // 這裡加入 2 秒延遲
+                setTimeout(() => {
+                    cycleGravity();
+                    isTransitioning = false;
+                }, 2000); 
             }
             lastDisplayTap = now;
         }
@@ -336,21 +330,16 @@
 
             btns.forEach(btn => {
                 if (gravityState === 0) {
-                    // 恢復原位
                     btn.style.transform = `translate(0, 0) rotate(0deg)`;
                 } else {
                     const rect = btn.getBoundingClientRect();
-                    const randomRotate = (Math.random() - 0.5) * 160; // 隨機大旋轉
-                    
-                    // 計算到底部的 Y 距離
+                    const randomRotate = (Math.random() - 0.5) * 160; 
                     const dropY = screenHeight - rect.bottom - 20; 
                     let dropX = 0;
 
                     if (gravityState === 1) {
-                        // 往左下集中 (算好位移量)
                         dropX = -rect.left + 20 + (Math.random() * 40);
                     } else if (gravityState === 2) {
-                        // 往右下集中
                         dropX = screenWidth - rect.right - 20 - (Math.random() * 40);
                     }
                     
@@ -369,7 +358,6 @@
             applyBG(currentBG);
         }
 
-        // --- 後台管理 ---
         function openAdmin() {
             document.getElementById('admin-screen').style.display = 'flex';
             document.getElementById('trigger-input').value = customTriggerCode;
