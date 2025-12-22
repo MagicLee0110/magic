@@ -34,7 +34,7 @@
         /* 1. 鎖定畫面 */
         #passcode-screen { z-index: 10; display: flex; flex-direction: column; align-items: center; color: white; opacity: 1; pointer-events: auto; }
         .passcode-area { margin-top: calc(env(safe-area-inset-top) + 60px); display: flex; flex-direction: column; align-items: center; }
-        .passcode-title { font-size: 22px; margin-bottom: 25px; letter-spacing: 1px; cursor: pointer; padding: 20px; position: relative; z-index: 100; pointer-events: auto !important; }
+        .passcode-title { font-size: 22px; margin-bottom: 25px; letter-spacing: 1px; cursor: pointer; padding: 20px; position: relative; z-index: 100; }
         .dots-container { display: flex; gap: 20px; margin-bottom: 50px; height: 20px; }
         .dot { width: 14px; height: 14px; border: 1.5px solid white; border-radius: 50%; transition: background-color 0.2s; }
         .dot.filled { background-color: white; }
@@ -42,27 +42,27 @@
         .shake { animation: shake 0.3s ease-in-out; }
         .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 30px; }
         .key { width: 78px; height: 78px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 34px; font-weight: 400; cursor: pointer; }
-        .key:active { background: rgba(255, 255, 255, 0.3); }
+        .key:active { background: rgba(255, 255, 255, 0.4); }
         .key span { font-size: 10px; font-weight: 600; letter-spacing: 2px; margin-top: -3px; }
         .bottom-buttons { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 50px); width: 70%; max-width: 280px; display: flex; justify-content: space-between; font-size: 17px; }
 
-        /* 2. 主畫面 */
+        /* 2. 主畫面 (已移除圖標) */
         #home-screen { 
             z-index: 5; background-image: url('image_1.png'); background-size: cover; background-position: center; 
             opacity: 0; transform: scale(1.1); pointer-events: none;
-            padding-top: calc(env(safe-area-inset-top) + 40px); padding-left: 20px; padding-right: 20px;
         }
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px 20px; width: 100%; }
-        .app-icon-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .app-icon { width: 60px; height: 60px; border-radius: 14px; background-color: #333; background-image: url('unlock.jpg'); background-size: cover; background-position: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .app-label { color: white; font-size: 11px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 
-        /* 3. 計算機 (真運算版) */
+        /* 3. 計算機 (真運算版 + 反白特效) */
         #calc-screen { z-index: 15; background-color: #000; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: env(safe-area-inset-bottom); opacity: 0; pointer-events: none; }
-        .calc-display { color: white; font-size: 70px; text-align: right; padding: 20px; font-weight: 300; overflow: hidden; white-space: nowrap; }
+        .calc-display { color: white; font-size: 75px; text-align: right; padding: 20px; font-weight: 300; overflow: hidden; white-space: nowrap; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; }
-        .calc-btn { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; color: white; cursor: pointer; transition: filter 0.1s; }
-        .calc-btn:active { filter: brightness(1.5); }
+        
+        /* 計算機按鈕通用樣式 */
+        .calc-btn { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; color: white; cursor: pointer; transition: background 0.1s; }
+        
+        /* 按下去時的反白效果 */
+        .calc-btn:active { background-color: #d1d1d1 !important; color: #000 !important; }
+
         .calc-btn.gray { background-color: #a5a5a5; color: black; }
         .calc-btn.dark { background-color: #333333; }
         .calc-btn.orange { background-color: #ff9f0a; }
@@ -110,14 +110,7 @@
             <div class="bottom-buttons"><div>緊急服務</div><div onclick="reset()">取消</div></div>
         </div>
 
-        <div class="screen" id="home-screen">
-            <div class="app-grid">
-                <div class="app-icon-wrapper">
-                    <div class="app-icon"></div>
-                    <div class="app-label">Unlock</div>
-                </div>
-            </div>
-        </div>
+        <div class="screen" id="home-screen"></div>
 
         <div class="screen" id="calc-screen">
             <div class="calc-display" id="calc-display">0</div>
@@ -159,7 +152,7 @@
     </div>
 
     <script>
-        // --- 基礎變數 ---
+        // --- 變數 ---
         let currentPasscode = "";
         let passcodeLength = 4;
         let customTriggerCode = "0000"; 
@@ -178,10 +171,9 @@
         const calcDisplay = document.getElementById('calc-display');
         const metaTheme = document.getElementById('meta-theme-color');
 
-        // --- 初始化 ---
         function init() { initDots(); renderBgSelector(); applyBG(0); setupACLongPress(); }
 
-        // --- 鎖定畫面邏輯 ---
+        // --- 密碼邏輯 ---
         function initDots() {
             const dotsBox = document.getElementById('dots-box');
             dotsBox.innerHTML = '';
@@ -267,27 +259,21 @@
             updateCalcDisplay();
         }
 
-        // --- 長按 AC 功能 ---
+        // --- 長按 AC 重置 ---
         function setupACLongPress() {
             const acBtn = document.getElementById('ac-btn');
             let acTimer;
             
-            // 長按開始 (手機)
             acBtn.addEventListener('touchstart', (e) => {
-                acTimer = setTimeout(() => { lockAgain(); }, 1000); // 按住一秒回鎖定畫面
+                acTimer = setTimeout(lockAgain, 1000);
             });
-
-            // 放開或移動則取消
             acBtn.addEventListener('touchend', () => {
                 clearTimeout(acTimer);
-                // 普通點擊清空計算機
                 if (waitingForNext || calcVal !== '0') {
                     calcVal = '0'; prevVal = null; currentOp = null; waitingForNext = false;
                     updateCalcDisplay();
                 }
             });
-            
-            // 電腦端輔助測試 (選配)
             acBtn.addEventListener('mousedown', () => { acTimer = setTimeout(lockAgain, 1000); });
             acBtn.addEventListener('mouseup', () => clearTimeout(acTimer));
         }
