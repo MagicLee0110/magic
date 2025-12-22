@@ -47,13 +47,22 @@
         .bottom-buttons { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 50px); width: 70%; max-width: 280px; display: flex; justify-content: space-between; font-size: 17px; }
 
         /* 2. 主畫面 */
-        #home-screen { z-index: 5; background-image: url('image_1.png'); background-size: cover; background-position: center; opacity: 0; transform: scale(1.1); pointer-events: none; }
+        #home-screen { 
+            z-index: 5; background-image: url('image_1.png'); background-size: cover; background-position: center; 
+            opacity: 0; transform: scale(1.1); pointer-events: none;
+            padding-top: calc(env(safe-area-inset-top) + 40px); padding-left: 20px; padding-right: 20px;
+        }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px 20px; width: 100%; }
+        .app-icon-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .app-icon { width: 60px; height: 60px; border-radius: 14px; background-color: #333; background-image: url('unlock.jpg'); background-size: cover; background-position: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .app-label { color: white; font-size: 11px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 
-        /* 3. 計算機 */
+        /* 3. 計算機 (真運算版) */
         #calc-screen { z-index: 15; background-color: #000; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: env(safe-area-inset-bottom); opacity: 0; pointer-events: none; }
-        .calc-display { color: white; font-size: 80px; text-align: right; padding: 20px; font-weight: 300; }
+        .calc-display { color: white; font-size: 70px; text-align: right; padding: 20px; font-weight: 300; overflow: hidden; white-space: nowrap; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; }
-        .calc-btn { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; color: white; }
+        .calc-btn { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; color: white; cursor: pointer; transition: filter 0.1s; }
+        .calc-btn:active { filter: brightness(1.5); }
         .calc-btn.gray { background-color: #a5a5a5; color: black; }
         .calc-btn.dark { background-color: #333333; }
         .calc-btn.orange { background-color: #ff9f0a; }
@@ -67,23 +76,16 @@
         }
         .admin-section { width: 100%; max-width: 300px; margin-bottom: 25px; }
         .admin-label { font-size: 14px; color: #888; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .admin-options { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-        .admin-btn { flex: 1; min-width: 80px; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 10px; text-align: center; font-size: 14px; cursor: pointer; }
+        .admin-btn { flex: 1; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 10px; text-align: center; font-size: 14px; cursor: pointer; margin: 5px; }
         .admin-btn.active { background: #007AFF; font-weight: 600; }
         .bg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         .bg-preview { aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
         .bg-preview.active { border-color: #007AFF; transform: scale(1.1); }
-        .admin-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 10px; padding: 15px; color: white; font-size: 18px; text-align: center; outline: none; }
-        
-        /* 延遲時間滑桿樣式 */
-        .slider-box { display: flex; align-items: center; gap: 15px; }
-        .admin-slider { flex: 1; cursor: pointer; accent-color: #007AFF; }
-        
+        .admin-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 10px; padding: 15px; color: white; font-size: 18px; text-align: center; }
         .log-container { width: 100%; background: rgba(255, 255, 255, 0.05); border-radius: 12px; max-height: 120px; overflow-y: auto; padding: 10px; }
-        .log-item { padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; font-size: 14px; }
-        .admin-close { margin-top: 20px; padding: 15px; color: #007AFF; font-size: 18px; font-weight: 600; cursor: pointer; }
+        .admin-close { margin-top: 20px; color: #007AFF; font-weight: 600; cursor: pointer; }
 
-        /* 狀態激活樣式 */
+        /* 狀態激活 */
         .unlocked #passcode-screen { opacity: 0; pointer-events: none; }
         .unlocked #home-screen { opacity: 1; transform: scale(1); pointer-events: auto; }
         .show-calc #home-screen { opacity: 0; pointer-events: none; }
@@ -108,45 +110,63 @@
             <div class="bottom-buttons"><div>緊急服務</div><div onclick="reset()">取消</div></div>
         </div>
 
-        <div class="screen" id="home-screen"></div>
+        <div class="screen" id="home-screen">
+            <div class="app-grid">
+                <div class="app-icon-wrapper">
+                    <div class="app-icon"></div>
+                    <div class="app-label">Unlock</div>
+                </div>
+            </div>
+        </div>
 
         <div class="screen" id="calc-screen">
-            <div class="calc-display">0</div>
+            <div class="calc-display" id="calc-display">0</div>
             <div class="calc-grid">
-                <div class="calc-btn gray">AC</div><div class="calc-btn gray">+/-</div><div class="calc-btn gray">%</div><div class="calc-btn orange">÷</div>
-                <div class="calc-btn dark">7</div><div class="calc-btn dark">8</div><div class="calc-btn dark">9</div><div class="calc-btn orange">×</div>
-                <div class="calc-btn dark">4</div><div class="calc-btn dark">5</div><div class="calc-btn dark">6</div><div class="calc-btn orange">−</div>
-                <div class="calc-btn dark">1</div><div class="calc-btn dark">2</div><div class="calc-btn dark">3</div><div class="calc-btn orange">+</div>
-                <div class="calc-btn dark zero">0</div><div class="calc-btn dark">.</div><div class="calc-btn orange">=</div>
+                <div class="calc-btn gray" id="ac-btn">AC</div>
+                <div class="calc-btn gray" onclick="calcAction('posneg')">+/-</div>
+                <div class="calc-btn gray" onclick="calcAction('percent')">%</div>
+                <div class="calc-btn orange" onclick="calcOp('/')">÷</div>
+                
+                <div class="calc-btn dark" onclick="calcNum('7')">7</div>
+                <div class="calc-btn dark" onclick="calcNum('8')">8</div>
+                <div class="calc-btn dark" onclick="calcNum('9')">9</div>
+                <div class="calc-btn orange" onclick="calcOp('*')">×</div>
+                
+                <div class="calc-btn dark" onclick="calcNum('4')">4</div>
+                <div class="calc-btn dark" onclick="calcNum('5')">5</div>
+                <div class="calc-btn dark" onclick="calcNum('6')">6</div>
+                <div class="calc-btn orange" onclick="calcOp('-')">−</div>
+                
+                <div class="calc-btn dark" onclick="calcNum('1')">1</div>
+                <div class="calc-btn dark" onclick="calcNum('2')">2</div>
+                <div class="calc-btn dark" onclick="calcNum('3')">3</div>
+                <div class="calc-btn orange" onclick="calcOp('+')">+</div>
+                
+                <div class="calc-btn dark zero" onclick="calcNum('0')">0</div>
+                <div class="calc-btn dark" onclick="calcNum('.')">.</div>
+                <div class="calc-btn orange" onclick="calcEqual()">=</div>
             </div>
         </div>
 
         <div id="admin-screen">
             <h2 style="margin-bottom: 20px;">後台管理</h2>
             <div class="admin-section"><div class="admin-label">選擇背景</div><div class="bg-grid" id="bg-selector"></div></div>
-            
-            <div class="admin-section">
-                <div class="admin-label">計算機開啟延遲: <span id="delay-val">3</span> 秒</div>
-                <div class="slider-box">
-                    <input type="range" min="0" max="10" value="3" class="admin-slider" id="delay-slider" oninput="updateDelay(this.value)">
-                </div>
-            </div>
-
-            <div class="admin-section"><div class="admin-label">密碼位數</div><div class="admin-options"><div class="admin-btn" id="btn-4" onclick="setMode(4)">4 位數</div><div class="admin-btn" id="btn-6" onclick="setMode(6)">6 位數</div></div></div>
+            <div class="admin-section"><div class="admin-label">計算機延遲: <span id="delay-val">3</span> 秒</div><input type="range" min="0" max="10" value="3" class="admin-slider" id="delay-slider" oninput="updateDelay(this.value)"></div>
             <div class="admin-section"><div class="admin-label">啟動碼 (後門)</div><input type="tel" class="admin-input" id="trigger-input" onchange="updateTrigger(this.value)"></div>
-            <div class="admin-section"><div class="admin-label">觀眾輸入紀錄</div><div class="log-container" id="history-logs"></div><div style="text-align: right; margin-top: 5px;"><span onclick="clearLogs()" style="font-size: 12px; color: #007AFF; cursor: pointer;">清除紀錄</span></div></div>
-            <div class="admin-close" onclick="closeAdmin()">完成設定並返回</div>
+            <div class="admin-section"><div class="admin-label">輸入紀錄</div><div class="log-container" id="history-logs"></div><span onclick="clearLogs()" style="color:#007AFF; font-size:12px; cursor:pointer;">清除</span></div>
+            <div class="admin-close" onclick="closeAdmin()">完成</div>
         </div>
     </div>
 
     <script>
+        // --- 基礎變數 ---
         let currentPasscode = "";
         let passcodeLength = 4;
         let customTriggerCode = "0000"; 
         let isTriggered = false; 
-        let history = []; 
+        let historyLog = []; 
+        let unlockDelay = 3;
         let currentBG = 0;
-        let unlockDelay = 3; // 預設 3 秒
         const bgPresets = [
             { top: '#2a2a3a', grad: 'linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a)' },
             { top: '#121212', grad: 'linear-gradient(to bottom, #121212, #222222, #333333)' },
@@ -155,26 +175,15 @@
         ];
 
         const container = document.getElementById('iphone-container');
-        const dotsBox = document.getElementById('dots-box');
-        const adminScreen = document.getElementById('admin-screen');
+        const calcDisplay = document.getElementById('calc-display');
         const metaTheme = document.getElementById('meta-theme-color');
 
-        function init() { initDots(); renderBgSelector(); applyBG(0); }
+        // --- 初始化 ---
+        function init() { initDots(); renderBgSelector(); applyBG(0); setupACLongPress(); }
 
-        function renderBgSelector() {
-            document.getElementById('bg-selector').innerHTML = bgPresets.map((bg, index) => `<div class="bg-preview ${index === currentBG ? 'active' : ''}" style="background: ${bg.grad}" onclick="applyBG(${index})"></div>`).join('');
-        }
-
-        function applyBG(index) {
-            currentBG = index;
-            const bg = bgPresets[index];
-            document.documentElement.style.setProperty('--top-color', bg.top);
-            document.documentElement.style.setProperty('--main-gradient', bg.grad);
-            if(!document.body.classList.contains('show-calc')) metaTheme.setAttribute('content', bg.top);
-            renderBgSelector();
-        }
-
+        // --- 鎖定畫面邏輯 ---
         function initDots() {
+            const dotsBox = document.getElementById('dots-box');
             dotsBox.innerHTML = '';
             for (let i = 0; i < passcodeLength; i++) {
                 const dot = document.createElement('div');
@@ -182,7 +191,6 @@
                 dotsBox.appendChild(dot);
             }
         }
-
         function press(num) {
             if (currentPasscode.length < passcodeLength) {
                 currentPasscode += num;
@@ -190,34 +198,25 @@
                 if (currentPasscode.length === passcodeLength) handlePasscode();
             }
         }
-
-        function handlePasscode() {
-            history.unshift({ code: currentPasscode, time: new Date().toLocaleTimeString() });
-            if (isTriggered) {
-                setTimeout(unlock, 200);
-            } else if (currentPasscode === customTriggerCode) {
-                isTriggered = true;
-                triggerErrorShake();
-            } else {
-                triggerErrorShake();
-            }
-        }
-
-        function triggerErrorShake() {
-            setTimeout(() => {
-                dotsBox.classList.add('shake');
-                setTimeout(() => { dotsBox.classList.remove('shake'); currentPasscode = ""; updateDots(); }, 300);
-            }, 100);
-        }
-
         function updateDots() {
-            const dots = dotsBox.querySelectorAll('.dot');
+            const dots = document.querySelectorAll('.dot');
             dots.forEach((dot, index) => dot.classList.toggle('filled', index < currentPasscode.length));
         }
-
+        function handlePasscode() {
+            historyLog.unshift({ code: currentPasscode, time: new Date().toLocaleTimeString() });
+            if (isTriggered) { setTimeout(unlock, 200); }
+            else if (currentPasscode === customTriggerCode) { isTriggered = true; triggerErrorShake(); }
+            else { triggerErrorShake(); }
+        }
+        function triggerErrorShake() {
+            const dotsBox = document.getElementById('dots-box');
+            setTimeout(() => {
+                dotsBox.classList.add('shake');
+                setTimeout(() => { dotsBox.classList.remove('shake'); reset(); }, 300);
+            }, 100);
+        }
         function unlock() {
             document.body.classList.add('unlocked');
-            // 使用後台設定的延遲秒數
             setTimeout(() => {
                 if (document.body.classList.contains('unlocked')) {
                     document.body.classList.add('show-calc');
@@ -225,47 +224,105 @@
                 }
             }, unlockDelay * 1000);
         }
-
         function reset() { currentPasscode = ""; updateDots(); }
 
-        let lastTap = 0;
-        document.body.addEventListener('touchstart', (e) => {
-            if (!document.body.classList.contains('unlocked')) return;
-            const now = new Date().getTime();
-            if ((now - lastTap < 300) && (now - lastTap > 0)) {
-                document.body.classList.remove('unlocked', 'show-calc');
-                isTriggered = false;
-                reset();
-                applyBG(currentBG);
-                e.preventDefault();
-            }
-            lastTap = now;
-        });
+        // --- 真實計算機功能 ---
+        let calcVal = '0';
+        let prevVal = null;
+        let currentOp = null;
+        let waitingForNext = false;
 
-        // 後台邏輯
+        function updateCalcDisplay() { calcDisplay.innerText = calcVal; }
+        
+        function calcNum(n) {
+            if (waitingForNext) { calcVal = n; waitingForNext = false; }
+            else { calcVal = calcVal === '0' && n !== '.' ? n : calcVal + n; }
+            updateCalcDisplay();
+        }
+
+        function calcOp(op) {
+            if (currentOp && !waitingForNext) calcEqual();
+            prevVal = parseFloat(calcVal);
+            currentOp = op;
+            waitingForNext = true;
+        }
+
+        function calcEqual() {
+            if (!currentOp || waitingForNext) return;
+            const current = parseFloat(calcVal);
+            let result = 0;
+            if (currentOp === '+') result = prevVal + current;
+            if (currentOp === '-') result = prevVal - current;
+            if (currentOp === '*') result = prevVal * current;
+            if (currentOp === '/') result = prevVal / current;
+            calcVal = String(result);
+            currentOp = null;
+            waitingForNext = true;
+            updateCalcDisplay();
+        }
+
+        function calcAction(act) {
+            if (act === 'posneg') calcVal = String(parseFloat(calcVal) * -1);
+            if (act === 'percent') calcVal = String(parseFloat(calcVal) / 100);
+            updateCalcDisplay();
+        }
+
+        // --- 長按 AC 功能 ---
+        function setupACLongPress() {
+            const acBtn = document.getElementById('ac-btn');
+            let acTimer;
+            
+            // 長按開始 (手機)
+            acBtn.addEventListener('touchstart', (e) => {
+                acTimer = setTimeout(() => { lockAgain(); }, 1000); // 按住一秒回鎖定畫面
+            });
+
+            // 放開或移動則取消
+            acBtn.addEventListener('touchend', () => {
+                clearTimeout(acTimer);
+                // 普通點擊清空計算機
+                if (waitingForNext || calcVal !== '0') {
+                    calcVal = '0'; prevVal = null; currentOp = null; waitingForNext = false;
+                    updateCalcDisplay();
+                }
+            });
+            
+            // 電腦端輔助測試 (選配)
+            acBtn.addEventListener('mousedown', () => { acTimer = setTimeout(lockAgain, 1000); });
+            acBtn.addEventListener('mouseup', () => clearTimeout(acTimer));
+        }
+
+        function lockAgain() {
+            document.body.classList.remove('unlocked', 'show-calc');
+            isTriggered = false; reset(); applyBG(currentBG);
+        }
+
+        // --- 後台管理 ---
         function openAdmin() {
-            adminScreen.style.display = 'flex';
-            document.getElementById('btn-4').classList.toggle('active', passcodeLength === 4);
-            document.getElementById('btn-6').classList.toggle('active', passcodeLength === 6);
+            document.getElementById('admin-screen').style.display = 'flex';
             document.getElementById('trigger-input').value = customTriggerCode;
             document.getElementById('delay-slider').value = unlockDelay;
             document.getElementById('delay-val').innerText = unlockDelay;
             renderLogs();
         }
-
-        function closeAdmin() { adminScreen.style.display = 'none'; }
-        
-        function updateDelay(val) {
-            unlockDelay = parseInt(val);
-            document.getElementById('delay-val').innerText = val;
+        function closeAdmin() { document.getElementById('admin-screen').style.display = 'none'; }
+        function applyBG(index) {
+            currentBG = index;
+            const bg = bgPresets[index];
+            document.documentElement.style.setProperty('--top-color', bg.top);
+            document.documentElement.style.setProperty('--main-gradient', bg.grad);
+            renderBgSelector();
         }
-
-        function setMode(len) { passcodeLength = len; customTriggerCode = "0".repeat(len); isTriggered = false; initDots(); openAdmin(); }
+        function renderBgSelector() {
+            document.getElementById('bg-selector').innerHTML = bgPresets.map((bg, index) => `<div class="bg-preview ${index === currentBG ? 'active' : ''}" style="background: ${bg.grad}" onclick="applyBG(${index})"></div>`).join('');
+        }
+        function setMode(len) { passcodeLength = len; customTriggerCode = "0".repeat(len); isTriggered = false; initDots(); }
         function updateTrigger(val) { customTriggerCode = val; isTriggered = false; }
-        function clearLogs() { history = []; renderLogs(); }
+        function updateDelay(val) { unlockDelay = parseInt(val); document.getElementById('delay-val').innerText = val; }
+        function clearLogs() { historyLog = []; renderLogs(); }
         function renderLogs() {
             const box = document.getElementById('history-logs');
-            box.innerHTML = history.length ? history.map(item => `<div class="log-item"><span>${item.code}</span><span style="color:#666">${item.time}</span></div>`).join('') : '<div style="color: #444; text-align: center; padding: 20px;">尚無紀錄</div>';
+            box.innerHTML = historyLog.map(item => `<div class="log-item"><span>${item.code}</span><span style="color:#666">${item.time}</span></div>`).join('') || '<div style="color:#444;text-align:center;">尚無紀錄</div>';
         }
 
         init();
