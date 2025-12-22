@@ -45,8 +45,51 @@
         .key span { font-size: 10px; font-weight: 600; letter-spacing: 2px; margin-top: -3px; }
         .bottom-buttons { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 50px); width: 70%; max-width: 280px; display: flex; justify-content: space-between; font-size: 17px; }
 
-        /* 2. 主畫面 */
-        #home-screen { z-index: 5; background-image: url('image_1.png'); background-size: cover; background-position: center; opacity: 0; transform: scale(1.1); pointer-events: none; }
+        /* 2. 主畫面 (新增 App 圖層) */
+        #home-screen { 
+            z-index: 5; 
+            background-image: url('image_1.png'); 
+            background-size: cover; 
+            background-position: center; 
+            opacity: 0; 
+            transform: scale(1.1); 
+            pointer-events: none;
+            padding-top: calc(env(safe-area-inset-top) + 40px);
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        /* App 圖標樣式 */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px 20px;
+            width: 100%;
+        }
+
+        .app-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px; /* iOS 圓角 */
+            background-image: url('unlock.jpg');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .app-label {
+            color: white;
+            font-size: 11px;
+            font-weight: 400;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
 
         /* 3. 計算機 */
         #calc-screen { z-index: 15; background-color: #000; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: env(safe-area-inset-bottom); opacity: 0; pointer-events: none; }
@@ -73,11 +116,8 @@
         .bg-preview { aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
         .bg-preview.active { border-color: #007AFF; transform: scale(1.1); }
         .admin-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 10px; padding: 15px; color: white; font-size: 18px; text-align: center; outline: none; }
-        
-        /* 延遲時間滑桿樣式 */
         .slider-box { display: flex; align-items: center; gap: 15px; }
         .admin-slider { flex: 1; cursor: pointer; accent-color: #007AFF; }
-        
         .log-container { width: 100%; background: rgba(255, 255, 255, 0.05); border-radius: 12px; max-height: 120px; overflow-y: auto; padding: 10px; }
         .log-item { padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; font-size: 14px; }
         .admin-close { margin-top: 20px; padding: 15px; color: #007AFF; font-size: 18px; font-weight: 600; cursor: pointer; }
@@ -107,7 +147,14 @@
             <div class="bottom-buttons"><div>緊急服務</div><div onclick="reset()">取消</div></div>
         </div>
 
-        <div class="screen" id="home-screen"></div>
+        <div class="screen" id="home-screen">
+            <div class="app-grid">
+                <div class="app-icon-wrapper">
+                    <div class="app-icon"></div>
+                    <div class="app-label">Unlock</div>
+                </div>
+            </div>
+        </div>
 
         <div class="screen" id="calc-screen">
             <div class="calc-display">0</div>
@@ -123,14 +170,7 @@
         <div id="admin-screen">
             <h2 style="margin-bottom: 20px;">後台管理</h2>
             <div class="admin-section"><div class="admin-label">選擇背景</div><div class="bg-grid" id="bg-selector"></div></div>
-            
-            <div class="admin-section">
-                <div class="admin-label">計算機開啟延遲: <span id="delay-val">3</span> 秒</div>
-                <div class="slider-box">
-                    <input type="range" min="0" max="10" value="3" class="admin-slider" id="delay-slider" oninput="updateDelay(this.value)">
-                </div>
-            </div>
-
+            <div class="admin-section"><div class="admin-label">計算機開啟延遲: <span id="delay-val">3</span> 秒</div><div class="slider-box"><input type="range" min="0" max="10" value="3" class="admin-slider" id="delay-slider" oninput="updateDelay(this.value)"></div></div>
             <div class="admin-section"><div class="admin-label">密碼位數</div><div class="admin-options"><div class="admin-btn" id="btn-4" onclick="setMode(4)">4 位數</div><div class="admin-btn" id="btn-6" onclick="setMode(6)">6 位數</div></div></div>
             <div class="admin-section"><div class="admin-label">啟動碼 (後門)</div><input type="tel" class="admin-input" id="trigger-input" onchange="updateTrigger(this.value)"></div>
             <div class="admin-section"><div class="admin-label">觀眾輸入紀錄</div><div class="log-container" id="history-logs"></div><div style="text-align: right; margin-top: 5px;"><span onclick="clearLogs()" style="font-size: 12px; color: #007AFF; cursor: pointer;">清除紀錄</span></div></div>
@@ -145,7 +185,7 @@
         let isTriggered = false; 
         let history = []; 
         let currentBG = 0;
-        let unlockDelay = 3; // 預設 3 秒
+        let unlockDelay = 3; 
         const bgPresets = [
             { top: '#2a2a3a', grad: 'linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a)' },
             { top: '#121212', grad: 'linear-gradient(to bottom, #121212, #222222, #333333)' },
@@ -216,7 +256,6 @@
 
         function unlock() {
             document.body.classList.add('unlocked');
-            // 使用後台設定的延遲秒數
             setTimeout(() => {
                 if (document.body.classList.contains('unlocked')) {
                     document.body.classList.add('show-calc');
@@ -241,7 +280,6 @@
             lastTap = now;
         });
 
-        // 後台邏輯
         function openAdmin() {
             adminScreen.style.display = 'flex';
             document.getElementById('btn-4').classList.toggle('active', passcodeLength === 4);
@@ -253,12 +291,7 @@
         }
 
         function closeAdmin() { adminScreen.style.display = 'none'; }
-        
-        function updateDelay(val) {
-            unlockDelay = parseInt(val);
-            document.getElementById('delay-val').innerText = val;
-        }
-
+        function updateDelay(val) { unlockDelay = parseInt(val); document.getElementById('delay-val').innerText = val; }
         function setMode(len) { passcodeLength = len; customTriggerCode = "0".repeat(len); isTriggered = false; initDots(); openAdmin(); }
         function updateTrigger(val) { customTriggerCode = val; isTriggered = false; }
         function clearLogs() { history = []; renderLogs(); }
