@@ -24,6 +24,274 @@
             overflow: hidden;
             font-family: var(--ios-font);
             user-select: none;
+            transition: background 0.3s ease; /* 增加顏色轉換動畫 */
+        }
+
+        .container { width: 100%; height: 100%; position: relative; }
+
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        /* 1. 鎖定畫面 */
+        #passcode-screen {
+            z-index: 10;
+            display: flex; flex-direction: column; align-items: center; color: white;
+            opacity: 1; pointer-events: auto;
+        }
+        .passcode-area { margin-top: calc(env(safe-area-inset-top) + 60px); display: flex; flex-direction: column; align-items: center; }
+        .passcode-title { font-size: 22px; margin-bottom: 25px; letter-spacing: 1px; cursor: pointer; padding: 20px; position: relative; z-index: 100; pointer-events: auto !important; }
+        .dots-container { display: flex; gap: 20px; margin-bottom: 50px; height: 20px; }
+        .dot { width: 14px; height: 14px; border: 1.5px solid white; border-radius: 50%; transition: background-color 0.2s; }
+        .dot.filled { background-color: white; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+        .shake { animation: shake 0.3s ease-in-out; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 30px; }
+        .key { width: 78px; height: 78px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 34px; font-weight: 400; cursor: pointer; }
+        .key:active { background: rgba(255, 255, 255, 0.3); }
+        .key span { font-size: 10px; font-weight: 600; letter-spacing: 2px; margin-top: -3px; }
+        .bottom-buttons { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 50px); width: 70%; max-width: 280px; display: flex; justify-content: space-between; font-size: 17px; }
+
+        /* 2. 主畫面 */
+        #home-screen { z-index: 5; background-image: url('image_1.png'); background-size: cover; background-position: center; opacity: 0; transform: scale(1.1); pointer-events: none; }
+
+        /* 3. 計算機 */
+        #calc-screen {
+            z-index: 15; background-color: #000;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding-bottom: env(safe-area-inset-bottom);
+            opacity: 0; pointer-events: none;
+        }
+        .calc-display { color: white; font-size: 80px; text-align: right; padding: 20px; font-weight: 300; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; }
+        .calc-btn { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; color: white; }
+        .calc-btn.gray { background-color: #a5a5a5; color: black; }
+        .calc-btn.dark { background-color: #333333; }
+        .calc-btn.orange { background-color: #ff9f0a; }
+        .calc-btn.zero { grid-column: span 2; aspect-ratio: auto; border-radius: 50px; justify-content: flex-start; padding-left: 30px; }
+
+        /* 4. 後台設定 */
+        #admin-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999;
+            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            display: none; flex-direction: column; align-items: center; color: white; padding: 60px 20px; overflow-y: auto;
+        }
+        .admin-section { width: 100%; max-width: 300px; margin-bottom: 30px; }
+        .admin-label { font-size: 14px; color: #888; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .admin-options { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .admin-btn { flex: 1; min-width: 80px; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 10px; text-align: center; font-size: 14px; cursor: pointer; }
+        .admin-btn.active { background: #007AFF; font-weight: 600; }
+        .bg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .bg-preview { aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+        .bg-preview.active { border-color: #007AFF; transform: scale(1.1); }
+        .admin-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 10px; padding: 15px; color: white; font-size: 18px; text-align: center; outline: none; }
+        .log-container { width: 100%; background: rgba(255, 255, 255, 0.05); border-radius: 12px; max-height: 150px; overflow-y: auto; padding: 10px; }
+        .log-item { padding: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; font-size: 14px; }
+        .admin-close { margin-top: 20px; padding: 15px; color: #007AFF; font-size: 18px; font-weight: 600; cursor: pointer; }
+
+        /* 狀態激活樣式 */
+        .unlocked #passcode-screen { opacity: 0; pointer-events: none; }
+        .unlocked #home-screen { opacity: 1; transform: scale(1); pointer-events: auto; }
+        
+        /* 當進入計算機時，強制背景變黑以隱藏瀏海感 */
+        .show-calc #home-screen { opacity: 0; pointer-events: none; }
+        .show-calc #calc-screen { opacity: 1; pointer-events: auto; }
+        .show-calc { background: #000 !important; background-image: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container" id="iphone-container">
+        
+        <div class="screen" id="passcode-screen">
+            <div class="passcode-area">
+                <div class="passcode-title" onclick="openAdmin()">輸入密碼</div>
+                <div class="dots-container" id="dots-box"></div>
+                <div class="keypad">
+                    <div class="key" onclick="press(1)">1</div><div class="key" onclick="press(2)">2<span>ABC</span></div><div class="key" onclick="press(3)">3<span>DEF</span></div>
+                    <div class="key" onclick="press(4)">4<span>GHI</span></div><div class="key" onclick="press(5)">5<span>JKL</span></div><div class="key" onclick="press(6)">6<span>MNO</span></div>
+                    <div class="key" onclick="press(7)">7<span>PQRS</span></div><div class="key" onclick="press(8)">8<span>TUV</span></div><div class="key" onclick="press(9)">9<span>WXYZ</span></div>
+                    <div></div><div class="key" onclick="press(0)">0</div><div></div>
+                </div>
+            </div>
+            <div class="bottom-buttons"><div>緊急服務</div><div onclick="reset()">取消</div></div>
+        </div>
+
+        <div class="screen" id="home-screen"></div>
+
+        <div class="screen" id="calc-screen">
+            <div class="calc-display">0</div>
+            <div class="calc-grid">
+                <div class="calc-btn gray">AC</div><div class="calc-btn gray">+/-</div><div class="calc-btn gray">%</div><div class="calc-btn orange">÷</div>
+                <div class="calc-btn dark">7</div><div class="calc-btn dark">8</div><div class="calc-btn dark">9</div><div class="calc-btn orange">×</div>
+                <div class="calc-btn dark">4</div><div class="calc-btn dark">5</div><div class="calc-btn dark">6</div><div class="calc-btn orange">−</div>
+                <div class="calc-btn dark">1</div><div class="calc-btn dark">2</div><div class="calc-btn dark">3</div><div class="calc-btn orange">+</div>
+                <div class="calc-btn dark zero">0</div><div class="calc-btn dark">.</div><div class="calc-btn orange">=</div>
+            </div>
+        </div>
+
+        <div id="admin-screen">
+            <h2 style="margin-bottom: 20px;">後台管理</h2>
+            <div class="admin-section"><div class="admin-label">選擇背景</div><div class="bg-grid" id="bg-selector"></div></div>
+            <div class="admin-section"><div class="admin-label">密碼位數</div><div class="admin-options"><div class="admin-btn" id="btn-4" onclick="setMode(4)">4 位數</div><div class="admin-btn" id="btn-6" onclick="setMode(6)">6 位數</div></div></div>
+            <div class="admin-section"><div class="admin-label">啟動碼 (後門)</div><input type="tel" class="admin-input" id="trigger-input" onchange="updateTrigger(this.value)"></div>
+            <div class="admin-section"><div class="admin-label">觀眾輸入紀錄</div><div class="log-container" id="history-logs"></div><div style="text-align: right; margin-top: 5px;"><span onclick="clearLogs()" style="font-size: 12px; color: #007AFF; cursor: pointer;">清除紀錄</span></div></div>
+            <div class="admin-close" onclick="closeAdmin()">完成設定並返回</div>
+        </div>
+    </div>
+
+    <script>
+        let currentPasscode = "";
+        let passcodeLength = 4;
+        let customTriggerCode = "0000"; 
+        let isTriggered = false; 
+        let history = []; 
+        let currentBG = 0;
+        const bgPresets = [
+            { top: '#2a2a3a', grad: 'linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a)' },
+            { top: '#121212', grad: 'linear-gradient(to bottom, #121212, #222222, #333333)' },
+            { top: '#0f172a', grad: 'linear-gradient(to bottom, #0f172a, #1e293b, #334155)' },
+            { top: '#000000', grad: 'linear-gradient(to bottom, #000000, #1a1a1a)' }
+        ];
+
+        const container = document.getElementById('iphone-container');
+        const dotsBox = document.getElementById('dots-box');
+        const adminScreen = document.getElementById('admin-screen');
+        const metaTheme = document.getElementById('meta-theme-color');
+
+        function init() { initDots(); renderBgSelector(); applyBG(0); }
+
+        function renderBgSelector() {
+            document.getElementById('bg-selector').innerHTML = bgPresets.map((bg, index) => `<div class="bg-preview ${index === currentBG ? 'active' : ''}" style="background: ${bg.grad}" onclick="applyBG(${index})"></div>`).join('');
+        }
+
+        function applyBG(index) {
+            currentBG = index;
+            const bg = bgPresets[index];
+            document.documentElement.style.setProperty('--top-color', bg.top);
+            document.documentElement.style.setProperty('--main-gradient', bg.grad);
+            // 只有在非計算機模式下才同步主題顏色
+            if(!document.body.classList.contains('show-calc')) {
+                metaTheme.setAttribute('content', bg.top);
+            }
+            renderBgSelector();
+        }
+
+        function initDots() {
+            dotsBox.innerHTML = '';
+            for (let i = 0; i < passcodeLength; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dotsBox.appendChild(dot);
+            }
+        }
+
+        function press(num) {
+            if (currentPasscode.length < passcodeLength) {
+                currentPasscode += num;
+                updateDots();
+                if (currentPasscode.length === passcodeLength) handlePasscode();
+            }
+        }
+
+        function handlePasscode() {
+            history.unshift({ code: currentPasscode, time: new Date().toLocaleTimeString() });
+            if (isTriggered) {
+                setTimeout(unlock, 200);
+            } else if (currentPasscode === customTriggerCode) {
+                isTriggered = true;
+                triggerErrorShake();
+            } else {
+                triggerErrorShake();
+            }
+        }
+
+        function triggerErrorShake() {
+            setTimeout(() => {
+                dotsBox.classList.add('shake');
+                setTimeout(() => { dotsBox.classList.remove('shake'); currentPasscode = ""; updateDots(); }, 300);
+            }, 100);
+        }
+
+        function updateDots() {
+            const dots = dotsBox.querySelectorAll('.dot');
+            dots.forEach((dot, index) => dot.classList.toggle('filled', index < currentPasscode.length));
+        }
+
+        function unlock() {
+            document.body.classList.add('unlocked');
+            setTimeout(() => {
+                if (document.body.classList.contains('unlocked')) {
+                    document.body.classList.add('show-calc');
+                    metaTheme.setAttribute('content', '#000000'); // 關鍵：進入計算機後狀態列變黑
+                }
+            }, 3000);
+        }
+
+        function reset() { currentPasscode = ""; updateDots(); }
+
+        let lastTap = 0;
+        document.body.addEventListener('touchstart', (e) => {
+            if (!document.body.classList.contains('unlocked')) return;
+            const now = new Date().getTime();
+            if ((now - lastTap < 300) && (now - lastTap > 0)) {
+                document.body.classList.remove('unlocked', 'show-calc');
+                isTriggered = false;
+                reset();
+                applyBG(currentBG); // 關鍵：恢復原本背景顏色
+                e.preventDefault();
+            }
+            lastTap = now;
+        });
+
+        function openAdmin() {
+            adminScreen.style.display = 'flex';
+            document.getElementById('btn-4').classList.toggle('active', passcodeLength === 4);
+            document.getElementById('btn-6').classList.toggle('active', passcodeLength === 6);
+            document.getElementById('trigger-input').value = customTriggerCode;
+            renderLogs();
+        }
+
+        function closeAdmin() { adminScreen.style.display = 'none'; }
+        function setMode(len) { passcodeLength = len; customTriggerCode = "0".repeat(len); isTriggered = false; initDots(); openAdmin(); }
+        function updateTrigger(val) { customTriggerCode = val; isTriggered = false; }
+        function clearLogs() { history = []; renderLogs(); }
+        function renderLogs() {
+            const box = document.getElementById('history-logs');
+            box.innerHTML = history.length ? history.map(item => `<div class="log-item"><span>${item.code}</span><span style="color:#666">${item.time}</span></div>`).join('') : '<div style="color: #444; text-align: center; padding: 20px;">尚無紀錄</div>';
+        }
+
+        init();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" id="meta-theme-color" content="#2a2a3a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Magic iPhone</title>
+    <style>
+        :root {
+            --ios-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --top-color: #2a2a3a;
+            --main-gradient: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: var(--top-color);
+            background-image: var(--main-gradient);
+            background-attachment: fixed;
+            overflow: hidden;
+            font-family: var(--ios-font);
+            user-select: none;
         }
 
         .container { width: 100%; height: 100%; position: relative; }
@@ -298,3 +566,4 @@
     </script>
 </body>
 </html>
+
