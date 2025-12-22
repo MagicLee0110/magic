@@ -9,30 +9,33 @@
     <style>
         :root {
             --ios-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* 定義統一的背景漸層，確保所有畫面一致 */
+            /* 定義一致的背景漸層色 */
             --main-gradient: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+        /* 關鍵 3：將背景設在最底層，並鎖定背景不隨捲動位移 */
+        html {
+            height: 100%;
+            background: var(--main-gradient);
         }
 
-        html, body {
-            width: 100%;
+        body {
+            margin: 0;
+            padding: 0;
             height: 100%;
-            background: var(--main-gradient); /* 讓最底層背景就是漸層 */
-            overflow: hidden;
+            width: 100%;
             font-family: var(--ios-font);
+            overflow: hidden;
+            background: transparent; /* 必須透明，才看得到 html 的漸層 */
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
             width: 100%;
             height: 100%;
             position: relative;
+            background: transparent;
         }
 
         .screen {
@@ -41,7 +44,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--main-gradient); /* 確保每一層背景都填滿 */
+            background: transparent; /* 保持透明 */
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
         }
 
@@ -52,22 +55,15 @@
             flex-direction: column;
             align-items: center;
             color: white;
-            /* 移除可能導致邊界感的毛玻璃背景顏色 */
-            background: transparent; 
         }
 
-        /* 頂部安全區留白，但背景會穿透過去 */
-        .safe-area-top {
-            height: env(safe-area-inset-top);
-            width: 100%;
-        }
-
+        /* 使用 padding 避開瀏海，但不產生顏色斷層 */
         .passcode-area {
-            /* 根據有無瀏海自動調整距離，讓「輸入密碼」位置更精準 */
-            margin-top: calc(env(safe-area-inset-top) + 60px); 
+            padding-top: calc(env(safe-area-inset-top) + 60px); 
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
         }
 
         .passcode-title {
@@ -75,6 +71,7 @@
             margin-bottom: 25px;
             letter-spacing: 1px;
             font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .dots-container {
@@ -125,6 +122,7 @@
 
         .bottom-buttons {
             position: absolute;
+            /* 適應底部安全區 */
             bottom: calc(env(safe-area-inset-bottom) + 50px);
             width: 80%;
             display: flex;
@@ -136,6 +134,7 @@
         /* --- 2. 主畫面 --- */
         #home-screen {
             z-index: 1;
+            /* 只有主畫面需要覆蓋一層背景圖 */
             background-image: url('image_1.png'); 
             background-size: cover;
             background-position: center;
@@ -143,6 +142,7 @@
             transform: scale(1.1);
         }
 
+        /* 解鎖動畫效果 */
         .container.unlocked #passcode-screen {
             opacity: 0;
             pointer-events: none;
@@ -159,7 +159,6 @@
 
     <div class="container" id="iphone-container">
         <div class="screen" id="passcode-screen">
-            <div class="safe-area-top"></div>
             <div class="passcode-area">
                 <div class="passcode-title">輸入密碼</div>
                 <div class="dots-container">
@@ -186,6 +185,7 @@
                 <div onclick="reset()">取消</div>
             </div>
         </div>
+
         <div class="screen" id="home-screen"></div>
     </div>
 
@@ -203,14 +203,17 @@
                 }
             }
         }
+
         function updateDots() {
             dots.forEach((dot, index) => {
                 dot.classList.toggle('filled', index < currentPasscode.length);
             });
         }
+
         function unlock() {
             container.classList.add('unlocked');
         }
+
         function reset() {
             currentPasscode = "";
             updateDots();
