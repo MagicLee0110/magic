@@ -48,26 +48,22 @@
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
         }
 
-        /* --- 1. 密碼鎖定畫面 (仿照你的 image_0.png) --- */
+        /* --- 1. 密碼鎖定畫面 --- */
         #passcode-screen {
             z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
             color: white;
-            /* 為了更像截圖，這裡加一點毛玻璃效果 */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
 
-        /* 狀態列模擬 (時間) */
+        /* 狀態列模擬 (移除文字後保留上方間距) */
         .status-bar-sim {
             width: 100%;
             padding: 15px 25px;
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
+            height: 50px; /* 固定高度保留上方留白 */
         }
 
         /* 密碼輸入區塊 */
@@ -113,7 +109,7 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15); /* 半透明按鈕 */
+            background: rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -124,7 +120,7 @@
             transition: background-color 0.1s;
         }
         .key:active {
-            background: rgba(255, 255, 255, 0.4); /* 按下時變亮 */
+            background: rgba(255, 255, 255, 0.4);
         }
         .key span {
             font-size: 11px;
@@ -144,26 +140,25 @@
             font-weight: 500;
         }
 
-        /* --- 2. 主畫面 (直接使用你的 image_1.png 截圖) --- */
+        /* --- 2. 主畫面 --- */
         #home-screen {
             z-index: 1;
-            /* 重要：直接使用你的截圖作為背景，確保完全一樣 */
             background-image: url('image_1.png'); 
             background-size: cover;
             background-position: center;
-            opacity: 0; /* 一開始隱藏 */
-            transform: scale(1.1); /* 解鎖時的縮放效果 */
+            opacity: 0;
+            transform: scale(1.1);
         }
 
         /* 解鎖後的狀態 */
         .container.unlocked #passcode-screen {
             opacity: 0;
             pointer-events: none;
-            transform: scale(1.1); /* 密碼盤放大淡出 */
+            transform: scale(1.1);
         }
         .container.unlocked #home-screen {
             opacity: 1;
-            transform: scale(1); /* 主畫面縮放定位 */
+            transform: scale(1);
         }
 
     </style>
@@ -173,9 +168,7 @@
     <div class="container" id="iphone-container">
         
         <div class="screen" id="passcode-screen">
-            <div class="status-bar-sim">
-                <div>11:34</div>
-                <div>IsI 90</div> </div>
+            <div class="status-bar-sim"></div>
 
             <div class="passcode-area">
                 <div class="passcode-title">輸入密碼</div>
@@ -214,21 +207,17 @@
         const container = document.getElementById('iphone-container');
         const dots = document.querySelectorAll('.dot');
 
-        // 按下數字鍵的處理
         function press(num) {
             if (currentPasscode.length < 4) {
                 currentPasscode += num;
                 updateDots();
                 
-                // 如果輸入滿 4 位數
                 if (currentPasscode.length === 4) {
-                    // 延遲一下下讓使用者看到最後一個點填滿，然後解鎖
                     setTimeout(unlock, 200);
                 }
             }
         }
 
-        // 更新圓點狀態
         function updateDots() {
             dots.forEach((dot, index) => {
                 if (index < currentPasscode.length) {
@@ -239,12 +228,10 @@
             });
         }
 
-        // 執行解鎖動作
         function unlock() {
             container.classList.add('unlocked');
         }
 
-        // 按下取消，重置密碼
         function reset() {
             currentPasscode = "";
             updateDots();
