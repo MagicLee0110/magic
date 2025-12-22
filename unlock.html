@@ -59,7 +59,6 @@
             padding-right: 20px;
         }
 
-        /* App 圖標樣式 */
         .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -77,10 +76,12 @@
         .app-icon {
             width: 60px;
             height: 60px;
-            border-radius: 14px; /* iOS 圓角 */
-            background-image: url('unlock.jpg');
+            border-radius: 14px;
+            background-color: #333; /* 預設底色，沒讀到圖時會看到灰色方塊 */
+            background-image: url('unlock.jpg'); /* 確保圖片就在 HTML 旁邊 */
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
@@ -89,6 +90,8 @@
             font-size: 11px;
             font-weight: 400;
             text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            text-align: center;
+            white-space: nowrap;
         }
 
         /* 3. 計算機 */
