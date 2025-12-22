@@ -9,6 +9,8 @@
     <style>
         :root {
             --ios-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* 定義統一的背景漸層，確保所有畫面一致 */
+            --main-gradient: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
         }
 
         * {
@@ -19,20 +21,18 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 讓背景直接從 body 開始填滿，避免邊緣出現黑邊 */
-        body, html {
-            background: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
-            font-family: var(--ios-font);
-            height: 100%;
+        html, body {
             width: 100%;
+            height: 100%;
+            background: var(--main-gradient); /* 讓最底層背景就是漸層 */
             overflow: hidden;
+            font-family: var(--ios-font);
         }
 
         .container {
             width: 100%;
             height: 100%;
             position: relative;
-            overflow: hidden;
         }
 
         .screen {
@@ -41,6 +41,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            background: var(--main-gradient); /* 確保每一層背景都填滿 */
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
         }
 
@@ -51,19 +52,19 @@
             flex-direction: column;
             align-items: center;
             color: white;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            /* 移除可能導致邊界感的毛玻璃背景顏色 */
+            background: transparent; 
         }
 
-        /* 使用 env(safe-area-inset-top) 自動適應瀏海高度，內容不會被擋住但背景會延伸上去 */
-        .status-bar-sim {
+        /* 頂部安全區留白，但背景會穿透過去 */
+        .safe-area-top {
+            height: env(safe-area-inset-top);
             width: 100%;
-            padding-top: env(safe-area-inset-top); 
-            height: calc(env(safe-area-inset-top) + 20px);
         }
 
         .passcode-area {
-            margin-top: 40px; /* 稍微下移，避開瀏海區域 */
+            /* 根據有無瀏海自動調整距離，讓「輸入密碼」位置更精準 */
+            margin-top: calc(env(safe-area-inset-top) + 60px); 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -73,6 +74,7 @@
             font-size: 22px;
             margin-bottom: 25px;
             letter-spacing: 1px;
+            font-weight: 500;
         }
 
         .dots-container {
@@ -84,7 +86,7 @@
         .dot {
             width: 14px;
             height: 14px;
-            border: 2px solid white;
+            border: 1.5px solid white;
             border-radius: 50%;
             transition: background-color 0.2s;
         }
@@ -99,38 +101,36 @@
         }
 
         .key {
-            width: 75px;
-            height: 75px;
+            width: 78px;
+            height: 78px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 400;
             cursor: pointer;
-            transition: background-color 0.1s;
         }
         .key:active {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.3);
         }
         .key span {
             font-size: 10px;
             font-weight: 600;
             letter-spacing: 2px;
-            margin-top: -5px;
+            margin-top: -3px;
         }
 
         .bottom-buttons {
             position: absolute;
-            /* 適應底部安全區域（如 iPhone 的橫條） */
-            bottom: calc(env(safe-area-inset-bottom) + 40px);
+            bottom: calc(env(safe-area-inset-bottom) + 50px);
             width: 80%;
             display: flex;
             justify-content: space-between;
             font-size: 17px;
-            font-weight: 500;
+            font-weight: 400;
         }
 
         /* --- 2. 主畫面 --- */
@@ -158,10 +158,8 @@
 <body>
 
     <div class="container" id="iphone-container">
-        
         <div class="screen" id="passcode-screen">
-            <div class="status-bar-sim"></div>
-
+            <div class="safe-area-top"></div>
             <div class="passcode-area">
                 <div class="passcode-title">輸入密碼</div>
                 <div class="dots-container">
@@ -170,7 +168,6 @@
                     <div class="dot"></div>
                     <div class="dot"></div>
                 </div>
-
                 <div class="keypad">
                     <div class="key" onclick="press(1)">1</div>
                     <div class="key" onclick="press(2)">2<span>ABC</span></div>
@@ -184,13 +181,11 @@
                     <div></div> <div class="key" onclick="press(0)">0</div>
                     <div></div> </div>
             </div>
-
             <div class="bottom-buttons">
                 <div>緊急服務</div>
                 <div onclick="reset()">取消</div>
             </div>
         </div>
-
         <div class="screen" id="home-screen"></div>
     </div>
 
@@ -208,21 +203,14 @@
                 }
             }
         }
-
         function updateDots() {
             dots.forEach((dot, index) => {
-                if (index < currentPasscode.length) {
-                    dot.classList.add('filled');
-                } else {
-                    dot.classList.remove('filled');
-                }
+                dot.classList.toggle('filled', index < currentPasscode.length);
             });
         }
-
         function unlock() {
             container.classList.add('unlocked');
         }
-
         function reset() {
             currentPasscode = "";
             updateDots();
