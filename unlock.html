@@ -105,6 +105,7 @@
             z-index: 1; background-image: url('image_1.png'); 
             background-size: cover; background-position: center;
             opacity: 0; transform: scale(1.1);
+            cursor: pointer;
         }
 
         .container.unlocked #passcode-screen { opacity: 0; pointer-events: none; transform: scale(1.1); }
@@ -140,7 +141,6 @@
 
         <div class="screen" id="admin-screen">
             <h2 style="margin-bottom: 30px;">後台管理</h2>
-            
             <div class="admin-section">
                 <div class="admin-label">密碼位數</div>
                 <div class="admin-options">
@@ -148,23 +148,17 @@
                     <div class="admin-btn" id="btn-6" onclick="setMode(6)">6 位數</div>
                 </div>
             </div>
-
             <div class="admin-section">
                 <div class="admin-label">自定義啟動碼 (後門)</div>
-                <input type="tel" class="admin-input" id="trigger-input" placeholder="例如 1234" onchange="updateTrigger(this.value)">
-                <div style="font-size: 11px; color: #888; margin-top: 5px;">* 輸入正確啟動碼也會跳動報錯，但會開啟解鎖權限。</div>
+                <input type="tel" class="admin-input" id="trigger-input" onchange="updateTrigger(this.value)">
             </div>
-
             <div class="admin-section">
                 <div class="admin-label">觀眾輸入紀錄</div>
-                <div class="log-container" id="history-logs">
-                    <div style="color: #444; text-align: center; padding: 20px;">尚無紀錄</div>
-                </div>
+                <div class="log-container" id="history-logs"></div>
                 <div style="text-align: right; margin-top: 5px;">
                     <span onclick="clearLogs()" style="font-size: 12px; color: #007AFF; cursor: pointer;">清除紀錄</span>
                 </div>
             </div>
-
             <div class="admin-close" onclick="closeAdmin()">完成設定並返回</div>
         </div>
 
@@ -181,8 +175,7 @@
         const container = document.getElementById('iphone-container');
         const dotsBox = document.getElementById('dots-box');
         const adminScreen = document.getElementById('admin-screen');
-        const historyBox = document.getElementById('history-logs');
-        const triggerInput = document.getElementById('trigger-input');
+        const homeScreen = document.getElementById('home-screen');
 
         function initDots() {
             dotsBox.innerHTML = '';
@@ -197,32 +190,22 @@
             if (currentPasscode.length < passcodeLength) {
                 currentPasscode += num;
                 updateDots();
-                if (currentPasscode.length === passcodeLength) {
-                    handlePasscode();
-                }
+                if (currentPasscode.length === passcodeLength) handlePasscode();
             }
         }
 
         function handlePasscode() {
             addLog(currentPasscode);
-
-            // 狀況 1：如果已經輸入過啟動碼，這一次直接解鎖
             if (isTriggered) {
                 setTimeout(unlock, 200);
-                return;
-            }
-
-            // 狀況 2：檢查是否剛好輸入啟動碼
-            if (currentPasscode === customTriggerCode) {
+            } else if (currentPasscode === customTriggerCode) {
                 isTriggered = true;
-                triggerErrorShake(); // 雖然對了，但還是要震動報錯來騙觀眾
+                triggerErrorShake();
             } else {
-                // 狀況 3：純粹輸入錯誤
                 triggerErrorShake();
             }
         }
 
-        // 執行報錯震動的函式
         function triggerErrorShake() {
             setTimeout(() => {
                 dotsBox.classList.add('shake');
@@ -235,18 +218,37 @@
 
         function updateDots() {
             const dots = dotsBox.querySelectorAll('.dot');
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('filled', index < currentPasscode.length);
-            });
+            dots.forEach((dot, index) => dot.classList.toggle('filled', index < currentPasscode.length));
         }
 
-        function unlock() {
-            container.classList.add('unlocked');
-        }
+        function unlock() { container.classList.add('unlocked'); }
 
         function reset() {
             currentPasscode = "";
             updateDots();
+        }
+
+        // --- 核心新增：雙擊再次鎖定 ---
+        let lastTap = 0;
+        homeScreen.addEventListener('touchstart', function(e) {
+            const now = new Date().getTime();
+            const timesince = now - lastTap;
+            if ((timesince < 300) && (timesince > 0)) {
+                // 執行重新鎖定
+                lockAgain();
+                e.preventDefault();
+            }
+            lastTap = now;
+        });
+
+        // 為了相容電腦測試，也加上 dblclick
+        homeScreen.addEventListener('dblclick', lockAgain);
+
+        function lockAgain() {
+            container.classList.remove('unlocked');
+            isTriggered = false; // 重置後門狀態，魔術可以重新表演
+            reset();             // 清除圓點
+            // 注意：這裡沒有呼叫 clearLogs()，所以紀錄會留著
         }
 
         // --- 後台管理 ---
@@ -254,50 +256,33 @@
             adminScreen.style.display = 'flex';
             document.getElementById('btn-4').classList.toggle('active', passcodeLength === 4);
             document.getElementById('btn-6').classList.toggle('active', passcodeLength === 6);
-            triggerInput.value = customTriggerCode;
+            document.getElementById('trigger-input').value = customTriggerCode;
             renderLogs();
         }
 
         function closeAdmin() { adminScreen.style.display = 'none'; }
-
         function setMode(len) {
             passcodeLength = len;
             customTriggerCode = "0".repeat(len);
-            triggerInput.value = customTriggerCode;
             isTriggered = false;
-            reset();
             initDots();
             openAdmin();
         }
-
-        function updateTrigger(val) {
-            customTriggerCode = val;
-            isTriggered = false; // 更新啟動碼時重設狀態
-        }
-
+        function updateTrigger(val) { customTriggerCode = val; isTriggered = false; }
         function addLog(code) {
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
             history.unshift({ code: code, time: timeStr });
         }
-
         function renderLogs() {
+            const historyBox = document.getElementById('history-logs');
             if (history.length === 0) {
                 historyBox.innerHTML = '<div style="color: #444; text-align: center; padding: 20px;">尚無紀錄</div>';
                 return;
             }
-            historyBox.innerHTML = history.map(item => `
-                <div class="log-item">
-                    <span>${item.code}</span>
-                    <span class="log-time">${item.time}</span>
-                </div>
-            `).join('');
+            historyBox.innerHTML = history.map(item => `<div class="log-item"><span>${item.code}</span><span class="log-time">${item.time}</span></div>`).join('');
         }
-
-        function clearLogs() {
-            history = [];
-            renderLogs();
-        }
+        function clearLogs() { history = []; renderLogs(); }
 
         initDots();
     </script>
