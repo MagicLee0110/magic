@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>計算機</title>
+    <style>
+        /* CSS 樣式：還原 iPhone 視覺 */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .calc-container { width: 100%; max-width: 400px; padding: 0 20px; }
+
+        /* 顯示螢幕 */
+        #display {
+            color: white;
+            font-size: 80px;
+            text-align: right;
+            padding: 10px 20px;
+            font-weight: 300;
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            overflow: hidden;
+            transition: all 0.1s;
+        }
+
+        /* 按鈕網格 */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 50%;
+            height: 80px;
+            width: 80px;
+            font-size: 32px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: brightness 0.2s;
+        }
+        .btn:active { filter: brightness(1.5); }
+
+        .btn.light-gray { background-color: #a5a5a5; color: black; }
+        .btn.dark-gray { background-color: #333333; }
+        .btn.orange { background-color: #ff9f0a; }
+        
+        .btn.zero {
+            grid-column: span 2;
+            width: 100%;
+            border-radius: 40px;
+            justify-content: flex-start;
+            padding-left: 30px;
+        }
+
+        /* 隱藏後台介面 */
+        #admin-panel {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            color: #00ff00;
+            z-index: 100;
+            padding: 20px;
+            font-family: monospace;
+            overflow-y: auto;
+        }
+        .admin-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .close-btn { color: white; background: red; padding: 5px 10px; border-radius: 5px; }
+        input { background: #222; color: #0f0; border: 1px solid #444; padding: 5px; width: 100px; }
+        .log-item { border-bottom: 1px solid #333; padding: 5px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="calc-container">
+        <div id="display" onclick="handleDisplayClick()" id="display-area">0</div>
+        
+        <div class="buttons">
+            <button class="btn light-gray" onclick="press('AC')">AC</button>
+            <button class="btn light-gray" onclick="press('±')">+/-</button>
+            <button class="btn light-gray" onclick="press('%')">%</button>
+            <button class="btn orange" onclick="press('/')">÷</button>
+
+            <button class="btn dark-gray" onclick="press('7')">7</button>
+            <button class="btn dark-gray" onclick="press('8')">8</button>
+            <button class="btn dark-gray" onclick="press('9')">9</button>
+            <button class="btn orange" onclick="press('*')">×</button>
+
+            <button class="btn dark-gray" onclick="press('4')">4</button>
+            <button class="btn dark-gray" onclick="press('5')">5</button>
+            <button class="btn dark-gray" onclick="press('6')">6</button>
+            <button class="btn orange" onclick="press('-')">-</button>
+
+            <button class="btn dark-gray" onclick="press('1')">1</button>
+            <button class="btn dark-gray" onclick="press('2')">2</button>
+            <button class="btn dark-gray" onclick="press('3')">3</button>
+            <button class="btn orange" onclick="press('+')">+</button>
+
+            <button class="btn dark-gray zero" onclick="press('0')">0</button>
+            <button class="btn dark-gray" onclick="press('.')">.</button>
+            <button class="btn orange" onclick="press('=')">=</button>
+        </div>
+    </div>
+
+    <div id="admin-panel">
+        <div class="admin-header">
+            <span>後台管理控制台</span>
+            <span class="close-btn" onclick="toggleAdmin()">關閉</span>
+        </div>
+        <div>
+            目前的啟動碼：<input type="text" id="code-input" value="0000" onchange="updateCode(this.value)">
+            <p>狀態：<span id="status-text" style="color:white">未解鎖 (偽裝中)</span></p>
+        </div>
+        <hr>
+        <h4>輸入紀錄：</h4>
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        let currentInput = "";
+        let isUnlocked = false;
+        let unlockCode = "0000";
+        let historyLogs = [];
+        let clickTimer = null;
+        let lastClickTime = 0;
+
+        const display = document.getElementById('display');
+        const logsContainer = document.getElementById('logs');
+        const statusText = document.getElementById('status-text');
+
+        // 按鈕按下邏輯
+        function press(key) {
+            recordLog(key);
+
+            if (key === 'AC') {
+                currentInput = "";
+                display.innerText = "0";
+                return;
+            }
+
+            if (key === '=') {
+                // 檢查是否輸入啟動碼
+                if (currentInput === unlockCode || currentInput === "000000") {
+                    isUnlocked = true;
+                    statusText.innerText = "已解鎖 (正常計算)";
+                    statusText.style.color = "#00ff00";
+                    currentInput = "";
+                    display.innerText = "0";
+                    return;
+                }
+
+                if (isUnlocked) {
+                    // 正常計算模式
+                    try {
+                        let exp = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
+                        let result = eval(exp);
+                        display.innerText = result;
+                        currentInput = result.toString();
+                    } catch (e) {
+                        display.innerText = "錯誤";
+                        currentInput = "";
+                    }
+                } else {
+                    // 偽裝模式：無論輸入什麼都給錯的結果
+                    // 這裡設定成：顯示目前的數字 + 11 (看起來像壞掉，又不太假)
+                    let fake = (parseFloat(currentInput) || 0) + 11;
+                    display.innerText = fake;
+                    currentInput = "";
+                }
+                return;
+            }
+
+            // 一般數字與符號輸入
+            currentInput += key;
+            display.innerText = currentInput;
+        }
+
+        // 紀錄功能
+        function recordLog(key) {
+            const time = new Date().toLocaleTimeString();
+            historyLogs.unshift(`[${time}] 按下: ${key}`); // 新的在上面
+            renderLogs();
+        }
+
+        function renderLogs() {
+            logsContainer.innerHTML = historyLogs.map(log => `<div class="log-item">${log}</div>`).join('');
+        }
+
+        // 修改啟動碼
+        function updateCode(newCode) {
+            unlockCode = newCode;
+            alert("啟動碼已改為: " + newCode);
+        }
+
+        // 處理顯示區點擊 (雙擊重置 / 長按進入後台)
+        function handleDisplayClick() {
+            const now = Date.now();
+            if (now - lastClickTime < 300) {
+                // 雙擊：重置 APP
+                resetApp();
+            }
+            lastClickTime = now;
+        }
+
+        // 長按顯示區域 2 秒開啟後台
+        let longPressTimer;
+        display.addEventListener('mousedown', () => { longPressTimer = setTimeout(toggleAdmin, 2000); });
+        display.addEventListener('touchstart', () => { longPressTimer = setTimeout(toggleAdmin, 2000); });
+        display.addEventListener('mouseup', () => clearTimeout(longPressTimer));
+        display.addEventListener('touchend', () => clearTimeout(longPressTimer));
+
+        function toggleAdmin() {
+            const panel = document.getElementById('admin-panel');
+            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function resetApp() {
+            currentInput = "";
+            isUnlocked = false;
+            display.innerText = "0";
+            statusText.innerText = "未解鎖 (偽裝中)";
+            statusText.style.color = "white";
+            alert("APP 已重新啟動");
+        }
+    </script>
+</body>
+</html>
