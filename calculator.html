@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>計算機</title>
     <style>
         :root {
@@ -16,86 +16,84 @@
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
         }
 
         body {
             background-color: var(--bg-black);
             display: flex;
-            justify-content: center;
-            align-items: flex-end;
+            flex-direction: column;
+            justify-content: flex-end;
             height: 100vh;
             margin: 0;
-            padding-bottom: 30px;
+            padding-bottom: 40px; /* 模擬 iPhone 底部間距 */
             overflow: hidden;
             user-select: none;
         }
 
-        .calculator {
-            width: 100%;
-            max-width: 400px;
-            padding: 0 20px;
-        }
-
         /* 顯示區域 */
         .display-container {
-            padding: 0 10px;
+            padding: 0 30px;
             text-align: right;
             margin-bottom: 10px;
+            min-height: 100px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
         }
 
         #display {
             color: white;
-            font-size: 80px;
+            font-size: 90px;
             font-weight: 300;
-            white-space: nowrap;
-            overflow: hidden;
-            transition: font-size 0.1s;
+            letter-spacing: -2px;
+            word-break: break-all;
+            line-height: 1;
         }
 
         /* 按鈕區域 */
         .buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 14px;
+            padding: 0 16px;
         }
 
         button {
             border: none;
             border-radius: 50%;
-            height: 80px;
-            width: 80px;
+            aspect-ratio: 1/1;
             font-size: 36px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: filter 0.2s, background-color 0.2s;
+            transition: background-color 0.1s;
         }
 
-        button:active {
-            filter: brightness(1.5);
-        }
+        /* 按下時的顏色變化 */
+        button:active { filter: brightness(1.3); }
 
         .num { background-color: var(--btn-gray); color: white; }
-        .op { background-color: var(--btn-orange); color: white; font-size: 45px; }
-        .func { background-color: var(--btn-lightgray); color: black; font-size: 30px; }
+        .op { background-color: var(--btn-orange); color: white; font-size: 45px; transition: all 0.2s; }
+        .func { background-color: var(--btn-lightgray); color: black; font-size: 32px; }
 
+        /* 運算符選中狀態 */
         .op.active {
             background-color: white;
             color: var(--btn-orange);
         }
 
-        /* 0 的特殊處理 */
         .zero {
             grid-column: span 2;
-            width: 100%;
+            aspect-ratio: auto;
+            height: 80px;
             border-radius: 50px;
             justify-content: flex-start;
-            padding-left: 30px;
+            padding-left: 32px;
         }
 
-        /* 後台樣式 */
+        /* 後台樣式 (隱藏) */
         #backstage {
             display: none;
             position: fixed;
@@ -105,65 +103,65 @@
             height: 100%;
             background: #1c1c1e;
             color: white;
-            padding: 50px 20px;
+            padding: 60px 25px;
             z-index: 999;
         }
-
-        .input-group { margin-bottom: 20px; }
+        .input-group { margin-bottom: 25px; }
+        label { display: block; color: #8e8e93; margin-bottom: 8px; font-size: 14px; }
         input {
             width: 100%; padding: 15px; background: #2c2c2e; border: none;
-            border-radius: 10px; color: white; font-size: 18px; margin-top: 5px;
+            border-radius: 10px; color: white; font-size: 18px;
         }
         .save-btn {
-            background: var(--btn-orange); border: none; padding: 15px;
-            width: 100%; border-radius: 10px; color: white; font-size: 18px;
+            background: var(--btn-orange); border: none; padding: 16px;
+            width: 100%; border-radius: 12px; color: white; font-size: 18px; font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="calculator">
-        <div class="display-container">
-            <div id="display">0</div>
-        </div>
-        <div class="buttons">
-            <button class="func" id="btn-ac" onclick="handleAC()">AC</button>
-            <button class="func" onclick="handleInput('+/-')">+/-</button>
-            <button class="func" id="btn-percent" onclick="handleInput('%')">%</button>
-            <button class="op" data-op="/">÷</button>
-            
-            <button class="num" onclick="handleNum('7')">7</button>
-            <button class="num" onclick="handleNum('8')">8</button>
-            <button class="num" onclick="handleNum('9')">9</button>
-            <button class="op" data-op="*">×</button>
-            
-            <button class="num" onclick="handleNum('4')">4</button>
-            <button class="num" onclick="handleNum('5')">5</button>
-            <button class="num" onclick="handleNum('6')">6</button>
-            <button class="op" data-op="-">−</button>
-            
-            <button class="num" onclick="handleNum('1')">1</button>
-            <button class="num" onclick="handleNum('2')">2</button>
-            <button class="num" onclick="handleNum('3')">3</button>
-            <button class="op" data-op="+">+</button>
-            
-            <button class="num zero" onclick="handleNum('0')">0</button>
-            <button class="num" onclick="handleNum('.')">.</button>
-            <button class="op" onclick="handleEquals()">=</button>
-        </div>
+    <div class="display-container">
+        <div id="display">0</div>
+    </div>
+    
+    <div class="buttons">
+        <button class="func" id="btn-ac" onclick="handleAC()">AC</button>
+        <button class="func" onclick="handleUnary('+/-')">+/-</button>
+        <button class="func" id="btn-percent" onclick="handleUnary('%')">%</button>
+        <button class="op" id="op-div" onclick="handleOp('/')">÷</button>
+        
+        <button class="num" onclick="handleNum('7')">7</button>
+        <button class="num" onclick="handleNum('8')">8</button>
+        <button class="num" onclick="handleNum('9')">9</button>
+        <button class="op" id="op-mul" onclick="handleOp('*')">×</button>
+        
+        <button class="num" onclick="handleNum('4')">4</button>
+        <button class="num" onclick="handleNum('5')">5</button>
+        <button class="num" onclick="handleNum('6')">6</button>
+        <button class="op" id="op-sub" onclick="handleOp('-')">−</button>
+        
+        <button class="num" onclick="handleNum('1')">1</button>
+        <button class="num" onclick="handleNum('2')">2</button>
+        <button class="num" onclick="handleNum('3')">3</button>
+        <button class="op" id="op-add" onclick="handleOp('+')">+</button>
+        
+        <button class="num zero" onclick="handleNum('0')">0</button>
+        <button class="num" onclick="handleNum('.')">.</button>
+        <button class="op" onclick="handleEquals()">=</button>
     </div>
 
     <div id="backstage">
-        <h2>後台設定</h2>
+        <h1 style="margin-top:0">後台設定</h1>
         <div class="input-group">
-            <label>強迫觸發次數 (預設3)</label>
+            <label>強迫觸發次數 (按第幾次 = 時觸發)</label>
             <input type="number" id="cfg-count" value="3">
         </div>
         <div class="input-group">
             <label>強迫目標數字</label>
             <input type="text" id="cfg-val" value="78203177.4">
         </div>
-        <p id="status-text">模式：關閉</p>
+        <hr style="border-color:#333; margin: 30px 0;">
+        <p id="status-text" style="color: #ff9f0a;">模式狀態：普通模式</p>
         <button class="save-btn" onclick="closeBackstage()">儲存並關閉</button>
     </div>
 
@@ -173,51 +171,80 @@
         let operator = null;
         let waitingForSecondOperand = false;
         
-        // 強迫模式變量
+        // 強迫模式設定
         let forceMode = false;
         let equalCount = 0;
         let targetCount = 3;
         let targetValue = "78203177.4";
 
         const displayEl = document.getElementById('display');
+        const acBtn = document.getElementById('btn-ac');
 
-        // 更新螢幕，包含字體縮小邏輯
+        function formatDisplay(numStr) {
+            if (numStr === 'Error' || numStr === 'NaN') return numStr;
+            const parts = numStr.split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join('.');
+        }
+
         function updateDisplay() {
-            displayEl.innerText = currentDisplay;
-            const len = currentDisplay.length;
-            if (len > 6) {
-                displayEl.style.fontSize = (80 - (len - 6) * 6) + 'px';
+            displayEl.innerText = formatDisplay(currentDisplay);
+            
+            // 字體縮小邏輯
+            const len = displayEl.innerText.length;
+            if (len > 7) {
+                displayEl.style.fontSize = Math.max(40, 90 - (len - 7) * 7) + 'px';
             } else {
-                displayEl.style.fontSize = '80px';
+                displayEl.style.fontSize = '90px';
             }
+
+            // 更新 AC/C 文字
+            acBtn.innerText = currentDisplay === '0' ? 'AC' : 'C';
         }
 
         function handleNum(num) {
+            // 清除運算符反白
+            clearOpHighlights();
+
             if (waitingForSecondOperand) {
                 currentDisplay = num;
                 waitingForSecondOperand = false;
             } else {
-                currentDisplay = currentDisplay === '0' ? num : currentDisplay + num;
+                if (currentDisplay === '0' && num !== '.') {
+                    currentDisplay = num;
+                } else {
+                    if (num === '.' && currentDisplay.includes('.')) return;
+                    currentDisplay += num;
+                }
             }
             updateDisplay();
         }
 
-        // 運算符處理
-        document.querySelectorAll('.op[data-op]').forEach(btn => {
-            btn.onclick = () => {
-                const nextOp = btn.getAttribute('data-op');
-                if (firstOperand === null) {
-                    firstOperand = parseFloat(currentDisplay);
-                } else if (operator) {
-                    const result = performCalc(firstOperand, parseFloat(currentDisplay), operator);
-                    currentDisplay = String(result);
-                    firstOperand = result;
-                }
-                waitingForSecondOperand = true;
+        function handleOp(nextOp) {
+            clearOpHighlights();
+            // 反白當前按下的運算符
+            const opIds = {'/': 'op-div', '*': 'op-mul', '-': 'op-sub', '+': 'op-add'};
+            document.getElementById(opIds[nextOp]).classList.add('active');
+
+            const inputValue = parseFloat(currentDisplay);
+
+            if (operator && waitingForSecondOperand) {
                 operator = nextOp;
+                return;
+            }
+
+            if (firstOperand === null) {
+                firstOperand = inputValue;
+            } else if (operator) {
+                const result = performCalc(firstOperand, inputValue, operator);
+                currentDisplay = String(result);
+                firstOperand = result;
                 updateDisplay();
-            };
-        });
+            }
+
+            waitingForSecondOperand = true;
+            operator = nextOp;
+        }
 
         function performCalc(first, second, op) {
             if (op === '+') return first + second;
@@ -228,9 +255,10 @@
         }
 
         function handleEquals() {
+            clearOpHighlights();
             equalCount++;
-            
-            // 強迫邏輯
+
+            // 強迫邏輯判斷
             if (forceMode && equalCount === targetCount) {
                 currentDisplay = targetValue;
                 firstOperand = null;
@@ -239,7 +267,7 @@
             } else {
                 if (!operator || waitingForSecondOperand) return;
                 const result = performCalc(firstOperand, parseFloat(currentDisplay), operator);
-                currentDisplay = String(result);
+                currentDisplay = String(parseFloat(result.toFixed(10))); // 處理浮點數精度
                 firstOperand = null;
                 operator = null;
                 waitingForSecondOperand = false;
@@ -248,18 +276,35 @@
         }
 
         function handleAC() {
+            // 如果顯示的不是 0，C 的功能是清除當前顯示，保持運算狀態
+            // 如果顯示的是 0，AC 的功能是徹底重置
             currentDisplay = '0';
-            firstOperand = null;
-            operator = null;
-            waitingForSecondOperand = false;
+            if (acBtn.innerText === 'AC') {
+                firstOperand = null;
+                operator = null;
+                waitingForSecondOperand = false;
+                clearOpHighlights();
+            }
             updateDisplay();
         }
 
-        // --- 長按邏輯與後台 ---
+        function handleUnary(type) {
+            let val = parseFloat(currentDisplay);
+            if (type === '+/-') val = -val;
+            if (type === '%') val = val / 100;
+            currentDisplay = String(val);
+            updateDisplay();
+        }
+
+        function clearOpHighlights() {
+            document.querySelectorAll('.op').forEach(el => el.classList.remove('active'));
+        }
+
+        // --- 長按邏輯 ---
         function setupLongPress(id, callback) {
             const el = document.getElementById(id);
             let timer;
-            const start = (e) => { e.preventDefault(); timer = setTimeout(callback, 1000); };
+            const start = (e) => { timer = setTimeout(callback, 1000); };
             const stop = () => clearTimeout(timer);
             el.addEventListener('touchstart', start);
             el.addEventListener('touchend', stop);
@@ -267,18 +312,16 @@
             el.addEventListener('mouseup', stop);
         }
 
-        // 長按 % 進入後台
         setupLongPress('btn-percent', () => {
             document.getElementById('backstage').style.display = 'block';
         });
 
-        // 長按 AC 開啟強迫模式
         setupLongPress('btn-ac', () => {
             forceMode = !forceMode;
             equalCount = 0;
-            const status = forceMode ? "強迫模式：ON" : "強迫模式：OFF";
-            document.getElementById('status-text').innerText = status;
-            alert(status);
+            document.getElementById('status-text').innerText = forceMode ? "模式狀態：強迫模式已開啟" : "模式狀態：普通模式";
+            // 震動回饋 (如果手機支援)
+            if (navigator.vibrate) navigator.vibrate(50);
         });
 
         function closeBackstage() {
@@ -287,7 +330,7 @@
             document.getElementById('backstage').style.display = 'none';
         }
 
-        // 阻止雙擊縮放（表演必備）
+        // 阻止系統雙擊縮放
         document.addEventListener('touchstart', (e) => {
             if (e.touches.length > 1) e.preventDefault();
         }, { passive: false });
