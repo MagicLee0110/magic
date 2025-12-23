@@ -3,50 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智能計算機</title>
+    <title>計算機</title>
     <style>
         :root {
-            --bg-color: #000;
-            --btn-gray: #333;
-            --btn-light-gray: #a5a5a5;
+            --bg-black: #000000;
+            --btn-gray: #333333;
+            --btn-lightgray: #a5a5a5;
             --btn-orange: #ff9f0a;
-            --text-white: #fff;
+            --text-white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-black);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end;
             height: 100vh;
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding-bottom: 30px;
             overflow: hidden;
             user-select: none;
         }
 
-        /* 計算機主體 */
         .calculator {
             width: 100%;
             max-width: 400px;
-            padding: 20px;
+            padding: 0 20px;
         }
 
-        .display {
+        /* 顯示區域 */
+        .display-container {
+            padding: 0 10px;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        #display {
             color: white;
             font-size: 80px;
-            text-align: right;
-            margin-bottom: 20px;
-            height: 100px;
-            line-height: 100px;
-            overflow: hidden;
             font-weight: 300;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: font-size 0.1s;
         }
 
+        /* 按鈕區域 */
         .buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 12px;
         }
 
         button {
@@ -54,26 +65,33 @@
             border-radius: 50%;
             height: 80px;
             width: 80px;
-            font-size: 32px;
+            font-size: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
-            transition: opacity 0.2s;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
+            transition: filter 0.2s, background-color 0.2s;
         }
 
         button:active {
-            opacity: 0.7;
+            filter: brightness(1.5);
         }
 
         .num { background-color: var(--btn-gray); color: white; }
-        .op { background-color: var(--btn-orange); color: white; font-size: 40px; }
-        .func { background-color: var(--btn-light-gray); color: black; }
-        
+        .op { background-color: var(--btn-orange); color: white; font-size: 45px; }
+        .func { background-color: var(--btn-lightgray); color: black; font-size: 30px; }
+
+        .op.active {
+            background-color: white;
+            color: var(--btn-orange);
+        }
+
+        /* 0 的特殊處理 */
         .zero {
             grid-column: span 2;
-            width: 175px;
-            border-radius: 40px;
-            text-align: left;
+            width: 100%;
+            border-radius: 50px;
+            justify-content: flex-start;
             padding-left: 30px;
         }
 
@@ -85,199 +103,194 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: #1c1c1e;
             color: white;
-            padding: 40px 20px;
-            box-sizing: border-box;
-            z-index: 100;
+            padding: 50px 20px;
+            z-index: 999;
         }
 
-        #backstage h2 { color: var(--btn-orange); }
-        .setting-item { margin-bottom: 25px; }
-        label { display: block; margin-bottom: 10px; font-size: 18px; }
+        .input-group { margin-bottom: 20px; }
         input {
-            width: 100%;
-            padding: 12px;
-            background: #222;
-            border: 1px solid #444;
-            color: white;
-            font-size: 18px;
-            border-radius: 8px;
+            width: 100%; padding: 15px; background: #2c2c2e; border: none;
+            border-radius: 10px; color: white; font-size: 18px; margin-top: 5px;
         }
-        .close-btn {
-            background: var(--btn-orange);
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            border-radius: 8px;
-            font-size: 18px;
-            margin-top: 20px;
+        .save-btn {
+            background: var(--btn-orange); border: none; padding: 15px;
+            width: 100%; border-radius: 10px; color: white; font-size: 18px;
         }
-
-        /* 模式指示器 (僅表演者可視) */
-        #status-dot {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: transparent;
-        }
-        #status-dot.active { background: #222; } /* 極深色，觀眾看不出來 */
     </style>
 </head>
 <body>
 
-    <div id="status-dot"></div>
-
     <div class="calculator">
-        <div class="display" id="display">0</div>
+        <div class="display-container">
+            <div id="display">0</div>
+        </div>
         <div class="buttons">
-            <button class="func" id="btn-ac">AC</button>
-            <button class="func">+/-</button>
-            <button class="func" id="btn-percent">%</button>
-            <button class="op" onclick="setOp('/')">÷</button>
+            <button class="func" id="btn-ac" onclick="handleAC()">AC</button>
+            <button class="func" onclick="handleInput('+/-')">+/-</button>
+            <button class="func" id="btn-percent" onclick="handleInput('%')">%</button>
+            <button class="op" data-op="/">÷</button>
             
-            <button class="num" onclick="appendNum('7')">7</button>
-            <button class="num" onclick="appendNum('8')">8</button>
-            <button class="num" onclick="appendNum('9')">9</button>
-            <button class="op" onclick="setOp('*')">×</button>
+            <button class="num" onclick="handleNum('7')">7</button>
+            <button class="num" onclick="handleNum('8')">8</button>
+            <button class="num" onclick="handleNum('9')">9</button>
+            <button class="op" data-op="*">×</button>
             
-            <button class="num" onclick="appendNum('4')">4</button>
-            <button class="num" onclick="appendNum('5')">5</button>
-            <button class="num" onclick="appendNum('6')">6</button>
-            <button class="op" onclick="setOp('-')">−</button>
+            <button class="num" onclick="handleNum('4')">4</button>
+            <button class="num" onclick="handleNum('5')">5</button>
+            <button class="num" onclick="handleNum('6')">6</button>
+            <button class="op" data-op="-">−</button>
             
-            <button class="num" onclick="appendNum('1')">1</button>
-            <button class="num" onclick="appendNum('2')">2</button>
-            <button class="num" onclick="appendNum('3')">3</button>
-            <button class="op" onclick="setOp('+')">+</button>
+            <button class="num" onclick="handleNum('1')">1</button>
+            <button class="num" onclick="handleNum('2')">2</button>
+            <button class="num" onclick="handleNum('3')">3</button>
+            <button class="op" data-op="+">+</button>
             
-            <button class="num zero" onclick="appendNum('0')">0</button>
-            <button class="num" onclick="appendNum('.')">.</button>
-            <button class="op" onclick="calculate()">=</button>
+            <button class="num zero" onclick="handleNum('0')">0</button>
+            <button class="num" onclick="handleNum('.')">.</button>
+            <button class="op" onclick="handleEquals()">=</button>
         </div>
     </div>
 
     <div id="backstage">
-        <h2>設定後台</h2>
-        <div class="setting-item">
-            <label>強迫觸發次數 (第幾次 = 觸發)</label>
-            <input type="number" id="config-count" value="3">
+        <h2>後台設定</h2>
+        <div class="input-group">
+            <label>強迫觸發次數 (預設3)</label>
+            <input type="number" id="cfg-count" value="3">
         </div>
-        <div class="setting-item">
+        <div class="input-group">
             <label>強迫目標數字</label>
-            <input type="text" id="config-force-num" value="78203177.4">
+            <input type="text" id="cfg-val" value="78203177.4">
         </div>
-        <hr>
-        <p id="mode-info">模式：普通模式</p>
-        <button class="close-btn" onclick="toggleBackstage(false)">關閉並儲存</button>
+        <p id="status-text">模式：關閉</p>
+        <button class="save-btn" onclick="closeBackstage()">儲存並關閉</button>
     </div>
 
     <script>
         let currentDisplay = '0';
-        let forceMode = false;
-        let equalClickCount = 0;
+        let firstOperand = null;
+        let operator = null;
+        let waitingForSecondOperand = false;
         
-        // 設定參數
+        // 強迫模式變量
+        let forceMode = false;
+        let equalCount = 0;
         let targetCount = 3;
-        let forceValue = "78203177.4";
+        let targetValue = "78203177.4";
 
         const displayEl = document.getElementById('display');
-        const backstageEl = document.getElementById('backstage');
-        const dotEl = document.getElementById('status-dot');
 
-        // --- 計算機基本邏輯 ---
+        // 更新螢幕，包含字體縮小邏輯
         function updateDisplay() {
-            displayEl.innerText = currentDisplay.substring(0, 9);
+            displayEl.innerText = currentDisplay;
+            const len = currentDisplay.length;
+            if (len > 6) {
+                displayEl.style.fontSize = (80 - (len - 6) * 6) + 'px';
+            } else {
+                displayEl.style.fontSize = '80px';
+            }
         }
 
-        function appendNum(num) {
-            if (currentDisplay === '0' && num !== '.') {
+        function handleNum(num) {
+            if (waitingForSecondOperand) {
                 currentDisplay = num;
+                waitingForSecondOperand = false;
             } else {
-                currentDisplay += num;
+                currentDisplay = currentDisplay === '0' ? num : currentDisplay + num;
             }
             updateDisplay();
         }
 
-        function setOp(op) {
-            currentDisplay += ` ${op} `;
-            updateDisplay();
-        }
-
-        function calculate() {
-            equalClickCount++;
-            
-            if (forceMode && equalClickCount === targetCount) {
-                currentDisplay = forceValue.toString();
-            } else {
-                try {
-                    // 簡單的計算邏輯
-                    let result = eval(currentDisplay.replace('×', '*').replace('÷', '/'));
-                    currentDisplay = result.toString();
-                } catch (e) {
-                    currentDisplay = "Error";
+        // 運算符處理
+        document.querySelectorAll('.op[data-op]').forEach(btn => {
+            btn.onclick = () => {
+                const nextOp = btn.getAttribute('data-op');
+                if (firstOperand === null) {
+                    firstOperand = parseFloat(currentDisplay);
+                } else if (operator) {
+                    const result = performCalc(firstOperand, parseFloat(currentDisplay), operator);
+                    currentDisplay = String(result);
+                    firstOperand = result;
                 }
-            }
-            updateDisplay();
-        }
-
-        function clearCalc() {
-            currentDisplay = '0';
-            updateDisplay();
-        }
-
-        // --- 長按邏輯 ---
-        function setupLongPress(elementId, callback) {
-            const el = document.getElementById(elementId);
-            let timer;
-
-            const start = (e) => {
-                e.preventDefault();
-                timer = setTimeout(callback, 1000); // 長按 1 秒
+                waitingForSecondOperand = true;
+                operator = nextOp;
+                updateDisplay();
             };
-            const cancel = () => clearTimeout(timer);
-
-            el.addEventListener('mousedown', start);
-            el.addEventListener('touchstart', start);
-            el.addEventListener('mouseup', cancel);
-            el.addEventListener('mouseleave', cancel);
-            el.addEventListener('touchend', cancel);
-            
-            // 點擊原有的功能
-            el.addEventListener('click', (e) => {
-                if (elementId === 'btn-ac') clearCalc();
-                // % 的功能可根據需求補充，這裡暫時僅作為後台入口
-            });
-        }
-
-        // 進入後台 (長按 %)
-        setupLongPress('btn-percent', () => {
-            toggleBackstage(true);
         });
 
-        // 開啟強迫模式 (長按 AC)
+        function performCalc(first, second, op) {
+            if (op === '+') return first + second;
+            if (op === '-') return first - second;
+            if (op === '*') return first * second;
+            if (op === '/') return first / second;
+            return second;
+        }
+
+        function handleEquals() {
+            equalCount++;
+            
+            // 強迫邏輯
+            if (forceMode && equalCount === targetCount) {
+                currentDisplay = targetValue;
+                firstOperand = null;
+                operator = null;
+                waitingForSecondOperand = false;
+            } else {
+                if (!operator || waitingForSecondOperand) return;
+                const result = performCalc(firstOperand, parseFloat(currentDisplay), operator);
+                currentDisplay = String(result);
+                firstOperand = null;
+                operator = null;
+                waitingForSecondOperand = false;
+            }
+            updateDisplay();
+        }
+
+        function handleAC() {
+            currentDisplay = '0';
+            firstOperand = null;
+            operator = null;
+            waitingForSecondOperand = false;
+            updateDisplay();
+        }
+
+        // --- 長按邏輯與後台 ---
+        function setupLongPress(id, callback) {
+            const el = document.getElementById(id);
+            let timer;
+            const start = (e) => { e.preventDefault(); timer = setTimeout(callback, 1000); };
+            const stop = () => clearTimeout(timer);
+            el.addEventListener('touchstart', start);
+            el.addEventListener('touchend', stop);
+            el.addEventListener('mousedown', start);
+            el.addEventListener('mouseup', stop);
+        }
+
+        // 長按 % 進入後台
+        setupLongPress('btn-percent', () => {
+            document.getElementById('backstage').style.display = 'block';
+        });
+
+        // 長按 AC 開啟強迫模式
         setupLongPress('btn-ac', () => {
             forceMode = !forceMode;
-            equalClickCount = 0;
-            dotEl.classList.toggle('active', forceMode);
-            alert(forceMode ? "強迫模式已啟動" : "強迫模式已關閉");
+            equalCount = 0;
+            const status = forceMode ? "強迫模式：ON" : "強迫模式：OFF";
+            document.getElementById('status-text').innerText = status;
+            alert(status);
         });
 
-        function toggleBackstage(show) {
-            if (show) {
-                backstageEl.style.display = 'block';
-                document.getElementById('mode-info').innerText = `目前狀態：${forceMode ? '強迫模式中' : '普通模式'}`;
-            } else {
-                // 儲存設定
-                targetCount = parseInt(document.getElementById('config-count').value);
-                forceValue = document.getElementById('config-force-num').value;
-                backstageEl.style.display = 'none';
-            }
+        function closeBackstage() {
+            targetCount = parseInt(document.getElementById('cfg-count').value);
+            targetValue = document.getElementById('cfg-val').value;
+            document.getElementById('backstage').style.display = 'none';
         }
+
+        // 阻止雙擊縮放（表演必備）
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
