@@ -17,7 +17,6 @@
     * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
     
     html { background-color: #fff; height: 100%; } 
-    /* 這裡的背景色會直接影響瀏海的顏色 */
     body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; transition: background-color 0.4s ease; }
 
     /* --- 啟動畫面 --- */
@@ -70,14 +69,12 @@
         left: 50%;
         transform: translateX(-50%);
         z-index: 4000;
-        /* 背景模擬：漸層加上毛玻璃感 */
         background: linear-gradient(180deg, #2c3e50 0%, #000000 100%);
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
         color: white;
     }
 
-    /* 上方時間 */
     .ios-lock-header {
         margin-top: calc(50px + env(safe-area-inset-top));
         text-align: center;
@@ -88,21 +85,24 @@
 
     .passcode-header { font-size: 17px; color: #fff; font-weight: 400; margin-bottom: 20px; margin-top: 10px; }
     
+    /* --- 震動動畫樣式 --- */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-12px); }
+        40%, 80% { transform: translateX(12px); }
+    }
+    .shake-err { animation: shake 0.4s ease-in-out; }
+    .shake-err .dot.filled { background: #ff453a !important; border-color: #ff453a !important; }
+
     .passcode-dots { display: flex; gap: 22px; margin-bottom: 45px; }
     .dot { width: 12px; height: 12px; border: 1.5px solid #fff; border-radius: 50%; transition: background 0.1s; }
     .dot.filled { background: #fff; }
 
     .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 25px; width: 280px; justify-items: center; }
     .key { 
-        width: 76px; 
-        height: 76px; 
-        border-radius: 50%; 
-        background: rgba(255,255,255,0.12); 
-        color: #fff; 
-        display: flex; 
-        flex-direction: column;
-        align-items: center; 
-        justify-content: center; 
+        width: 76px; height: 76px; border-radius: 50%; 
+        background: rgba(255,255,255,0.12); color: #fff; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
         transition: background 0.1s;
     }
     .key:active { background: rgba(255,255,255,0.35); }
@@ -111,15 +111,8 @@
     .key-zero { grid-column: 2; }
     
     .keypad-footer { 
-        margin-top: auto; 
-        margin-bottom: calc(50px + env(safe-area-inset-bottom));
-        font-size: 16px; 
-        width: 100%; 
-        display: flex; 
-        justify-content: space-between; 
-        padding: 0 50px; 
-        color: #fff;
-        font-weight: 400;
+        margin-top: auto; margin-bottom: calc(50px + env(safe-area-inset-bottom));
+        font-size: 16px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; color: #fff; font-weight: 400;
     }
 
     /* 閱讀器樣式 */
@@ -278,16 +271,12 @@
 
     function closeInfo() { document.getElementById("info-view").style.display = "none"; }
 
-    // --- 修改點：開啟解鎖畫面時同步 Body 顏色 ---
     function openSetup() { 
         document.getElementById("info-view").style.display = "none"; 
         document.getElementById("main-nav").style.display = "none"; 
         document.getElementById("magic-setup").style.display = "flex"; 
-        
-        // 將 Body 背景改為解鎖畫面的頂部顏色，同步瀏海區域
         document.body.style.backgroundColor = "#2c3e50"; 
         document.getElementById("theme-color-meta").content = "#2c3e50";
-        
         clearPass(); 
     }
 
@@ -295,8 +284,6 @@
         document.getElementById("magic-setup").style.display = "none"; 
         document.getElementById("main-nav").style.display = "flex"; 
         document.getElementById("info-view").style.display = "flex"; 
-        
-        // 還原 Body 顏色
         document.body.style.backgroundColor = "#fff";
         document.getElementById("theme-color-meta").content = "#ffffff";
     }
@@ -305,7 +292,6 @@
     
     function openReader() { 
         document.getElementById("main-nav").style.display = "none"; 
-        // 進入閱讀模式也調整 Body 顏色
         document.body.style.backgroundColor = "#fffdfb"; 
         document.getElementById("theme-color-meta").content = "#fffdfb";
         document.getElementById("reader-book-title").innerText = currentActiveBook.t; 
@@ -333,27 +319,42 @@
     }
     function clearPass() { passcode = ""; document.querySelectorAll('.dot').forEach(d => d.classList.remove('filled')); }
 
+    // --- 修改點：密碼錯誤觸發震動動畫 ---
     function calculate() {
+        const dotsBox = document.getElementById("dotsContainer");
         const suitMap = {"1":"黑桃", "2":"紅心", "3":"方塊", "4":"梅花"};
         const suit = suitMap[passcode[0]];
         const rankMap = ["","A","2","3","4","5","6","7","8","9","10","J","Q","K"];
         const rank = rankMap[parseInt(passcode.substring(1,3))];
         const nv = parseInt(passcode.substring(3,5));
-        if (!suit || !rank || isNaN(nv)) { alert("密碼錯誤"); clearPass(); return; }
+        
         let found = false;
-        for (let k in allDecks) {
-            let deck = allDecks[k], pos = -1;
-            for(let i=0; i<deck.length; i++) if(deck[i].suit === suit && deck[i].number === rank) { pos = i + 1; break; }
-            if (pos + 3 === nv) { setRes(k, "背面向上一張張往下發"); found = true; break; }
-            if (pos + 2 === nv) { setRes(k, "拿掉廣告牌後，背面向上一張張往下發"); found = true; break; }
-            if (pos + 1 === nv) { setRes(k, "拿掉鬼牌後，背面向上一張張往下發"); found = true; break; }
-            if (pos === nv) { setRes(k, "拿掉鬼牌和廣告牌後，背面向上一張張往下發"); found = true; break; }
+        if (suit && rank && !isNaN(nv)) {
+            for (let k in allDecks) {
+                let deck = allDecks[k], pos = -1;
+                for(let i=0; i<deck.length; i++) if(deck[i].suit === suit && deck[i].number === rank) { pos = i + 1; break; }
+                if (pos + 3 === nv) { setRes(k, "背面向上一張張往下發"); found = true; break; }
+                if (pos + 2 === nv) { setRes(k, "拿掉廣告牌後，背面向上一張張往下發"); found = true; break; }
+                if (pos + 1 === nv) { setRes(k, "拿掉鬼牌後，背面向上一張張往下發"); found = true; break; }
+                if (pos === nv) { setRes(k, "拿掉鬼牌和廣告牌後，背面向上一張張往下發"); found = true; break; }
+            }
         }
-        if(!found) { alert("無法解析"); clearPass(); return; }
+
+        if(!found) { 
+            // 觸發震動
+            dotsBox.classList.add('shake-err');
+            setTimeout(() => {
+                dotsBox.classList.remove('shake-err');
+                clearPass();
+            }, 450); // 動畫結束後清空
+            return; 
+        }
+
         isCalculated = true; 
         document.getElementById("magic-setup").style.display = "none"; 
         openReader();
     }
+
     function setRes(k, act) { resultAction = `從${{"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"}[k]}拿出一副撲克牌，大衛請我將牌取出，${act}，`; }
 
     function getDynamicContent(p) {
