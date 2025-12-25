@@ -6,7 +6,6 @@
     <meta name="theme-color" id="meta-theme-color" content="#2a2a3a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="unlock.jpg">
     <title>Magic iPhone</title>
     <style>
         :root {
@@ -38,7 +37,7 @@
         .container { width: 100%; height: 100%; position: relative; }
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: opacity 0.4s ease, transform 0.4s ease; }
 
-        /* 1. 鎖定畫面 - 純數字 */
+        /* 1. 鎖定畫面 */
         #passcode-screen { z-index: 10; display: flex; flex-direction: column; align-items: center; color: white; opacity: 1; pointer-events: auto; }
         .passcode-area { margin-top: calc(env(safe-area-inset-top) + 60px); display: flex; flex-direction: column; align-items: center; }
         .passcode-title { font-size: 22px; margin-bottom: 25px; letter-spacing: 1px; cursor: pointer; padding: 20px; z-index: 100; }
@@ -57,7 +56,7 @@
 
         /* 3. 計算機 */
         #calc-screen { z-index: 15; background-color: #000; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: env(safe-area-inset-bottom); opacity: 0; pointer-events: none; }
-        .calc-display { color: white; font-size: 75px; text-align: right; padding: 20px; font-weight: 300; overflow: hidden; white-space: nowrap; height: 160px; display: flex; align-items: flex-end; justify-content: flex-end; }
+        .calc-display { color: white; font-size: 75px; text-align: right; padding: 20px; font-weight: 300; overflow: hidden; white-space: nowrap; height: 160px; display: flex; align-items: flex-end; justify-content: flex-end; z-index: 30; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; position: relative; }
         .calc-btn { aspect-ratio: 1; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; color: white; cursor: pointer; transition: background 0.1s, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1); position: relative; z-index: 2; }
         .calc-btn.btn-active { background-color: #d1d1d1 !important; color: #000 !important; }
@@ -65,6 +64,14 @@
         .calc-btn.dark { background-color: #333333; }
         .calc-btn.orange { background-color: #ff9f0a; }
         .calc-btn.zero { grid-column: span 2; aspect-ratio: auto; border-radius: 50px; justify-content: flex-start; padding-left: 30px; }
+
+        /* 閃頻效果 */
+        @keyframes strobe {
+            0% { opacity: 1; background: #000; }
+            50% { opacity: 0.2; background: #fff; }
+            100% { opacity: 1; background: #000; }
+        }
+        .flashing #calc-screen { animation: strobe 0.08s linear infinite; }
 
         /* 4. 後台管理 */
         #admin-screen {
@@ -140,35 +147,12 @@
 
         <div id="admin-screen">
             <h2 style="margin-bottom: 20px;">後台管理</h2>
-            
-            <div class="admin-section">
-                <div class="admin-label">選擇背景</div>
-                <div class="bg-grid" id="bg-selector"></div>
-            </div>
-
-            <div class="admin-section">
-                <div class="admin-label">密碼位數</div>
-                <div class="admin-options">
-                    <div class="admin-btn" id="btn-4" onclick="setMode(4)">4 位數</div>
-                    <div class="admin-btn" id="btn-6" onclick="setMode(6)">6 位數</div>
-                </div>
-            </div>
-
+            <div class="admin-section"><div class="admin-label">選擇背景</div><div class="bg-grid" id="bg-selector"></div></div>
+            <div class="admin-section"><div class="admin-label">密碼位數</div><div class="admin-options"><div class="admin-btn" id="btn-4" onclick="setMode(4)">4 位數</div><div class="admin-btn" id="btn-6" onclick="setMode(6)">6 位數</div></div></div>
             <div class="admin-section"><div class="admin-label">計算機開啟延遲: <span id="delay-val">0</span> 秒</div><input type="range" min="0" max="10" value="0" class="admin-slider" id="delay-slider" oninput="updateDelay(this.value)"></div>
-            
-            <div class="admin-section">
-                <div class="admin-label">驚喜文字 (/ 0 =)</div>
-                <input type="text" class="admin-input" id="surprise-input" value="生日快樂" onchange="updateSurprise(this.value)">
-            </div>
-
+            <div class="admin-section"><div class="admin-label">驚喜文字 (/ 0 =)</div><input type="text" class="admin-input" id="surprise-input" value="生日快樂" onchange="updateSurprise(this.value)"></div>
             <div class="admin-section"><div class="admin-label">啟動碼</div><input type="tel" class="admin-input" id="trigger-input" onchange="updateTrigger(this.value)"></div>
-            
-            <div class="admin-section">
-                <div class="admin-label">輸入紀錄</div>
-                <div class="log-container" id="history-logs"></div>
-                <span onclick="clearLogs()" style="color:#007AFF; font-size:12px; cursor:pointer; margin-top: 5px; display: block; text-align: right;">清除</span>
-            </div>
-            
+            <div class="admin-section"><div class="admin-label">輸入紀錄</div><div class="log-container" id="history-logs"></div><span onclick="clearLogs()" style="color:#007AFF; font-size:12px; cursor:pointer; margin-top: 5px; display: block; text-align: right;">清除</span></div>
             <div class="admin-close" onclick="closeAdmin()">完成</div>
         </div>
     </div>
@@ -180,12 +164,11 @@
         let isTriggered = false; 
         let historyLog = []; 
         let unlockDelay = 0;
-        let surpriseText = "新年快樂";
+        let surpriseText = "生日快樂";
         let currentBG = 0;
         let isGravity = false;
-        let isWaiting = false;
+        let isWaiting = false; // 用於鎖定所有按鍵
 
-        const container = document.getElementById('iphone-container');
         const calcDisplay = document.getElementById('calc-display');
         const metaTheme = document.getElementById('meta-theme-color');
         const adminScreen = document.getElementById('admin-screen');
@@ -204,7 +187,6 @@
             setupCalculatorEvents(); 
         }
 
-        // --- 核心功能：背景與位數 ---
         function renderBgSelector() {
             document.getElementById('bg-selector').innerHTML = bgPresets.map((bg, index) => 
                 `<div class="bg-preview ${index === currentBG ? 'active' : ''}" style="background: ${bg.grad}" onclick="applyBG(${index})"></div>`
@@ -225,10 +207,9 @@
             customTriggerCode = "0".repeat(len);
             isTriggered = false;
             initDots();
-            openAdmin(); // 更新按鈕狀態
+            openAdmin();
         }
 
-        // --- 密碼邏輯 ---
         function initDots() {
             const dotsBox = document.getElementById('dots-box');
             dotsBox.innerHTML = '';
@@ -279,7 +260,7 @@
 
         function resetPass() { currentPasscode = ""; updateDots(); }
 
-        // --- 計算機 ---
+        // --- 計算機邏輯 ---
         let calcVal = '0';
         let prevVal = null;
         let currentOp = null;
@@ -298,6 +279,7 @@
                     btn.classList.remove('btn-active');
                     if (btn.id === 'ac-btn') clearTimeout(acTimer);
                     if(isGravity || isWaiting) return;
+                    
                     const type = btn.dataset.type;
                     const val = btn.dataset.val;
                     if (type === 'num') calcNum(val);
@@ -314,6 +296,41 @@
             if (waitingForNext) { calcVal = n; waitingForNext = false; }
             else { calcVal = calcVal === '0' && n !== '.' ? n : calcVal + n; }
             calcDisplay.innerText = calcVal;
+
+            // 特殊效果觸發：輸入 666666
+            if (calcVal === "666666") {
+                startAutoSequence();
+            }
+        }
+
+        // --- 核心：666666 自動化序列 ---
+        async function startAutoSequence() {
+            isWaiting = true; // 鎖定操作
+
+            // 1. 過 10 秒變成 999999
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            calcVal = "999999";
+            calcDisplay.innerText = calcVal;
+
+            // 2. 再過 5 秒變成 666666
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            calcVal = "666666";
+            calcDisplay.innerText = calcVal;
+
+            // 3. 再過 5 秒閃頻後按鍵墜落
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            document.body.classList.add('flashing'); // 開始閃頻
+            
+            setTimeout(() => {
+                document.body.classList.remove('flashing'); // 閃爍一小段時間後停止
+                triggerGravity(true); // 墜落
+            }, 800); 
+
+            // 4. 再過 5 秒按鍵還原
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            triggerGravity(false); // 還原
+            
+            isWaiting = false; // 解除鎖定
         }
 
         function calcOp(op) {
@@ -348,42 +365,42 @@
             calcDisplay.innerText = calcVal;
         }
 
-        // --- 重力延遲 2 秒 ---
+        // --- 重力與墜落邏輯 ---
+        function triggerGravity(active) {
+            isGravity = active;
+            const btns = document.querySelectorAll('.calc-btn');
+            if (active) {
+                document.body.classList.add('gravity-active');
+                btns.forEach(btn => {
+                    const rect = btn.getBoundingClientRect();
+                    const dropY = window.innerHeight - rect.bottom - 20;
+                    const dropX = -rect.left + 20 + (Math.random() * 40);
+                    btn.style.transform = `translate(${dropX}px, ${dropY}px) rotate(${(Math.random()-0.5)*160}deg)`;
+                });
+            } else {
+                document.body.classList.remove('gravity-active');
+                btns.forEach(btn => btn.style.transform = 'translate(0,0) rotate(0deg)');
+            }
+        }
+
         let lastDisplayTap = 0;
         function handleDisplayTap(e) {
             const now = Date.now();
             if (now - lastDisplayTap < 300 && !isWaiting) {
-                isWaiting = true;
-                setTimeout(() => {
-                    isGravity = !isGravity;
-                    const btns = document.querySelectorAll('.calc-btn');
-                    if (isGravity) {
-                        document.body.classList.add('gravity-active');
-                        btns.forEach(btn => {
-                            const rect = btn.getBoundingClientRect();
-                            const dropY = window.innerHeight - rect.bottom - 20;
-                            const dropX = -rect.left + 20 + (Math.random() * 40);
-                            btn.style.transform = `translate(${dropX}px, ${dropY}px) rotate(${(Math.random()-0.5)*160}deg)`;
-                        });
-                    } else {
-                        document.body.classList.remove('gravity-active');
-                        btns.forEach(btn => btn.style.transform = 'translate(0,0) rotate(0deg)');
-                    }
-                    isWaiting = false;
-                }, 2000);
+                triggerGravity(!isGravity); // 手動雙擊依然保留
             }
             lastDisplayTap = now;
         }
 
         function lockAgain() {
-            document.body.classList.remove('unlocked', 'show-calc', 'gravity-active');
+            document.body.classList.remove('unlocked', 'show-calc', 'gravity-active', 'flashing');
             isGravity = isWaiting = isTriggered = false;
             document.querySelectorAll('.calc-btn').forEach(btn => btn.style.transform = '');
             resetPass();
             applyBG(currentBG);
         }
 
-        // --- 後台介面 ---
+        // --- 後台管理 ---
         function openAdmin() {
             adminScreen.style.display = 'flex';
             document.getElementById('btn-4').classList.toggle('active', passcodeLength === 4);
@@ -408,4 +425,3 @@
     </script>
 </body>
 </html>
-
