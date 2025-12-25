@@ -12,78 +12,76 @@
  <link rel="icon" href="Tree.png" type="image/png">
  <style>
     :root {
-        --paper-bg: #fffdfb; --text-color: #787878; --accent-brown: #8b572a; --shelf-bg: #ffffff; --ui-blue: #007aff;
+        --paper-bg: #fffdfb; --text-color: #787878; --header-text: #bbbbbb; --accent-brown: #8b572a; --shelf-bg: #ffffff; --ui-blue: #007aff;
     }
-    * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; box-sizing: border-box; }
+    * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
     
-    /* 瀏海穿透的關鍵底色 */
-    html { background-color: #2c3e50; } 
-    body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; transition: background-color 0.3s ease; }
+    /* 瀏海顏色銜接核心 */
+    html { background-color: #2c3e50; height: 100%; } 
+    body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; transition: background-color 0.3s; }
 
     /* --- 啟動畫面 --- */
     #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
 
-    /* --- 主要分頁容器 --- */
+    /* --- 主要容器 --- */
     .view-container { width: 100%; max-width: 500px; height: calc(100dvh - 65px - env(safe-area-inset-bottom)); margin: 0 auto; display: none; flex-direction: column; overflow-y: auto; background: var(--shelf-bg); }
     .active-view { display: flex; }
 
-    /* --- 1. 書櫃視圖 (Logo與標題) --- */
+    /* --- 1. 書櫃視圖 --- */
     .lib-header { height: calc(65px + env(safe-area-inset-top)); display: flex; align-items: flex-end; padding: 0 20px 15px; font-size: 26px; font-weight: 800; border-bottom: 1px solid #f2f2f2; background: #fff; }
-    .header-logo { width: 32px; height: 32px; border-radius: 7px; margin-right: 12px; margin-bottom: 2px; flex-shrink: 0; }
+    .header-logo { width: 32px; height: 32px; border-radius: 7px; margin-right: 12px; margin-bottom: 2px; }
     .lib-content { padding: 20px; }
     .book-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px 20px; }
     .book-card { display: flex; flex-direction: column; }
     .book-cover { width: 100%; aspect-ratio: 2/3; border-radius: 6px; box-shadow: 0 6px 15px rgba(0,0,0,0.12); display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; font-size: 14px; font-weight: bold; color: white; position: relative; overflow: hidden; }
     .book-cover::after { content: ''; position: absolute; top:0; left:0; width: 6%; height:100%; background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(0,0,0,0.05)); }
-    .book-info { margin-top: 10px; font-size: 13px; color: #333; font-weight: 600; line-height: 1.3; height: 36px; overflow: hidden; }
-    .book-progress { font-size: 11px; color: #999; margin-top: 4px; }
+    .book-info { margin-top: 10px; font-size: 13px; color: #333; font-weight: 600; height: 36px; overflow: hidden; }
 
-    /* --- 2. 商店與 3. 設定 (完整還原) --- */
+    /* --- 2. 商店與設定 --- */
     .shop-header { padding: calc(20px + env(safe-area-inset-top)) 20px 20px; font-size: 24px; font-weight: 800; }
     .shop-banner { width: 90%; height: 130px; background: linear-gradient(135deg, #6e8efb, #a777e3); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; padding: 20px; color: white; }
     .shop-item { padding: 15px 20px; border-bottom: 1px solid #f2f2f2; display: flex; gap: 15px; background: #fff; }
-    .shop-thumb { width: 60px; height: 90px; background: #eee; border-radius: 4px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .shop-thumb { width: 60px; height: 90px; background: #eee; border-radius: 4px; }
     .shop-price { color: var(--ui-blue); font-weight: bold; margin-top: 5px; }
     .settings-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; background: white; border-bottom: 1px solid #f2f2f2; font-size: 16px; }
 
     /* --- 底部導覽 --- */
     #main-nav { height: calc(65px + env(safe-area-inset-bottom)); border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); position: fixed; bottom: 0; width: 100%; max-width: 500px; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #999; width: 33%; cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #999; width: 33%; }
     .nav-item.active { color: var(--ui-blue); }
-    .nav-icon { font-size: 22px; }
 
     /* --- 彈窗系統 --- */
-    #info-view, #magic-setup, #ebook-app { display: none; width: 100%; max-width: 500px; height: 100dvh; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 2000; overflow-y: auto; flex-direction: column; align-items: center; }
+    #info-view, #magic-setup, #ebook-app { display: none; background: white; width: 100%; max-width: 500px; height: 100dvh; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 2000; overflow-y: auto; flex-direction: column; align-items: center; }
     
-    #info-view { background: white; padding-top: calc(40px + env(safe-area-inset-top)); }
-    .info-cover-box { width: 160px; height: 240px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; color: white; flex-shrink: 0; }
-    .read-btn { width: 85%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 10px; font-weight: bold; margin-top: auto; margin-bottom: calc(40px + env(safe-area-inset-bottom)); text-align: center; font-size: 16px; border: none; }
+    #info-view { padding-top: calc(40px + env(safe-area-inset-top)); }
+    .info-cover-box { width: 160px; height: 240px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; color: white; }
+    .read-btn { width: 85%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 10px; font-weight: bold; margin-top: auto; margin-bottom: 40px; text-align: center; font-size: 16px; }
 
-    /* --- 解鎖畫面 (格式與顏色鎖定) --- */
+    /* --- 核心修復：沉浸式鎖屏 UI --- */
     #magic-setup { 
         background: linear-gradient(180deg, #2c3e50 0%, #000000 100%); 
-        padding-top: calc(80px + env(safe-area-inset-top));
+        padding-top: calc(85px + env(safe-area-inset-top));
+        z-index: 4000;
+        top: 0; /* 強制置頂 */
     }
-    .passcode-header { font-size: 19px; color: #fff; letter-spacing: 0.5px; font-weight: 300; margin-bottom: 35px; }
-    .passcode-dots { display: flex; gap: 24px; margin-bottom: 70px; }
+    .passcode-header { font-size: 19px; color: #fff; letter-spacing: 0.5px; font-weight: 300; margin-bottom: 30px; }
+    .passcode-dots { display: flex; gap: 24px; margin-bottom: 60px; }
     .dot { width: 13px; height: 13px; border: 1.5px solid #fff; border-radius: 50%; }
     .dot.filled { background: #fff; }
-    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 28px; width: 285px; justify-items: center; }
-    .key { width: 75px; height: 75px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 300; cursor: pointer; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 28px; width: 280px; justify-items: center; }
+    .key { width: 75px; height: 75px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 300; }
     .key:active { background: rgba(255,255,255,0.4); }
     .key-zero { grid-column: 2; }
-    .keypad-footer { margin-top: 60px; font-size: 16px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; color: #fff; }
+    .keypad-footer { margin-top: 60px; font-size: 16px; width: 100%; display: flex; justify-content: space-between; padding: 0 45px; color: #fff; }
 
     /* 閱讀器樣式 */
     #ebook-app { background-color: var(--paper-bg); padding: 0; }
     #app-header { flex-shrink: 0; height: calc(55px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding: env(safe-area-inset-top) 15px 0; border-bottom: 1px solid rgba(0,0,0,0.04); background: var(--paper-bg); width: 100%; }
     #article { flex: 1; overflow-y: auto; padding: 30px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); position: relative; }
     #article p { margin-bottom: 35px; text-indent: 2em; font-family: "Noto Serif TC", serif; letter-spacing: 0.8px; }
-    #app-footer { flex-shrink: 0; background: var(--paper-bg); border-top: 1px solid rgba(0,0,0,0.04); padding: 15px 30px calc(15px + env(safe-area-inset-bottom, 10px)) 30px; width: 100%; }
-    
+    #app-footer { flex-shrink: 0; background: var(--paper-bg); border-top: 1px solid rgba(0,0,0,0.04); padding: 15px 30px calc(15px + env(safe-area-inset-bottom)) 30px; width: 100%; }
     #prevArea, #nextArea { position: absolute; top: 70px; bottom: 70px; width: 35%; z-index: 5000; }
     #prevArea { left: 0; } #nextArea { right: 0; }
-    
     .drop-cap::first-letter { float: left; font-size: 52px; line-height: 0.8; padding: 6px 8px 0 0; color: var(--accent-brown); font-family: serif; }
     .master-note { background: rgba(139,87,42,0.02); border-left: 2px solid var(--accent-brown); padding: 15px; margin: 30px 0; font-size: 16px; font-style: italic; color: #999; }
     .book-img { text-align: center; margin: 25px 0; width: 100%; }
@@ -106,8 +104,8 @@
     <div class="shop-header">書店精選</div>
     <div class="shop-section">
         <div class="shop-banner"><div><div style="font-size:12px;opacity:0.8">本週強打</div><div style="font-size:20px;font-weight:bold">解構大腦的預判機制</div></div></div>
-        <div class="shop-item"><div class="shop-thumb" style="background:#4a5a6a"></div><div><div style="font-weight:bold">行為心理學：實戰篇</div><div style="font-size:12px;color:#999">Mark Z.</div><div class="shop-price">$380</div></div></div>
-        <div class="shop-item"><div class="shop-thumb" style="background:#6a4a4a"></div><div><div style="font-weight:bold">微動作讀心術</div><div style="font-size:12px;color:#999">FBI 顧問</div><div class="shop-price">$450</div></div></div>
+        <div class="shop-item"><div class="shop-thumb" style="background:#4a5a6a"></div><div><div style="font-weight:bold">行為心理學：實戰篇</div><div style="font-size:12px;color:#999">作者：Mark Z.</div><div class="shop-price">$380</div></div></div>
+        <div class="shop-item"><div class="shop-thumb" style="background:#6a4a4a"></div><div><div style="font-weight:bold">微動作讀心術</div><div style="font-size:12px;color:#999">作者：FBI 顧問</div><div class="shop-price">$450</div></div></div>
     </div>
 </div>
 
@@ -156,7 +154,7 @@
     <div id="app-header">
         <span onclick="exitReader()" style="font-size:32px; color:var(--ui-blue); font-weight:300; padding: 0 10px;">‹</span>
         <span id="reader-book-title" style="font-size:12px; font-weight:bold; color:#aaa; letter-spacing:1px;"></span>
-        <span style="font-size:18px; color:var(--ui-blue);">ᴀA</span>
+        <span style="font-size:18px; color:var(--ui-blue); padding-right:15px">ᴀA</span>
     </div>
     <div id="article"><div id="articleContent"></div></div>
     <div id="app-footer">
@@ -167,7 +165,6 @@
 </div>
 
 <script>
-    // --- 同您原始邏輯 ---
     const bookData = [
         { id: 1, t: "思考，快與慢", a: "Daniel Kahneman", d: "關於認知偏差的權威著作。", p: "未讀", bg: "linear-gradient(45deg, #2c3e50, #000)" },
         { id: 2, t: "影響力心理學", a: "Robert Cialdini", d: "揭開說服與服從的社會心理法則。", p: "未下載", bg: "linear-gradient(45deg, #ff5858, #f09819)" },
@@ -184,8 +181,9 @@
     window.onload = function() {
         initShelf();
         setTimeout(() => {
-            document.getElementById('splash-screen').style.opacity = '0';
-            setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 500);
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.display = 'none', 500);
         }, 1200);
     };
 
@@ -193,7 +191,7 @@
         const grid = document.getElementById("mainGrid"); grid.innerHTML = "";
         bookData.forEach(b => {
             const card = document.createElement("div"); card.className = "book-card"; card.onclick = () => showInfo(b);
-            card.innerHTML = `<div class="book-cover" style="background:${b.bg}; border:${b.b||'none'}; color:${b.color||'#fff'}">${b.t}</div><div class="book-info">${b.t}</div><div class="book-progress" ${b.isM?'id="magic-prog"':''}>📖 ${b.p}</div>`;
+            card.innerHTML = `<div class="book-cover" style="background:${b.bg}; color:${b.color||'#fff'}">${b.t}</div><div class="book-info">${b.t}</div><div class="book-progress" ${b.isM?'id="magic-prog"':''}>📖 ${b.p}</div>`;
             grid.appendChild(card);
         });
     }
@@ -208,44 +206,43 @@
     }
 
     function showInfo(b) {
-        currentActiveBook = b; document.getElementById("info-title").innerText = b.t; document.getElementById("info-author").innerText = b.a; document.getElementById("info-desc").innerText = b.d;
-        const target = document.getElementById("info-cover-target"); target.style.background = b.bg; target.style.color = b.color || '#fff'; target.innerText = b.t;
+        currentActiveBook = b; 
+        document.getElementById("info-title").innerText = b.t; 
+        document.getElementById("info-author").innerText = b.a; 
+        document.getElementById("info-desc").innerText = b.d;
+        const target = document.getElementById("info-cover-target"); 
+        target.style.background = b.bg; target.style.color = b.color || '#fff'; target.innerText = b.t;
         document.getElementById("info-view").style.display = "flex";
     }
 
     function closeInfo() { document.getElementById("info-view").style.display = "none"; }
-    
     function openSetup() { 
-        document.body.style.backgroundColor = "#2c3e50"; // 同步 body 顏色達成瀏海穿透
         document.getElementById("info-view").style.display = "none"; 
         document.getElementById("main-nav").style.display = "none"; 
+        document.body.style.backgroundColor = "#2c3e50"; // 修正：進入解鎖時 body 變深色
         document.getElementById("magic-setup").style.display = "flex"; 
         clearPass(); 
     }
-    
     function closeSetup() { 
-        document.body.style.backgroundColor = "#ffffff";
         document.getElementById("magic-setup").style.display = "none"; 
         document.getElementById("main-nav").style.display = "flex"; 
+        document.body.style.backgroundColor = "#fff"; 
         document.getElementById("info-view").style.display = "flex"; 
     }
-
     function checkMagicFlow() { if(currentActiveBook.isM && isCalculated) { document.getElementById("info-view").style.display="none"; openReader(); } else if(currentActiveBook.isM) { openSetup(); } else { openReader(); } }
-    
     function openReader() { 
-        document.body.style.backgroundColor = "#ffffff";
         document.getElementById("main-nav").style.display = "none"; 
+        document.body.style.backgroundColor = "#fffdfb"; 
         document.getElementById("reader-book-title").innerText = currentActiveBook.t; 
         document.getElementById("ebook-app").style.display = "flex"; 
         render(); 
     }
-    
     function exitReader() { 
         document.getElementById("ebook-app").style.display = "none"; 
         document.getElementById("main-nav").style.display = "flex"; 
+        document.body.style.backgroundColor = "#fff"; 
         if(currentActiveBook.isM) document.getElementById("magic-prog").innerText = "📖 " + currentPage + "% 已讀"; 
     }
-
     function fullReset() { isCalculated = false; currentPage = 37; alert("系統已重置"); }
 
     function press(n) {
@@ -264,7 +261,7 @@
         const rankMap = ["","A","2","3","4","5","6","7","8","9","10","J","Q","K"];
         const rank = rankMap[parseInt(passcode.substring(1,3))];
         const nv = parseInt(passcode.substring(3,5));
-        if (!suit || !rank || isNaN(nv)) { alert("密鑰錯誤"); clearPass(); return; }
+        if (!suit || !rank || isNaN(nv)) { alert("密碼錯誤"); clearPass(); return; }
         let found = false;
         for (let k in allDecks) {
             let deck = allDecks[k], pos = -1;
@@ -277,7 +274,6 @@
         if(!found) { alert("無法解析"); clearPass(); return; }
         isCalculated = true; document.getElementById("magic-setup").style.display = "none"; openReader();
     }
-
     function setRes(k, act) { resultAction = `從${{"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"}[k]}拿出一副撲克牌，大衛請我將牌取出，${act}，`; }
 
     function getDynamicContent(p) {
@@ -285,11 +281,11 @@
             if (p === 34) return `<h2 style="text-align:center; margin-top:60px; font-weight:300; letter-spacing:5px;">SECTION III</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown); letter-spacing:2px;">巴格拉斯效果</h1><p class="drop-cap" style="margin-top:40px;">毫無疑問，這個效果已經到達了「傳奇」的地位。這是一個如此不可能的效果，以至於魔術圈內最聰明的人都在絞盡腦汁地尋找解決辦法，甚至有些人根本不相信這個效果的存在，本章我將帶與你一同分享，這個傳奇的故事。</p>`;
             if (p === 35) return `<p>心靈魔術的聖杯——ACAAN至今已擁有多年的歷史，隨便一張牌任意一個數字的巧合，世界各地的魔術師都擁有屬於自己的ACAAN版本。最具代表性的莫過於大衛·巴格拉斯（David Berglas）。</p><div class="book-img"><img src="book1.jpg" alt="Photo"></div><p>至今依然沒有一個魔術師能完全解釋大衛是如何運作這個效果的。大衛總是拒絕解釋秘密，是為了留下觀眾心中的奇蹟。</p>`;
             if (p === 36) return `<p>在那倫敦的午後，壁爐旁的對話依然清晰。大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。大衛聽完後，露出了那個標誌性的神祕微笑。</p>`;
-            if (p === 37) return `<p class="drop-cap">故事發生認 1976 年。當時我已認識大衛多年，始終未能親眼目睹傳聞中的奇蹟。直到那次，大衛邀請我去他家作客。記得當時聊的正愉快時，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。</p><p>大衛先分享了一個有趣的小故事後，便緩緩起身，${resultAction} 當數到第 32 張時，空氣仿佛凝固了...</p><p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天...多希望當時你們也能夠在場見證，這就是傳說中的「巴格拉斯效果」。</p>`;
+            if (p === 37) return `<p class="drop-cap">故事發生認 1976 年。當時我已認識大衛多年，始維未能親眼目睹傳聞中的奇蹟。直到那次，大衛邀請我去他家作客。記得當時聊的正愉快時，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。</p><p>大衛先分享了一個有趣的小故事後，便緩緩起身，${resultAction} 當數到第 32 張時，空氣仿佛凝固了...</p><p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天...多希望當時你們也能夠在場見證，這就是傳說中的「巴格拉斯效果」。</p>`;
             if (p === 38) return `<p style="margin-top:180px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><div class="master-note" style="text-align:center;">至此後，我不斷地在尋找任何可能的答案...但一切都太不可能了，直到現在，我還是一點想法都沒有。</div>`;
             if (p === 40) return `<h2 style="text-align:center; margin-top:80px; color:var(--header-text); letter-spacing:3px;">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">第四章：屬於我的 ACAAN 最終實務</p>`;
         }
-        return `<h2>SECTION ${p}</h2><p class="drop-cap">心靈魔術的核心在於對人類認知的重新架構。所謂的自由意志，在特定環境下極易被操控。</p><div class="master-note">Archive Ref: #MN-${p*7}</div>`;
+        return `<h2>SECTION ${p}</h2><p class="drop-cap">心靈魔術的核心在於對人類認知的重新架構。所謂的自由意志，在特定環境下極易被操控。</p>`;
     }
 
     function render() {
