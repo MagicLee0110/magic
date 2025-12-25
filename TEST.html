@@ -17,7 +17,7 @@
     * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
     
     html { background-color: #fff; height: 100%; } 
-    body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif; overflow: hidden; transition: background-color 0.4s ease; }
+    body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; transition: background-color 0.4s ease; }
 
     /* --- 啟動畫面 --- */
     #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
@@ -36,6 +36,14 @@
     .book-cover::after { content: ''; position: absolute; top:0; left:0; width: 6%; height:100%; background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(0,0,0,0.05)); }
     .book-info { margin-top: 10px; font-size: 13px; color: #333; font-weight: 600; height: 36px; overflow: hidden; }
 
+    /* --- 2. 商店與設定 --- */
+    .shop-header { padding: calc(20px + env(safe-area-inset-top)) 20px 20px; font-size: 24px; font-weight: 800; }
+    .shop-banner { width: 90%; height: 130px; background: linear-gradient(135deg, #6e8efb, #a777e3); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; padding: 20px; color: white; }
+    .shop-item { padding: 15px 20px; border-bottom: 1px solid #f2f2f2; display: flex; gap: 15px; background: #fff; }
+    .shop-thumb { width: 60px; height: 90px; background: #eee; border-radius: 4px; }
+    .shop-price { color: var(--ui-blue); font-weight: bold; margin-top: 5px; }
+    .settings-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; background: white; border-bottom: 1px solid #f2f2f2; font-size: 16px; }
+
     /* --- 底部導覽 --- */
     #main-nav { height: calc(65px + env(safe-area-inset-bottom)); border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); position: fixed; bottom: 0; width: 100%; max-width: 500px; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #999; width: 33%; }
@@ -43,70 +51,82 @@
 
     /* --- 彈窗系統 --- */
     #info-view, #ebook-app { display: none; background: white; width: 100%; max-width: 500px; height: 100dvh; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 2000; overflow-y: auto; flex-direction: column; align-items: center; }
+    
     #info-view { padding-top: calc(40px + env(safe-area-inset-top)); }
     .info-cover-box { width: 160px; height: 240px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; color: white; }
     .read-btn { width: 85%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 10px; font-weight: bold; margin-top: auto; margin-bottom: 40px; text-align: center; font-size: 16px; }
 
-    /* ============ iOS 26 鎖屏與解鎖流程 ============ */
+    /* --- iOS 鎖屏風格重製 --- */
     #magic-setup { 
-        display: none; width: 100%; max-width: 500px; height: 100dvh; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 4000; 
-        background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop') center/cover;
-        overflow: hidden;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 500px;
+        height: 100dvh;
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 4000;
+        background: linear-gradient(180deg, #2c3e50 0%, #000000 100%);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        color: white;
     }
+
+    .ios-lock-header {
+        margin-top: calc(50px + env(safe-area-inset-top));
+        text-align: center;
+        width: 100%;
+    }
+    .ios-date-top { font-size: 19px; font-weight: 500; margin-bottom: 5px; opacity: 0.9; }
+    .ios-time-top { font-size: 80px; font-weight: 700; margin-bottom: 10px; letter-spacing: -2px; }
+
+    .passcode-header { font-size: 17px; color: #fff; font-weight: 400; margin-bottom: 20px; margin-top: 10px; }
     
-    /* 玻璃感覆蓋層 */
-    .magic-overlay { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.2); backdrop-filter: blur(0px); transition: backdrop-filter 0.5s; }
-    .setup-active .magic-overlay { backdrop-filter: blur(25px); background: rgba(0,0,0,0.4); }
-
-    /* 鎖定畫面內容 (第一層) */
-    #lock-screen-content {
-        position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center;
-        transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s;
-        z-index: 10;
+    /* --- 震動動畫樣式 --- */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-12px); }
+        40%, 80% { transform: translateX(12px); }
     }
-    .ios-time { margin-top: calc(80px + env(safe-area-inset-top)); font-size: 88px; font-weight: 200; color: white; letter-spacing: -2px; }
-    .ios-date { font-size: 20px; font-weight: 500; color: white; margin-top: -10px; }
-    
-    .swipe-hint { position: absolute; bottom: calc(20px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; color: white; animation: bounce 2s infinite; }
-    .swipe-bar { width: 140px; height: 5px; background: white; border-radius: 10px; margin-top: 15px; opacity: 0.8; }
-    @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+    .shake-err { animation: shake 0.4s ease-in-out; }
+    .shake-err .dot.filled { background: #ff453a !important; border-color: #ff453a !important; }
 
-    /* 密碼輸入內容 (第二層) */
-    #passcode-screen-content {
-        position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center;
-        transform: translateY(100%); transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-        z-index: 20; padding-top: calc(60px + env(safe-area-inset-top));
-    }
-    .setup-active #lock-screen-content { transform: translateY(-100%); opacity: 0; }
-    .setup-active #passcode-screen-content { transform: translateY(0); }
-
-    .passcode-header { font-size: 18px; color: #fff; font-weight: 500; margin-bottom: 30px; }
-    .passcode-dots { display: flex; gap: 20px; margin-bottom: 50px; }
-    .dot { width: 13px; height: 13px; border: 1.5px solid #fff; border-radius: 50%; transition: background 0.2s; }
+    .passcode-dots { display: flex; gap: 22px; margin-bottom: 45px; }
+    .dot { width: 12px; height: 12px; border: 1.5px solid #fff; border-radius: 50%; transition: background 0.1s; }
     .dot.filled { background: #fff; }
 
-    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 25px; width: 290px; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 25px; width: 280px; justify-items: center; }
     .key { 
-        width: 78px; height: 78px; border-radius: 50%; background: rgba(255,255,255,0.15); 
-        color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-        transition: background 0.1s; cursor: pointer;
+        width: 76px; height: 76px; border-radius: 50%; 
+        background: rgba(255,255,255,0.12); color: #fff; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        transition: background 0.1s;
     }
-    .key:active { background: rgba(255,255,255,0.4); }
-    .key-num { font-size: 32px; font-weight: 400; }
-    .key-letters { font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+    .key:active { background: rgba(255,255,255,0.35); }
+    .key-num { font-size: 34px; font-weight: 400; line-height: 1; }
+    .key-letters { font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
+    .key-zero { grid-column: 2; }
     
-    .keypad-footer { margin-top: auto; margin-bottom: calc(50px + env(safe-area-inset-bottom)); width: 80%; display: flex; justify-content: space-between; color: white; font-size: 16px; }
+    .keypad-footer { 
+        margin-top: auto; margin-bottom: calc(50px + env(safe-area-inset-bottom));
+        font-size: 16px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; color: #fff; font-weight: 400;
+    }
 
-    /* 震動錯誤動畫 */
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-15px); } 40%, 80% { transform: translateX(15px); } }
-    .shake-err { animation: shake 0.4s ease-in-out; }
-
-    /* 閱讀器樣式保持不變 */
+    /* 閱讀器樣式 */
     #ebook-app { background-color: var(--paper-bg); padding: 0; }
     #app-header { flex-shrink: 0; height: calc(55px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding: env(safe-area-inset-top) 15px 0; border-bottom: 1px solid rgba(0,0,0,0.04); background: var(--paper-bg); width: 100%; }
-    #article { flex: 1; overflow-y: auto; padding: 30px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); }
-    #article p { margin-bottom: 35px; text-indent: 2em; font-family: "Noto Serif TC", serif; }
+    #article { flex: 1; overflow-y: auto; padding: 30px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); position: relative; }
+    #article p { margin-bottom: 35px; text-indent: 2em; font-family: "Noto Serif TC", serif; letter-spacing: 0.8px; }
     #app-footer { flex-shrink: 0; background: var(--paper-bg); border-top: 1px solid rgba(0,0,0,0.04); padding: 15px 30px calc(15px + env(safe-area-inset-bottom)) 30px; width: 100%; }
+    #prevArea, #nextArea { position: absolute; top: 70px; bottom: 70px; width: 35%; z-index: 5000; }
+    #prevArea { left: 0; } #nextArea { right: 0; }
+    .drop-cap::first-letter { float: left; font-size: 52px; line-height: 0.8; padding: 6px 8px 0 0; color: var(--accent-brown); font-family: serif; }
+    .master-note { background: rgba(139,87,42,0.02); border-left: 2px solid var(--accent-brown); padding: 15px; margin: 30px 0; font-size: 16px; font-style: italic; color: #999; }
+    .book-img { text-align: center; margin: 25px 0; width: 100%; }
+    .book-img img { max-width: 90%; height: auto; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
  </style>
 </head>
 <body>
@@ -121,108 +141,111 @@
     <div class="lib-content"><div class="book-grid" id="mainGrid"></div></div>
 </div>
 
-<div id="main-nav">
-    <div class="nav-item active" id="nav-lib" onclick="switchTab('library')"><span>📚</span><span>書櫃</span></div>
-    <div class="nav-item"><span>🛒</span><span>商店</span></div>
-    <div class="nav-item" id="nav-set" onclick="switchTab('settings')"><span>⚙️</span><span>設定</span></div>
+<div id="shop-view" class="view-container">
+    <div class="shop-header">書店精選</div>
+    <div class="shop-section">
+        <div class="shop-banner"><div><div style="font-size:12px;opacity:0.8">本週強打</div><div style="font-size:20px;font-weight:bold">解構大腦的預判機制</div></div></div>
+        <div class="shop-item"><div class="shop-thumb" style="background:#4a5a6a"></div><div><div style="font-weight:bold">行為心理學：實戰篇</div><div style="font-size:12px;color:#999">作者：Mark Z.</div><div class="shop-price">$380</div></div></div>
+        <div class="shop-item"><div class="shop-thumb" style="background:#6a4a4a"></div><div><div style="font-weight:bold">微動作讀心術</div><div style="font-size:12px;color:#999">作者：FBI 顧問</div><div class="shop-price">$450</div></div></div>
+    </div>
 </div>
 
 <div id="settings-view" class="view-container">
     <div style="padding:calc(40px + env(safe-area-inset-top)) 20px 20px; font-size:24px; font-weight:800">設定</div>
-    <div class="settings-item" style="padding:20px; border-bottom:1px solid #eee;"><span>個人帳戶</span><span style="color:#999">魔術師森森 ›</span></div>
-    <div class="settings-item" style="padding:20px; color:red;" onclick="fullReset()">清除快取記憶 (重置)</div>
+    <div class="settings-item"><span>個人帳戶</span><span style="color:#999">魔術師森森 ›</span></div>
+    <div class="settings-group">
+        <div class="settings-item"><span>雲端同步</span><span style="color:var(--ui-blue)">已開啟</span></div>
+        <div class="settings-item" onclick="fullReset()"><span>清除快取記憶 (重置)</span><span style="color:red">立即執行</span></div>
+    </div>
+</div>
+
+<div id="main-nav" class="nav-bar">
+    <div class="nav-item active" id="nav-lib" onclick="switchTab('library')"><span class="nav-icon">📚</span><span>書櫃</span></div>
+    <div class="nav-item" id="nav-shop" onclick="switchTab('shop')"><span class="nav-icon">🛒</span><span>商店</span></div>
+    <div class="nav-item" id="nav-set" onclick="switchTab('settings')"><span class="nav-icon">⚙️</span><span>設定</span></div>
 </div>
 
 <div id="info-view">
-    <div style="align-self:flex-start; color:var(--ui-blue); font-size: 17px; padding: 10px 25px;" onclick="closeInfo()">‹ 書櫃</div>
+    <div style="align-self:flex-start; color:var(--ui-blue); font-size: 17px; padding: 10px 0; margin-left:25px;" onclick="closeInfo()">‹ 書櫃</div>
     <div id="info-cover-target" class="info-cover-box"></div>
-    <h2 id="info-title" style="margin-top:25px; font-size:22px;"></h2>
-    <p id="info-author" style="color:#888; font-size:14px;"></p>
-    <p id="info-desc" style="color:#666; font-size:14px; margin-top:20px; padding:20px 25px; border-top:1px solid #eee; line-height:1.6;"></p>
+    <h2 id="info-title" style="margin-top:25px; font-size:22px; text-align:center"></h2>
+    <p id="info-author" style="color:#888; font-size:14px; margin-top:5px; text-align:center"></p>
+    <p id="info-desc" style="color:#666; font-size:14px; margin-top:20px; text-align:justify; line-height:1.6; border-top:1px solid #eee; padding:20px 25px 0;"></p>
     <div class="read-btn" onclick="checkMagicFlow()">繼續閱讀</div>
 </div>
 
 <div id="magic-setup">
-    <div class="magic-overlay"></div>
-    
-    <div id="lock-screen-content">
-        <div class="ios-time" id="ios-clock">09:41</div>
-        <div class="ios-date">12月25日 星期四</div>
-        <div class="swipe-hint">
-            <span style="font-size:13px; font-weight:600; letter-spacing:1px; opacity:0.8;">向上輕掃以解鎖</span>
-            <div class="swipe-bar"></div>
-        </div>
+    <div class="ios-lock-header">
+        <div class="ios-date-top">12月25日 星期四</div>
+        <div class="ios-time-top">09:41</div>
     </div>
-
-    <div id="passcode-screen-content">
-        <div class="passcode-header">輸入密碼</div>
-        <div class="passcode-dots" id="dotsContainer">
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <div class="keypad">
-            <div class="key" onclick="press('1')"><span class="key-num">1</span><span class="key-letters">&nbsp;</span></div>
-            <div class="key" onclick="press('2')"><span class="key-num">2</span><span class="key-letters">ABC</span></div>
-            <div class="key" onclick="press('3')"><span class="key-num">3</span><span class="key-letters">DEF</span></div>
-            <div class="key" onclick="press('4')"><span class="key-num">4</span><span class="key-letters">GHI</span></div>
-            <div class="key" onclick="press('5')"><span class="key-num">5</span><span class="key-letters">JKL</span></div>
-            <div class="key" onclick="press('6')"><span class="key-num">6</span><span class="key-letters">MNO</span></div>
-            <div class="key" onclick="press('7')"><span class="key-num">7</span><span class="key-letters">PQRS</span></div>
-            <div class="key" onclick="press('8')"><span class="key-num">8</span><span class="key-letters">TUV</span></div>
-            <div class="key" onclick="press('9')"><span class="key-num">9</span><span class="key-letters">WXYZ</span></div>
-            <div style="grid-column:2" class="key" onclick="press('0')"><span class="key-num">0</span></div>
-        </div>
-        <div class="keypad-footer">
-            <span>緊急情況</span>
-            <span onclick="closeSetup()">取消</span>
-        </div>
+    
+    <div class="passcode-header">輸入密碼</div>
+    <div class="passcode-dots" id="dotsContainer">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    
+    <div class="keypad">
+        <div class="key" onclick="press('1')"><span class="key-num">1</span><span class="key-letters">&nbsp;</span></div>
+        <div class="key" onclick="press('2')"><span class="key-num">2</span><span class="key-letters">ABC</span></div>
+        <div class="key" onclick="press('3')"><span class="key-num">3</span><span class="key-letters">DEF</span></div>
+        <div class="key" onclick="press('4')"><span class="key-num">4</span><span class="key-letters">GHI</span></div>
+        <div class="key" onclick="press('5')"><span class="key-num">5</span><span class="key-letters">JKL</span></div>
+        <div class="key" onclick="press('6')"><span class="key-num">6</span><span class="key-letters">MNO</span></div>
+        <div class="key" onclick="press('7')"><span class="key-num">7</span><span class="key-letters">PQRS</span></div>
+        <div class="key" onclick="press('8')"><span class="key-num">8</span><span class="key-letters">TUV</span></div>
+        <div class="key" onclick="press('9')"><span class="key-num">9</span><span class="key-letters">WXYZ</span></div>
+        <div class="key key-zero" onclick="press('0')"><span class="key-num">0</span></div>
+    </div>
+    
+    <div class="keypad-footer">
+        <span onclick="clearPass()">緊急情況</span>
+        <span onclick="closeSetup()">取消</span>
     </div>
 </div>
 
 <div id="ebook-app">
     <div id="app-header">
-        <span onclick="exitReader()" style="font-size:32px; color:var(--ui-blue);">‹</span>
-        <span id="reader-book-title" style="font-size:12px; font-weight:bold; color:#aaa;"></span>
-        <span style="font-size:18px; color:var(--ui-blue);">ᴀA</span>
+        <span onclick="exitReader()" style="font-size:32px; color:var(--ui-blue); font-weight:300; padding: 0 10px;">‹</span>
+        <span id="reader-book-title" style="font-size:12px; font-weight:bold; color:#aaa; letter-spacing:1px;"></span>
+        <span style="font-size:18px; color:var(--ui-blue); padding-right:15px">ᴀA</span>
     </div>
     <div id="article"><div id="articleContent"></div></div>
     <div id="app-footer">
-        <div class="footer-info" style="font-size:12px; color:#999; text-align:center;">第 <span id="cur-p"></span> 頁 / 共 100 頁</div>
+        <div class="progress-container" style="width:100%; height:2px; background:#f2f2f2; position:relative; margin-bottom:12px;"><div class="progress-bar-dot" id="dot"></div></div>
+        <div class="footer-info">第 <span id="cur-p"></span> 頁 / 共 100 頁</div>
     </div>
-    <div style="position:absolute; top:70px; bottom:70px; left:0; width:30%;" onclick="prev()"></div>
-    <div style="position:absolute; top:70px; bottom:70px; right:0; width:30%;" onclick="next()"></div>
+    <div id="prevArea" onclick="prev()"></div><div id="nextArea" onclick="next()"></div>
 </div>
 
 <script>
     const bookData = [
         { id: 1, t: "思考，快與慢", a: "Daniel Kahneman", d: "關於認知偏差的權威著作。", p: "未讀", bg: "linear-gradient(45deg, #2c3e50, #000)" },
-        { id: 3, t: "THE MAGIC SENTINEL", a: "David Berglas", d: "本章詳細記錄了大衛·巴格拉斯的即興奇蹟實錄。深入探討 ACAAN 的最終心理架構。", p: "36% 已讀", isM: true, bg: "linear-gradient(to bottom, #3d2b1f, #1a110a)", color: "#e5c100" },
-        { id: 4, t: "FBI 讀心術", a: "Joe Navarro", d: "前情報員親授破解身體語言的技術。", p: "已完讀", bg: "linear-gradient(to right, #434343, #000)" }
+        { id: 2, t: "影響力心理學", a: "Robert Cialdini", d: "揭開說服與服從的社會心理法則。", p: "未下載", bg: "linear-gradient(45deg, #ff5858, #f09819)" },
+        { id: 3, t: "THE MAGIC SENTINEL", a: "David Berglas", d: "本章詳細記錄了大衛·巴格拉斯的即興奇蹟實錄。深入探討 ACAAN 的最終心理架構。", p: "36% 已讀", isM: true, bg: "linear-gradient(to bottom, #3d2b1f, #1a110a)", color: "#e5c100", b: "2px solid #cfa670" },
+        { id: 4, t: "FBI 讀心術", a: "Joe Navarro", d: "前情報員親授破解身體語言的技術。", p: "已完讀", bg: "linear-gradient(to right, #434343, #000)" },
+        { id: 5, t: "暗示的藝術", a: "Guide", d: "如何利用語言在潛意識中植入想法。", p: "未讀", bg: "repeating-linear-gradient(45deg, #1a1a1a, #222)" },
+        { id: 6, t: "善惡的彼岸", a: "Nietzsche", d: "尼采對傳統道德的批判。", p: "未下載", bg: "linear-gradient(to top, #6a11cb, #2575fc)" }
     ];
 
-    let stack = [{suit:"梅花",number:"4"},{suit:"紅心",number:"2"},{suit:"方塊",number:"7"},{suit:"梅花",number:"3"},{suit:"紅心",number:"4"},{suit:"方塊",number:"6"},{suit:"黑桃",number:"A"},{suit:"紅心",number:"5"},{suit:"黑桃",number:"9"},{suit:"黑桃",number:"2"},{suit:"紅心",number:"Q"},{suit:"方塊",number:"3"},{suit:"梅花",number:"Q"},{suit:"紅心",number:"8"},{suit:"黑桃",number:"6"},{suit:"黑桃",number:"5"},{suit:"紅心",number:"9"},{suit:"梅花",number:"K"},{suit:"方塊",number:"2"},{suit:"紅心",number:"J"},{suit:"黑桃",number:"3"},{suit:"黑桃",number:"8"},{suit:"紅心",number:"6"},{suit:"梅花",number:"10"},{suit:"方塊",number:"5"},{suit:"方塊",number:"K"},{suit:"梅花",number:"2"},{suit:"紅心",number:"3"},{suit:"方塊",number:"8"},{suit:"梅花",number:"5"},{suit:"黑桃",number:"K"},{suit:"方塊",number:"J"},{suit:"梅花",number:"8"},{suit:"黑桃",number:"10"},{suit:"紅心",number:"K"},{suit:"梅花",number:"J"},{suit:"黑桃",number:"7"},{suit:"紅心",number:"10"},{suit:"方塊",number:"A"},{suit:"黑桃",number:"4"},{suit:"紅心",number:"7"},{suit:"方塊",number:"4"},{suit:"梅花",number:"A"},{suit:"梅花",number:"9"},{suit:"黑桃",number:"J"},{suit:"方塊",number:"Q"},{suit:"梅花",number:"7"},{suit:"黑桃",number:"Q"},{suit:"方塊",number:"10"},{suit:"梅花",number:"6"},{suit:"紅心",number:"A"},{suit:"方塊",number:"9"}];
-    let allDecks = {}; for (let i = 0; i < 13; i++) { allDecks[String.fromCharCode(65 + i)] = stack.slice(i * 4).concat(stack.slice(0, i * 4)); }
-    let resultAction = "", currentPage = 37, isCalculated = false, currentActiveBook = null, passcode = "";
+    var stack = [{suit:"梅花",number:"4"},{suit:"紅心",number:"2"},{suit:"方塊",number:"7"},{suit:"梅花",number:"3"},{suit:"紅心",number:"4"},{suit:"方塊",number:"6"},{suit:"黑桃",number:"A"},{suit:"紅心",number:"5"},{suit:"黑桃",number:"9"},{suit:"黑桃",number:"2"},{suit:"紅心",number:"Q"},{suit:"方塊",number:"3"},{suit:"梅花",number:"Q"},{suit:"紅心",number:"8"},{suit:"黑桃",number:"6"},{suit:"黑桃",number:"5"},{suit:"紅心",number:"9"},{suit:"梅花",number:"K"},{suit:"方塊",number:"2"},{suit:"紅心",number:"J"},{suit:"黑桃",number:"3"},{suit:"黑桃",number:"8"},{suit:"紅心",number:"6"},{suit:"梅花",number:"10"},{suit:"方塊",number:"5"},{suit:"方塊",number:"K"},{suit:"梅花",number:"2"},{suit:"紅心",number:"3"},{suit:"方塊",number:"8"},{suit:"梅花",number:"5"},{suit:"黑桃",number:"K"},{suit:"方塊",number:"J"},{suit:"梅花",number:"8"},{suit:"黑桃",number:"10"},{suit:"紅心",number:"K"},{suit:"梅花",number:"J"},{suit:"黑桃",number:"7"},{suit:"紅心",number:"10"},{suit:"方塊",number:"A"},{suit:"黑桃",number:"4"},{suit:"紅心",number:"7"},{suit:"方塊",number:"4"},{suit:"梅花",number:"A"},{suit:"梅花",number:"9"},{suit:"黑桃",number:"J"},{suit:"方塊",number:"Q"},{suit:"梅花",number:"7"},{suit:"黑桃",number:"Q"},{suit:"方塊",number:"10"},{suit:"梅花",number:"6"},{suit:"紅心",number:"A"},{suit:"方塊",number:"9"}];
+    var allDecks = {}; for (var i = 0; i < 13; i++) { allDecks[String.fromCharCode(65 + i)] = stack.slice(i * 4).concat(stack.slice(0, i * 4)); }
+    var resultAction = "", currentPage = 37, isCalculated = false, currentActiveBook = null, passcode = "";
 
     window.onload = function() {
         initShelf();
-        updateClock();
-        setInterval(updateClock, 1000);
-        initSwipeHandler();
-        setTimeout(() => { document.getElementById('splash-screen').style.opacity = '0'; setTimeout(()=>document.getElementById('splash-screen').style.display='none', 500); }, 1200);
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.display = 'none', 500);
+        }, 1200);
     };
-
-    function updateClock() {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        document.getElementById('ios-clock').innerText = `${h}:${m}`;
-    }
 
     function initShelf() {
         const grid = document.getElementById("mainGrid"); grid.innerHTML = "";
         bookData.forEach(b => {
             const card = document.createElement("div"); card.className = "book-card"; card.onclick = () => showInfo(b);
-            card.innerHTML = `<div class="book-cover" style="background:${b.bg}; color:${b.color||'#fff'}">${b.t}</div><div class="book-info">${b.t}</div><div style="font-size:11px; color:#999;" ${b.isM?'id="magic-prog"':''}>📖 ${b.p}</div>`;
+            card.innerHTML = `<div class="book-cover" style="background:${b.bg}; color:${b.color||'#fff'}">${b.t}</div><div class="book-info">${b.t}</div><div class="book-progress" ${b.isM?'id="magic-prog"':''}>📖 ${b.p}</div>`;
             grid.appendChild(card);
         });
     }
@@ -232,81 +255,71 @@
         document.getElementById(tab + '-view').classList.add('active-view');
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         if(tab==='library') document.getElementById('nav-lib').classList.add('active');
+        if(tab==='shop') document.getElementById('nav-shop').classList.add('active');
         if(tab==='settings') document.getElementById('nav-set').classList.add('active');
     }
 
     function showInfo(b) {
-        currentActiveBook = b;
-        document.getElementById("info-title").innerText = b.t;
-        document.getElementById("info-author").innerText = b.a;
+        currentActiveBook = b; 
+        document.getElementById("info-title").innerText = b.t; 
+        document.getElementById("info-author").innerText = b.a; 
         document.getElementById("info-desc").innerText = b.d;
-        const target = document.getElementById("info-cover-target");
+        const target = document.getElementById("info-cover-target"); 
         target.style.background = b.bg; target.style.color = b.color || '#fff'; target.innerText = b.t;
         document.getElementById("info-view").style.display = "flex";
     }
 
     function closeInfo() { document.getElementById("info-view").style.display = "none"; }
 
-    function openSetup() {
-        document.getElementById("info-view").style.display = "none";
-        document.getElementById("main-nav").style.display = "none";
-        document.getElementById("magic-setup").style.display = "block";
-        document.getElementById("magic-setup").classList.remove('setup-active'); // 回到時鐘層
-        clearPass();
+    function openSetup() { 
+        document.getElementById("info-view").style.display = "none"; 
+        document.getElementById("main-nav").style.display = "none"; 
+        document.getElementById("magic-setup").style.display = "flex"; 
+        document.body.style.backgroundColor = "#2c3e50"; 
+        document.getElementById("theme-color-meta").content = "#2c3e50";
+        clearPass(); 
     }
 
-    function closeSetup() {
-        document.getElementById("magic-setup").style.display = "none";
-        document.getElementById("main-nav").style.display = "flex";
-        document.getElementById("info-view").style.display = "flex";
+    function closeSetup() { 
+        document.getElementById("magic-setup").style.display = "none"; 
+        document.getElementById("main-nav").style.display = "flex"; 
+        document.getElementById("info-view").style.display = "flex"; 
+        document.body.style.backgroundColor = "#fff";
+        document.getElementById("theme-color-meta").content = "#ffffff";
     }
 
-    // 滑動解鎖邏輯
-    function initSwipeHandler() {
-        let startY = 0;
-        const setupContainer = document.getElementById('magic-setup');
-        
-        setupContainer.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; });
-        setupContainer.addEventListener('touchend', (e) => {
-            let endY = e.changedTouches[0].clientY;
-            if (startY - endY > 50 && !setupContainer.classList.contains('setup-active')) {
-                setupContainer.classList.add('setup-active'); // 向上滑動，進入密碼層
-            }
-        });
+    function checkMagicFlow() { if(currentActiveBook.isM && isCalculated) { document.getElementById("info-view").style.display="none"; openReader(); } else if(currentActiveBook.isM) { openSetup(); } else { openReader(); } }
+    
+    function openReader() { 
+        document.getElementById("main-nav").style.display = "none"; 
+        document.body.style.backgroundColor = "#fffdfb"; 
+        document.getElementById("theme-color-meta").content = "#fffdfb";
+        document.getElementById("reader-book-title").innerText = currentActiveBook.t; 
+        document.getElementById("ebook-app").style.display = "flex"; 
+        render(); 
     }
 
-    function checkMagicFlow() {
-        if(currentActiveBook.isM && isCalculated) { document.getElementById("info-view").style.display="none"; openReader(); }
-        else if(currentActiveBook.isM) { openSetup(); }
-        else { openReader(); }
+    function exitReader() { 
+        document.getElementById("ebook-app").style.display = "none"; 
+        document.getElementById("main-nav").style.display = "flex"; 
+        document.body.style.backgroundColor = "#fff"; 
+        document.getElementById("theme-color-meta").content = "#ffffff";
+        if(currentActiveBook.isM) document.getElementById("magic-prog").innerText = "📖 " + currentPage + "% 已讀"; 
     }
 
-    function openReader() {
-        document.getElementById("main-nav").style.display = "none";
-        document.getElementById("reader-book-title").innerText = currentActiveBook.t;
-        document.getElementById("ebook-app").style.display = "flex";
-        render();
-    }
-
-    function exitReader() {
-        document.getElementById("ebook-app").style.display = "none";
-        document.getElementById("main-nav").style.display = "flex";
-        if(currentActiveBook.isM) document.getElementById("magic-prog").innerText = "📖 " + currentPage + "% 已讀";
-    }
+    function fullReset() { isCalculated = false; currentPage = 37; alert("系統已重置"); }
 
     function press(n) {
         if (passcode.length < 6) {
             passcode += n;
-            updateDots();
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((d, i) => { if (i < passcode.length) d.classList.add('filled'); else d.classList.remove('filled'); });
             if (passcode.length === 6) setTimeout(calculate, 200);
         }
     }
-    function updateDots() {
-        const dots = document.querySelectorAll('.dot');
-        dots.forEach((d, i) => { if (i < passcode.length) d.classList.add('filled'); else d.classList.remove('filled'); });
-    }
-    function clearPass() { passcode = ""; updateDots(); }
+    function clearPass() { passcode = ""; document.querySelectorAll('.dot').forEach(d => d.classList.remove('filled')); }
 
+    // --- 修改點：密碼錯誤觸發震動動畫 ---
     function calculate() {
         const dotsBox = document.getElementById("dotsContainer");
         const suitMap = {"1":"黑桃", "2":"紅心", "3":"方塊", "4":"梅花"};
@@ -327,37 +340,42 @@
             }
         }
 
-        if(!found) {
+        if(!found) { 
+            // 觸發震動
             dotsBox.classList.add('shake-err');
-            setTimeout(() => { dotsBox.classList.remove('shake-err'); clearPass(); }, 450);
-            return;
+            setTimeout(() => {
+                dotsBox.classList.remove('shake-err');
+                clearPass();
+            }, 450); // 動畫結束後清空
+            return; 
         }
 
-        isCalculated = true;
-        document.getElementById("magic-setup").style.display = "none";
+        isCalculated = true; 
+        document.getElementById("magic-setup").style.display = "none"; 
         openReader();
     }
 
-    function setRes(k, act) { 
-        const loc = {"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"抽屜","K":"側邊抽屜","L":"電視下方","M":"櫃子"};
-        resultAction = `從${loc[k]||"身後"}拿出一副牌，大衛請我將牌取出，${act}，`; 
-    }
+    function setRes(k, act) { resultAction = `從${{"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"}[k]}拿出一副撲克牌，大衛請我將牌取出，${act}，`; }
 
     function getDynamicContent(p) {
-        if (currentActiveBook.isM && p === 37) {
-            return `<p class="drop-cap">故事發生在 1976 年。當時大衛邀請我去他家作客，聊的正愉快時，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。</p><p>大衛緩緩起身，${resultAction} 當數到第 32 張時，空氣仿佛凝固了...</p><p>那張牌正是「方塊 5」！我永遠忘不了那一天。</p>`;
+        if (currentActiveBook.isM) {
+            if (p === 34) return `<h2 style="text-align:center; margin-top:60px; font-weight:300; letter-spacing:5px;">SECTION III</h2><h1 style="text-align:center; font-size:26px; color:var(--accent-brown); letter-spacing:2px;">巴格拉斯效果</h1><p class="drop-cap" style="margin-top:40px;">毫無疑問，這個效果已經到達了「傳奇」的地位。這是一個如此不可能的效果，以至於魔術圈內最聰明的人都在絞盡腦汁地尋找解決辦法，甚至有些人根本不相信這個效果的存在，本章我將帶與你一同分享，這個傳奇的故事。</p>`;
+            if (p === 35) return `<p>心靈魔術的聖杯——ACAAN至今已擁有多年的歷史，隨便一張牌任意一個數字的巧合，世界各地的魔術師都擁有屬於自己的ACAAN版本。最具代表性的莫過於大衛·巴格拉斯（David Berglas）。</p><div class="book-img"><img src="book1.jpg" alt="Photo"></div><p>至今依然沒有一個魔術師能完全解釋大衛是如何運作這個效果的。大衛總是拒絕解釋秘密，是為了留下觀眾心中的奇蹟。</p>`;
+            if (p === 36) return `<p>在那倫敦的午後，壁爐旁的對話依然清晰。大衛突然看著我的眼睛說：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。大衛聽完後，露出了那個標誌性的神祕微笑。</p>`;
+            if (p === 37) return `<p class="drop-cap">故事發生認 1976 年。當時我已認識大衛多年，始維未能親眼目睹傳聞中的奇蹟。直到那次，大衛邀請我去他家作客。記得當時聊的正愉快時，大衛突然問我：「隨便說一張牌，和一個 1 到 52 之間的數字。」</p><p>我不假思索地回答：「方塊 5，32」。</p><p>大衛先分享了一個有趣的小故事後，便緩緩起身，${resultAction} 當數到第 32 張時，空氣仿佛凝固了...</p><p>你知道的...那張牌正是「方塊 5」！我永遠忘不了那天...多希望當時你們也能夠在場見證，這就是傳說中的「巴格拉斯效果」。</p>`;
+            if (p === 38) return `<p style="margin-top:180px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><div class="master-note" style="text-align:center;">至此後，我不斷地在尋找任何可能的答案...但一切都太不可能了，直到現在，我還是一點想法都沒有。</div>`;
+            if (p === 40) return `<h2 style="text-align:center; margin-top:80px; color:var(--header-text); letter-spacing:3px;">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">第四章：屬於我的 ACAAN 最終實務</p>`;
         }
-        return `<p class="drop-cap">心靈魔術的核心在於對人類認知的重新架構。所謂的自由意志，在特定環境下極易被操控。我們所見、所聽、所想，往往都經過了潛意識的過濾。</p><p>在這一章，我們將深入探討如何引導觀眾進入我們預設的思考框架中。</p>`;
+        return `<h2>SECTION ${p}</h2><p class="drop-cap">心靈魔術的核心在於對人類認知的重新架構。所謂的自由意志，在特定環境下極易被操控。</p>`;
     }
 
     function render() {
-        document.getElementById("article").scrollTop = 0;
-        document.getElementById("articleContent").innerHTML = getDynamicContent(currentPage);
-        document.getElementById("cur-p").innerText = currentPage;
+        var content = document.getElementById("articleContent"), pgText = document.getElementById("cur-p"), dot = document.getElementById("dot"), artDiv = document.getElementById("article");
+        artDiv.scrollTop = 0; content.innerHTML = getDynamicContent(currentPage);
+        dot.style.left = currentPage + "%"; pgText.innerText = currentPage;
     }
     function next() { if(currentPage < 100) { currentPage++; render(); } }
     function prev() { if(currentPage > 1) { currentPage--; render(); } }
-    function fullReset() { isCalculated = false; currentPage = 37; alert("系統已重置"); }
     document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
 </body>
