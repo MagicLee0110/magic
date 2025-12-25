@@ -12,84 +12,83 @@
  <link rel="icon" href="Tree.png" type="image/png">
  <style>
     :root {
-        --paper-bg: #fffdfb; --text-color: #787878; --header-text: #bbbbbb; --accent-brown: #8b572a; --shelf-bg: #ffffff; --ui-blue: #007aff; --ui-gray: #f2f2f7;
+        --paper-bg: #fffdfb; --text-color: #787878; --accent-brown: #8b572a; --shelf-bg: #ffffff; --ui-blue: #007aff;
     }
-    * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; outline: none; box-sizing: border-box; }
+    * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
     
-    /* 3. 背景色彩精準銜接：html 的背景色決定了瀏海區域的顏色 */
-    html, body { 
-        margin: 0; padding: 0; height: 100%; width: 100%; 
-        background-color: #2c3e50; /* 銜接漸層頂部顏色 */
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-        overflow: hidden; 
-    }
+    /* 決定瀏海顏色的關鍵 */
+    html { background-color: #2c3e50; } 
+    body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; }
 
     /* --- 啟動畫面 --- */
-    #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-out; }
+    #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
 
-    /* --- 主要分頁容器 --- */
-    .view-container { width: 100%; max-width: 500px; height: calc(100dvh - 65px); margin: 0 auto; display: none; flex-direction: column; overflow-y: auto; background: var(--shelf-bg); }
+    /* --- 分頁容器 --- */
+    .view-container { width: 100%; max-width: 500px; height: calc(100dvh - 65px - env(safe-area-inset-bottom)); margin: 0 auto; display: none; flex-direction: column; overflow-y: auto; background: var(--shelf-bg); }
     .active-view { display: flex; }
 
-    /* --- 1. 書櫃視圖 --- */
-    .lib-header { height: calc(70px + env(safe-area-inset-top)); display: flex; align-items: flex-end; padding: 0 20px 15px; font-size: 26px; font-weight: 800; border-bottom: 1px solid #f2f2f2; background: #fff; }
-    .header-logo { width: 32px; height: 32px; border-radius: 7px; margin-right: 12px; margin-bottom: 2px; flex-shrink: 0; }
+    /* --- 1. 書櫃視圖 (Logo修復) --- */
+    .lib-header { height: calc(65px + env(safe-area-inset-top)); display: flex; align-items: flex-end; padding: 0 20px 15px; font-size: 26px; font-weight: 800; border-bottom: 1px solid #f2f2f2; background: #fff; }
+    .header-logo { width: 32px; height: 32px; border-radius: 7px; margin-right: 12px; margin-bottom: 2px; }
     .lib-content { padding: 20px; }
     .book-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px 20px; }
-    .book-card { display: flex; flex-direction: column; cursor: pointer; }
-    .book-cover { width: 100%; aspect-ratio: 2/3; border-radius: 6px; box-shadow: 0 6px 15px rgba(0,0,0,0.12); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; font-size: 14px; font-weight: bold; color: white; transition: transform 0.2s; }
-    .book-info { margin-top: 10px; font-size: 13px; color: #333; height: 36px; overflow: hidden; font-weight: 600; line-height: 1.3; }
-    .book-progress { font-size: 11px; color: #999; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .book-card { display: flex; flex-direction: column; }
+    .book-cover { width: 100%; aspect-ratio: 2/3; border-radius: 6px; box-shadow: 0 6px 15px rgba(0,0,0,0.12); display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; font-size: 14px; font-weight: bold; color: white; position: relative; overflow: hidden; }
+    .book-cover::after { content: ''; position: absolute; top:0; left:0; width: 6%; height:100%; background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(0,0,0,0.05)); }
+    .book-info { margin-top: 10px; font-size: 13px; color: #333; font-weight: 600; line-height: 1.3; height: 36px; overflow: hidden; }
+    .book-progress { font-size: 11px; color: #999; margin-top: 4px; }
 
-    /* --- 2. 商店視圖 --- */
+    /* --- 2. 商店與設定 --- */
     .shop-header { padding: calc(20px + env(safe-area-inset-top)) 20px 20px; font-size: 24px; font-weight: 800; }
-    .shop-banner { width: 90%; height: 130px; background: linear-gradient(135deg, #6e8efb, #a777e3); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; padding: 20px; color: white; position: relative; }
-    .shop-item { padding: 15px 20px; border-bottom: 1px solid #f2f2f2; display: flex; gap: 15px; background: #fff; }
-    .shop-thumb { width: 60px; height: 90px; background: #eee; border-radius: 4px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .shop-banner { width: 90%; height: 130px; background: linear-gradient(135deg, #6e8efb, #a777e3); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; padding: 20px; color: white; }
+    .shop-item { padding: 15px 20px; border-bottom: 1px solid #f2f2f2; display: flex; gap: 15px; }
+    .shop-thumb { width: 60px; height: 90px; background: #eee; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .shop-price { color: var(--ui-blue); font-weight: bold; margin-top: 5px; }
+    .settings-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; background: white; border-bottom: 1px solid #f2f2f2; font-size: 16px; }
 
-    /* --- 3. 設定視圖 --- */
-    .settings-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; background: white; border-bottom: 1px solid #f2f2f2; font-size: 16px; color: #333; }
-    .settings-group { margin-top: 25px; border-top: 1px solid #f2f2f2; }
-
-    /* --- 底部導覽欄 --- */
+    /* --- 底部導覽 --- */
     #main-nav { height: calc(65px + env(safe-area-inset-bottom)); border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); position: fixed; bottom: 0; width: 100%; max-width: 500px; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #999; width: 33%; cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #999; width: 33%; }
     .nav-item.active { color: var(--ui-blue); }
+    .nav-icon { font-size: 22px; }
 
-    /* --- 彈窗層 --- */
-    #info-view, #magic-setup, #ebook-app { display: none; background: white; width: 100%; max-width: 500px; height: 100dvh; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 2000; overflow-y: auto; align-items: center; }
+    /* --- 彈窗系統 (詳情/驗證/閱讀) --- */
+    #info-view, #magic-setup, #ebook-app { display: none; background: white; width: 100%; max-width: 500px; height: 100dvh; position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 2000; overflow-y: auto; flex-direction: column; align-items: center; }
     
-    /* 詳情頁需考慮頂部間距 */
-    #info-view { padding: calc(40px + env(safe-area-inset-top)) 25px 40px; }
-    .info-cover-box { width: 160px; height: 240px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; color: white; flex-shrink: 0; }
-    .read-btn { width: 100%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 10px; font-weight: bold; margin-top: auto; text-align: center; font-size: 16px; border: none; }
+    #info-view { padding-top: calc(40px + env(safe-area-inset-top)); }
+    .info-cover-box { width: 160px; height: 240px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; color: white; }
+    .read-btn { width: 85%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 10px; font-weight: bold; margin-top: auto; margin-bottom: 40px; text-align: center; font-size: 16px; }
 
-    /* --- 極致擬真：全視窗穿透鎖屏介面 --- */
+    /* --- 核心修復：沉浸式鎖屏 UI --- */
     #magic-setup { 
         background: linear-gradient(180deg, #2c3e50 0%, #000000 100%); 
-        padding-top: calc(80px + env(safe-area-inset-top)); /* 內容避開瀏海，背景填滿瀏海 */
-        display: none; flex-direction: column; 
+        padding-top: calc(80px + env(safe-area-inset-top));
     }
-    .passcode-header { font-size: 20px; color: #fff; letter-spacing: 0.5px; font-weight: 300; margin-bottom: 30px; }
-    .passcode-dots { display: flex; gap: 24px; margin-bottom: 70px; }
-    .dot { width: 13px; height: 13px; border: 1.5px solid #fff; border-radius: 50%; }
+    .passcode-header { font-size: 19px; color: #fff; letter-spacing: 0.5px; font-weight: 300; margin-bottom: 30px; }
+    .passcode-dots { display: flex; gap: 22px; margin-bottom: 60px; }
+    .dot { width: 12px; height: 12px; border: 1.5px solid #fff; border-radius: 50%; }
     .dot.filled { background: #fff; }
-    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 28px; width: 285px; justify-items: center; }
-    .key { width: 75px; height: 75px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 34px; cursor: pointer; font-weight: 300; }
-    .keypad-footer { margin-top: 60px; font-size: 16px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; color: #fff; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 28px; width: 280px; justify-items: center; }
+    .key { width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 300; }
+    .key:active { background: rgba(255,255,255,0.4); }
+    .key-zero { grid-column: 2; }
+    .keypad-footer { margin-top: 60px; font-size: 16px; width: 100%; display: flex; justify-content: space-between; padding: 0 45px; color: #fff; }
 
     /* 閱讀器樣式 */
     #ebook-app { background-color: var(--paper-bg); padding: 0; }
     #app-header { flex-shrink: 0; height: calc(55px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; padding: env(safe-area-inset-top) 15px 0; border-bottom: 1px solid rgba(0,0,0,0.04); background: var(--paper-bg); width: 100%; }
-    #article { flex: 1; overflow-y: auto; padding: 30px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); }
+    #article { flex: 1; overflow-y: auto; padding: 30px 25px 60px 35px; text-align: justify; line-height: 2.3; font-size: 18px; color: var(--text-color); position: relative; }
     #article p { margin-bottom: 35px; text-indent: 2em; font-family: "Noto Serif TC", serif; letter-spacing: 0.8px; }
     #app-footer { flex-shrink: 0; background: var(--paper-bg); border-top: 1px solid rgba(0,0,0,0.04); padding: 15px 30px calc(15px + env(safe-area-inset-bottom)) 30px; width: 100%; }
+    .progress-bar-dot { width: 7px; height: 7px; background: var(--accent-brown); border-radius: 50%; position: absolute; top: -2.5px; transition: left 0.4s ease; }
     .footer-info { display: flex; justify-content: center; font-size: 10px; color: #cccccc; letter-spacing: 2px; font-weight: bold; }
-    #prevArea, #nextArea { position: absolute; top: 70px; bottom: 70px; width: 35%; z-index: 5000; }
     
+    #prevArea, #nextArea { position: absolute; top: 60px; bottom: 60px; width: 35%; z-index: 5000; }
+    #prevArea { left: 0; } #nextArea { right: 0; }
     .drop-cap::first-letter { float: left; font-size: 52px; line-height: 0.8; padding: 6px 8px 0 0; color: var(--accent-brown); font-family: serif; }
     .master-note { background: rgba(139,87,42,0.02); border-left: 2px solid var(--accent-brown); padding: 15px; margin: 30px 0; font-size: 16px; font-style: italic; color: #999; }
+    .book-img { text-align: center; margin: 25px 0; width: 100%; }
+    .book-img img { max-width: 90%; height: auto; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
  </style>
 </head>
 <body>
@@ -123,17 +122,17 @@
 </div>
 
 <div id="main-nav" class="nav-bar">
-    <div class="nav-item active" onclick="switchTab('library')"><span class="nav-icon">📚</span><span>書櫃</span></div>
-    <div class="nav-item" onclick="switchTab('shop')"><span class="nav-icon">🛒</span><span>商店</span></div>
-    <div class="nav-item" onclick="switchTab('settings')"><span class="nav-icon">⚙️</span><span>設定</span></div>
+    <div class="nav-item active" id="nav-lib" onclick="switchTab('library')"><span class="nav-icon">📚</span><span>書櫃</span></div>
+    <div class="nav-item" id="nav-shop" onclick="switchTab('shop')"><span class="nav-icon">🛒</span><span>商店</span></div>
+    <div class="nav-item" id="nav-set" onclick="switchTab('settings')"><span class="nav-icon">⚙️</span><span>設定</span></div>
 </div>
 
 <div id="info-view">
-    <div style="align-self:flex-start; color:var(--ui-blue); font-size: 17px; padding: 10px 0;" onclick="closeInfo()">‹ 書櫃</div>
+    <div style="align-self:flex-start; color:var(--ui-blue); font-size: 17px; padding: 10px 0; margin-left:25px;" onclick="closeInfo()">‹ 書櫃</div>
     <div id="info-cover-target" class="info-cover-box"></div>
     <h2 id="info-title" style="margin-top:25px; font-size:22px; text-align:center"></h2>
     <p id="info-author" style="color:#888; font-size:14px; margin-top:5px; text-align:center"></p>
-    <p id="info-desc" style="color:#666; font-size:14px; margin-top:20px; text-align:justify; line-height:1.6; border-top:1px solid #eee; padding-top:20px;"></p>
+    <p id="info-desc" style="color:#666; font-size:14px; margin-top:20px; text-align:justify; line-height:1.6; border-top:1px solid #eee; padding:20px 25px 0;"></p>
     <div class="read-btn" onclick="checkMagicFlow()">繼續閱讀</div>
 </div>
 
@@ -169,18 +168,13 @@
 </div>
 
 <script>
-    // --- 同您原始邏輯 ---
     const bookData = [
-        { id: 1, t: "思考，快與慢", a: "Daniel Kahneman", d: "關於認知偏差的權威著作。", p: "未讀", bg: "linear-gradient(45deg, #2c3e50, #000)" },
-        { id: 2, t: "影響力心理學", a: "Robert Cialdini", d: "揭開說服與服從的社會心理法則。", p: "未下載", bg: "linear-gradient(45deg, #ff5858, #f09819)" },
+        { id: 1, t: "思考，快與慢", a: "Daniel Kahneman", d: "認知偏差權威著作。", p: "未讀", bg: "linear-gradient(45deg, #2c3e50, #000)" },
+        { id: 2, t: "影響力心理學", a: "Robert Cialdini", d: "說服他人的心理法則。", p: "未下載", bg: "linear-gradient(45deg, #ff5858, #f09819)" },
         { id: 3, t: "THE MAGIC SENTINEL", a: "David Berglas", d: "本章詳細記錄了大衛·巴格拉斯的即興奇蹟實錄。深入探討 ACAAN 的最終心理架構。", p: "36% 已讀", isM: true, bg: "linear-gradient(to bottom, #3d2b1f, #1a110a)", color: "#e5c100", b: "2px solid #cfa670" },
         { id: 4, t: "FBI 讀心術", a: "Joe Navarro", d: "前情報員親授破解身體語言的技術。", p: "已完讀", bg: "linear-gradient(to right, #434343, #000)" },
-        { id: 5, t: "暗示的藝術", a: "Mentalist Guide", d: "如何利用語言在潛意識中植入想法。", p: "未讀", bg: "repeating-linear-gradient(45deg, #1a1a1a, #222)" },
-        { id: 6, t: "冷讀術實務", a: "Ian Rowland", d: "心靈魔術最完整的語言架構手冊。", p: "未下載", bg: "linear-gradient(to top, #cfd9df, #e2ebf0)", black: true },
-        { id: 7, t: "善惡的彼岸", a: "Friedrich Nietzsche", d: "尼采對傳統道德的批判。", p: "未讀", bg: "linear-gradient(to top, #6a11cb, #2575fc)" },
-        { id: 8, t: "怪誕行為學", a: "Dan Ariely", d: "揭示人類非理性行為。", p: "12% 已讀", bg: "linear-gradient(to right, #ed6a10, #f8b500)" },
-        { id: 9, t: "理想國", a: "Plato", d: "探討正義與人類認知。", p: "未下載", bg: "linear-gradient(to bottom, #114357, #f29492)" },
-        { id: 10, t: "活出意義來", a: "Viktor Frankl", d: "存在主義心理學經典。", p: "未讀", bg: "linear-gradient(45deg, #874da2, #c43a30)" }
+        { id: 5, t: "暗示的藝術", a: "Guide", d: "如何利用語言在潛意識中植入想法。", p: "未讀", bg: "repeating-linear-gradient(45deg, #1a1a1a, #222)" },
+        { id: 6, t: "善惡的彼岸", a: "Nietzsche", d: "尼采對傳統道德的批判。", p: "未下載", bg: "linear-gradient(to top, #6a11cb, #2575fc)" }
     ];
 
     var stack = [{suit:"梅花",number:"4"},{suit:"紅心",number:"2"},{suit:"方塊",number:"7"},{suit:"梅花",number:"3"},{suit:"紅心",number:"4"},{suit:"方塊",number:"6"},{suit:"黑桃",number:"A"},{suit:"紅心",number:"5"},{suit:"黑桃",number:"9"},{suit:"黑桃",number:"2"},{suit:"紅心",number:"Q"},{suit:"方塊",number:"3"},{suit:"梅花",number:"Q"},{suit:"紅心",number:"8"},{suit:"黑桃",number:"6"},{suit:"黑桃",number:"5"},{suit:"紅心",number:"9"},{suit:"梅花",number:"K"},{suit:"方塊",number:"2"},{suit:"紅心",number:"J"},{suit:"黑桃",number:"3"},{suit:"黑桃",number:"8"},{suit:"紅心",number:"6"},{suit:"梅花",number:"10"},{suit:"方塊",number:"5"},{suit:"方塊",number:"K"},{suit:"梅花",number:"2"},{suit:"紅心",number:"3"},{suit:"方塊",number:"8"},{suit:"梅花",number:"5"},{suit:"黑桃",number:"K"},{suit:"方塊",number:"J"},{suit:"梅花",number:"8"},{suit:"黑桃",number:"10"},{suit:"紅心",number:"K"},{suit:"梅花",number:"J"},{suit:"黑桃",number:"7"},{suit:"紅心",number:"10"},{suit:"方塊",number:"A"},{suit:"黑桃",number:"4"},{suit:"紅心",number:"7"},{suit:"方塊",number:"4"},{suit:"梅花",number:"A"},{suit:"梅花",number:"9"},{suit:"黑桃",number:"J"},{suit:"方塊",number:"Q"},{suit:"梅花",number:"7"},{suit:"黑桃",number:"Q"},{suit:"方塊",number:"10"},{suit:"梅花",number:"6"},{suit:"紅心",number:"A"},{suit:"方塊",number:"9"}];
@@ -190,8 +184,9 @@
     window.onload = function() {
         initShelf();
         setTimeout(() => {
-            document.getElementById('splash-screen').style.opacity = '0';
-            setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 500);
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.display = 'none', 500);
         }, 1200);
     };
 
@@ -199,7 +194,7 @@
         const grid = document.getElementById("mainGrid"); grid.innerHTML = "";
         bookData.forEach(b => {
             const card = document.createElement("div"); card.className = "book-card"; card.onclick = () => showInfo(b);
-            card.innerHTML = `<div class="book-cover" style="background:${b.bg}; border:${b.b||'none'}; color:${b.color||(b.black?'#333':'#fff')}">${b.t}</div><div class="book-info">${b.t}</div><div class="book-progress" ${b.isM?'id="magic-prog"':''}>📖 ${b.p}</div>`;
+            card.innerHTML = `<div class="book-cover" style="background:${b.bg}; color:${b.color||'#fff'}">${b.t}</div><div class="book-info">${b.t}</div><div class="book-progress" ${b.isM?'id="magic-prog"':''}>📖 ${b.p}</div>`;
             grid.appendChild(card);
         });
     }
@@ -208,9 +203,9 @@
         document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active-view'));
         document.getElementById(tab + '-view').classList.add('active-view');
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        if(tab === 'library') document.getElementById('nav-lib').classList.add('active');
-        if(tab === 'shop') document.getElementById('nav-shop').classList.add('active');
-        if(tab === 'settings') document.getElementById('nav-set').classList.add('active');
+        if(tab==='library') document.getElementById('nav-lib').classList.add('active');
+        if(tab==='shop') document.getElementById('nav-shop').classList.add('active');
+        if(tab==='settings') document.getElementById('nav-set').classList.add('active');
     }
 
     function showInfo(b) {
@@ -219,7 +214,7 @@
         document.getElementById("info-author").innerText = b.a; 
         document.getElementById("info-desc").innerText = b.d;
         const target = document.getElementById("info-cover-target"); 
-        target.style.background = b.bg; target.style.color = b.color || (b.black?'#333':'#fff'); target.innerText = b.t;
+        target.style.background = b.bg; target.style.color = b.color || '#fff'; target.innerText = b.t;
         document.getElementById("info-view").style.display = "flex";
     }
 
@@ -229,7 +224,7 @@
     function checkMagicFlow() { if(currentActiveBook.isM && isCalculated) { document.getElementById("info-view").style.display="none"; openReader(); } else if(currentActiveBook.isM) { openSetup(); } else { openReader(); } }
     function openReader() { document.getElementById("main-nav").style.display = "none"; document.getElementById("reader-book-title").innerText = currentActiveBook.t; document.getElementById("ebook-app").style.display = "flex"; render(); }
     function exitReader() { document.getElementById("ebook-app").style.display = "none"; document.getElementById("main-nav").style.display = "flex"; if(currentActiveBook.isM) document.getElementById("magic-prog").innerText = "📖 " + currentPage + "% 已讀"; }
-    function fullReset() { isCalculated = false; currentPage = 37; alert("系統重置成功"); }
+    function fullReset() { isCalculated = false; currentPage = 37; alert("系統已重置"); }
 
     function press(n) {
         if (passcode.length < 6) {
@@ -247,7 +242,7 @@
         const rankMap = ["","A","2","3","4","5","6","7","8","9","10","J","Q","K"];
         const rank = rankMap[parseInt(passcode.substring(1,3))];
         const nv = parseInt(passcode.substring(3,5));
-        if (!suit || !rank || isNaN(nv)) { alert("驗證碼錯誤"); clearPass(); return; }
+        if (!suit || !rank || isNaN(nv)) { alert("密鑰錯誤"); clearPass(); return; }
         let found = false;
         for (let k in allDecks) {
             let deck = allDecks[k], pos = -1;
@@ -257,7 +252,7 @@
             if (pos + 1 === nv) { setRes(k, "拿掉鬼牌後，背面向上一張張往下發"); found = true; break; }
             if (pos === nv) { setRes(k, "拿掉鬼牌和廣告牌後，背面向上一張張往下發"); found = true; break; }
         }
-        if(!found) { alert("無法分析序列"); clearPass(); return; }
+        if(!found) { alert("無法解析"); clearPass(); return; }
         isCalculated = true; document.getElementById("magic-setup").style.display = "none"; openReader();
     }
 
@@ -272,8 +267,7 @@
             if (p === 38) return `<p style="margin-top:180px; text-align:center; font-style:italic; font-size: 20px;">「我永遠忘不了那個男人......永遠。」</p><div class="master-note" style="text-align:center;">至此後，我不斷地在尋找任何可能的答案...但一切都太不可能了，直到現在，我還是一點想法都沒有。</div>`;
             if (p === 40) return `<h2 style="text-align:center; margin-top:80px; color:var(--header-text); letter-spacing:3px;">END OF SECTION</h2><hr style="border:0; border-top:1px solid #eee; margin: 40px auto; width: 40%;"><p style="text-align:center; font-size:14px; opacity: 0.6;">第四章：屬於我的 ACAAN 最終實務</p>`;
         }
-        const dict = { T: ["潛意識結構","預期管理","行為分析","絕對位移","環境冷讀"], S: ["心靈魔術的核心在於對人類認知的重新架構。","所謂的自由意志，在特定環境下極易被操控。"] };
-        return `<h2>${dict.T[p%6]}</h2><p class="drop-cap">${dict.S[p%2]}</p><p>本節討論的是如何利用環境光線與聲音頻率，在不經意間引導對方的數字選擇。這需要長期的練習與對人類微表情的精確捕捉...</p><div class="master-note">Archive Ref: #MN-${p*7}</div>`;
+        return `<h2>SECTION ${p}</h2><p class="drop-cap">心靈魔術的核心在於對人類認知的重新架構。所謂的自由意志，在特定環境下極易被操控。</p><div class="master-note">Archive Ref: #MN-${p*7}</div>`;
     }
 
     function render() {
