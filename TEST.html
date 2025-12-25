@@ -6,7 +6,7 @@
  <meta name="apple-mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
  <meta name="apple-mobile-web-app-title" content="電子樹">
- <meta name="theme-color" content="#2c3e50">
+ <meta id="theme-color-meta" name="theme-color" content="#ffffff">
  <title>電子樹APP</title>
  <link rel="apple-touch-icon" href="Tree.png">
  <link rel="icon" href="Tree.png" type="image/png">
@@ -16,8 +16,9 @@
     }
     * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
     
-    html { background-color: #2c3e50; height: 100%; } 
-    body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; transition: background-color 0.3s; }
+    html { background-color: #fff; height: 100%; } 
+    /* 這裡的背景色會直接影響瀏海的顏色 */
+    body { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; transition: background-color 0.4s ease; }
 
     /* --- 啟動畫面 --- */
     #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
@@ -69,28 +70,11 @@
         left: 50%;
         transform: translateX(-50%);
         z-index: 4000;
-        background: linear-gradient(180deg, rgba(44, 62, 80, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%);
+        /* 背景模擬：漸層加上毛玻璃感 */
+        background: linear-gradient(180deg, #2c3e50 0%, #000000 100%);
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
         color: white;
-    }
-
-    /* --- 新增：iPhone 靈動島 / 瀏海樣式 --- */
-    .ios-dynamic-island {
-        position: absolute;
-        top: 11px; /* 針對 iPhone 靈動島高度調整 */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 120px;
-        height: 35px;
-        background: #000;
-        border-radius: 20px;
-        z-index: 5001;
-        /* 如果沒進入全螢幕模式則隱藏，保持開發預覽乾淨 */
-    }
-    /* 只有當應用程式以全螢幕模式 (Standalone) 運行時顯示靈動島 */
-    @media (display-mode: standalone) {
-        .ios-dynamic-island { display: block; }
     }
 
     /* 上方時間 */
@@ -198,7 +182,7 @@
 </div>
 
 <div id="magic-setup">
-    <div class="ios-dynamic-island"></div> <div class="ios-lock-header">
+    <div class="ios-lock-header">
         <div class="ios-date-top">12月25日 星期四</div>
         <div class="ios-time-top">09:41</div>
     </div>
@@ -223,7 +207,7 @@
     
     <div class="keypad-footer">
         <span onclick="clearPass()">緊急情況</span>
-        <span onclick="clearPass()">取消</span>
+        <span onclick="closeSetup()">取消</span>
     </div>
 </div>
 
@@ -242,7 +226,6 @@
 </div>
 
 <script>
-    // --- 原有邏輯完全保留，不作改動 ---
     const bookData = [
         { id: 1, t: "思考，快與慢", a: "Daniel Kahneman", d: "關於認知偏差的權威著作。", p: "未讀", bg: "linear-gradient(45deg, #2c3e50, #000)" },
         { id: 2, t: "影響力心理學", a: "Robert Cialdini", d: "揭開說服與服從的社會心理法則。", p: "未下載", bg: "linear-gradient(45deg, #ff5858, #f09819)" },
@@ -294,31 +277,50 @@
     }
 
     function closeInfo() { document.getElementById("info-view").style.display = "none"; }
+
+    // --- 修改點：開啟解鎖畫面時同步 Body 顏色 ---
     function openSetup() { 
         document.getElementById("info-view").style.display = "none"; 
         document.getElementById("main-nav").style.display = "none"; 
         document.getElementById("magic-setup").style.display = "flex"; 
+        
+        // 將 Body 背景改為解鎖畫面的頂部顏色，同步瀏海區域
+        document.body.style.backgroundColor = "#2c3e50"; 
+        document.getElementById("theme-color-meta").content = "#2c3e50";
+        
         clearPass(); 
     }
+
     function closeSetup() { 
         document.getElementById("magic-setup").style.display = "none"; 
         document.getElementById("main-nav").style.display = "flex"; 
         document.getElementById("info-view").style.display = "flex"; 
+        
+        // 還原 Body 顏色
+        document.body.style.backgroundColor = "#fff";
+        document.getElementById("theme-color-meta").content = "#ffffff";
     }
+
     function checkMagicFlow() { if(currentActiveBook.isM && isCalculated) { document.getElementById("info-view").style.display="none"; openReader(); } else if(currentActiveBook.isM) { openSetup(); } else { openReader(); } }
+    
     function openReader() { 
         document.getElementById("main-nav").style.display = "none"; 
+        // 進入閱讀模式也調整 Body 顏色
         document.body.style.backgroundColor = "#fffdfb"; 
+        document.getElementById("theme-color-meta").content = "#fffdfb";
         document.getElementById("reader-book-title").innerText = currentActiveBook.t; 
         document.getElementById("ebook-app").style.display = "flex"; 
         render(); 
     }
+
     function exitReader() { 
         document.getElementById("ebook-app").style.display = "none"; 
         document.getElementById("main-nav").style.display = "flex"; 
         document.body.style.backgroundColor = "#fff"; 
+        document.getElementById("theme-color-meta").content = "#ffffff";
         if(currentActiveBook.isM) document.getElementById("magic-prog").innerText = "📖 " + currentPage + "% 已讀"; 
     }
+
     function fullReset() { isCalculated = false; currentPage = 37; alert("系統已重置"); }
 
     function press(n) {
@@ -348,7 +350,9 @@
             if (pos === nv) { setRes(k, "拿掉鬼牌和廣告牌後，背面向上一張張往下發"); found = true; break; }
         }
         if(!found) { alert("無法解析"); clearPass(); return; }
-        isCalculated = true; document.getElementById("magic-setup").style.display = "none"; openReader();
+        isCalculated = true; 
+        document.getElementById("magic-setup").style.display = "none"; 
+        openReader();
     }
     function setRes(k, act) { resultAction = `從${{"A":"窗台上","B":"書櫃中間","C":"酒櫃裡","D":"衣櫃裡","E":"手提包內","F":"口袋內","G":"椅子底下","H":"桌上的盒子內","I":"招財貓後面","J":"桌子下面的抽屜","K":"桌子側邊的抽屜","L":"電視正下方的抽屜","M":"電視正上方的櫃子"}[k]}拿出一副撲克牌，大衛請我將牌取出，${act}，`; }
 
