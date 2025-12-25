@@ -16,7 +16,8 @@
     <style>
         :root {
             --paper-bg: #fffdfb; --text-color: #787878; --accent-brown: #8b572a; --shelf-bg: #ffffff; --ui-blue: #007aff;
-            --ios-pure-dark: linear-gradient(to bottom, #000000 0%, #1a1a1c 45%, #2c2c2e 100%);
+            /* 核心修改：漸層上下顛倒，頂部變亮(深灰)，底部變黑 */
+            --ios-reversed-dark: linear-gradient(to bottom, #3a3a3c 0%, #1c1c1e 50%, #000000 100%);
         }
         
         * { -webkit-tap-highlight-color: transparent !important; -webkit-touch-callout: none; -webkit-user-select: none; box-sizing: border-box; }
@@ -62,10 +63,10 @@
         .info-cover-box { width: 160px; height: 240px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; text-align: center; padding: 15px; font-weight: bold; color: white; flex-shrink: 0; }
         .read-btn { width: 85%; background: var(--ui-blue); color: white; padding: 16px; border-radius: 10px; font-weight: bold; margin-top: auto; margin-bottom: 40px; text-align: center; font-size: 16px; border: none; }
 
-        /* --- 核心：純淨擬真鎖屏 UI --- */
+        /* --- 核心：漸層反轉鎖屏 UI --- */
         #magic-setup { 
-            background: #000;
-            background-image: var(--ios-pure-dark);
+            background: #1c1c1e; /* 設定一個中間色作為底色 */
+            background-image: var(--ios-reversed-dark); /* 套用反轉後的漸層 */
             background-attachment: fixed;
             padding-top: calc(100px + env(safe-area-inset-top));
         }
@@ -183,7 +184,8 @@
         { id: 1, t: "思考，快與慢", a: "Daniel Kahneman", d: "認知偏差權威著作。", p: "未讀", bg: "linear-gradient(45deg, #2c3e50, #000)" },
         { id: 2, t: "影響力心理學", a: "Robert Cialdini", d: "說服與服從的法則。", p: "未下載", bg: "linear-gradient(45deg, #ff5858, #f09819)" },
         { id: 3, t: "THE MAGIC SENTINEL", a: "David Berglas", d: "本章詳細記錄了大衛·巴格拉斯的即興奇蹟實錄。深入探討 ACAAN 的最終心理架構。", p: "36% 已讀", isM: true, bg: "linear-gradient(to bottom, #3d2b1f, #1a110a)", color: "#e5c100", b: "2px solid #cfa670" },
-        { id: 4, t: "FBI 讀心術", a: "Joe Navarro", d: "前情報員親授破解身體語言的技術。", p: "已完讀", bg: "linear-gradient(to right, #434343, #000)" }
+        { id: 4, t: "FBI 讀心術", a: "Joe Navarro", d: "前情報員親授破解身體語言的技術。", p: "已完讀", bg: "linear-gradient(to right, #434343, #000)" },
+        { id: 5, t: "暗示的藝術", a: "Guide", d: "如何利用語言在潛意識中植入想法。", p: "未讀", bg: "repeating-linear-gradient(45deg, #1a1a1a, #222)" }
     ];
 
     var stack = [{suit:"梅花",number:"4"},{suit:"紅心",number:"2"},{suit:"方塊",number:"7"},{suit:"梅花",number:"3"},{suit:"紅心",number:"4"},{suit:"方塊",number:"6"},{suit:"黑桃",number:"A"},{suit:"紅心",number:"5"},{suit:"黑桃",number:"9"},{suit:"黑桃",number:"2"},{suit:"紅心",number:"Q"},{suit:"方塊",number:"3"},{suit:"梅花",number:"Q"},{suit:"紅心",number:"8"},{suit:"黑桃",number:"6"},{suit:"黑桃",number:"5"},{suit:"紅心",number:"9"},{suit:"梅花",number:"K"},{suit:"方塊",number:"2"},{suit:"紅心",number:"J"},{suit:"黑桃",number:"3"},{suit:"黑桃",number:"8"},{suit:"紅心",number:"6"},{suit:"梅花",number:"10"},{suit:"方塊",number:"5"},{suit:"方塊",number:"K"},{suit:"梅花",number:"2"},{suit:"紅心",number:"3"},{suit:"方塊",number:"8"},{suit:"梅花",number:"5"},{suit:"黑桃",number:"K"},{suit:"方塊",number:"J"},{suit:"梅花",number:"8"},{suit:"黑桃",number:"10"},{suit:"紅心",number:"K"},{suit:"梅花",number:"J"},{suit:"黑桃",number:"7"},{suit:"紅心",number:"10"},{suit:"方塊",number:"A"},{suit:"黑桃",number:"4"},{suit:"紅心",number:"7"},{suit:"方塊",number:"4"},{suit:"梅花",number:"A"},{suit:"梅花",number:"9"},{suit:"黑桃",number:"J"},{suit:"方塊",number:"Q"},{suit:"梅花",number:"7"},{suit:"黑桃",number:"Q"},{suit:"方塊",number:"10"},{suit:"梅花",number:"6"},{suit:"紅心",number:"A"},{suit:"方塊",number:"9"}];
@@ -202,7 +204,7 @@
         const grid = document.getElementById("mainGrid"); grid.innerHTML = "";
         bookData.forEach(b => {
             const card = document.createElement("div"); card.className = "book-card"; card.onclick = () => showInfo(b);
-            card.innerHTML = `<div class="book-cover" style="background:${b.bg}; color:${b.color||'#fff'}">${b.t}</div><div class="book-info">${b.t}</div><div class="book-progress" ${b.isM?'id="magic-prog"':''}>📖 ${b.p}</div>`;
+            card.innerHTML = `<div class="book-cover" style="background:${b.bg}; border:${b.b||'none'}; color:${b.color||'#fff'}">${b.t}</div><div class="book-info">${b.t}</div><div class="book-progress" ${b.isM?'id="magic-prog"':''}>📖 ${b.p}</div>`;
             grid.appendChild(card);
         });
     }
@@ -226,7 +228,7 @@
     function closeInfo() { document.getElementById("info-view").style.display = "none"; }
     
     function openSetup() { 
-        document.documentElement.style.backgroundColor = "#000000";
+        document.documentElement.style.backgroundColor = "#3a3a3c"; // 將 html 背景色設為漸層頂部的顏色
         document.getElementById("info-view").style.display = "none"; 
         document.getElementById("main-nav").style.display = "none"; 
         document.getElementById("magic-setup").style.display = "flex"; 
