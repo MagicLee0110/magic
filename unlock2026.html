@@ -12,6 +12,7 @@
         :root {
             --ios-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --top-color: #2a2a3a;
+            /* 將漸層定義為變數，方便統一調用 */
             --main-gradient: linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a);
         }
 
@@ -24,12 +25,12 @@
             touch-action: manipulation;
         }
 
-        /* 重點修復：確保 html 本身就帶有背景色，防止底部變色 */
+        /* 修復核心：將背景直接鎖死在 html 標籤上，這能確保最底部的安全區域顏色一致 */
         html {
             height: 100%;
             background: var(--top-color);
             background-image: var(--main-gradient);
-            background-attachment: fixed;
+            background-attachment: fixed; /* 鎖定背景不隨捲動位移 */
         }
 
         body {
@@ -38,17 +39,15 @@
             height: 100dvh; 
             overflow: hidden;
             font-family: var(--ios-font);
-            transition: background 0.3s ease;
             position: fixed;
-            /* 讓內容延伸到安全區域外 */
-            padding-bottom: env(safe-area-inset-bottom);
+            /* 移除 body 可能自帶的背景，避免與 html 衝突 */
+            background: transparent !important;
         }
 
         .container { 
             width: 100%; 
             height: 100dvh; 
             position: relative; 
-            /* 修正 standalone 模式下的滾動問題 */
             display: flex;
             flex-direction: column;
         }
@@ -61,7 +60,7 @@
             transition: opacity 0.4s ease, transform 0.4s ease; 
         }
 
-        /* 鎖定畫面佈局優化 */
+        /* 鎖定畫面佈局：進一步修正訂選後的比例 */
         #passcode-screen { 
             z-index: 10; 
             display: flex; 
@@ -77,8 +76,8 @@
             flex-direction: column; 
             align-items: center; 
             width: 100%;
-            /* 針對訂選桌面的全螢幕高度進行微調，18vh 會比 16vh 更穩定 */
-            margin-top: 18vh; 
+            /* 在訂選桌面模式下，18.5vh 是最接近真機標題位置的設定 */
+            margin-top: 18.5vh; 
         }
 
         .passcode-title { 
@@ -117,11 +116,11 @@
         }
         .key:active { background: rgba(255, 255, 255, 0.4); }
 
-        /* 底部按鈕修復：確保顏色與背景一致，且位置正確 */
+        /* 底部按鈕修復：強化底部定位 */
         .bottom-buttons { 
             position: absolute;
-            /* 增加底部間距，防止跟 Home Indicator 疊在一起 */
-            bottom: calc(env(safe-area-inset-bottom) + 50px);
+            /* 讓按鈕固定在安全區域上方 55px，這是 iOS 鎖定畫面的標準高度 */
+            bottom: calc(env(safe-area-inset-bottom) + 55px);
             width: 75%; 
             max-width: 320px; 
             display: flex; 
@@ -130,15 +129,15 @@
             font-weight: 400;
         }
 
-        /* 計算機畫面修復 */
+        /* 計算機畫面 */
         #calc-screen { 
             z-index: 15; 
             background-color: #000; 
             display: flex; 
             flex-direction: column; 
             justify-content: flex-end; 
-            /* 修正底部黑色背景斷層 */
-            padding-bottom: calc(env(safe-area-inset-bottom) + 20px); 
+            /* 計算機必須完全漆黑，防止底部滲出漸層色 */
+            padding-bottom: calc(env(safe-area-inset-bottom) + 10px); 
             opacity: 0; 
             pointer-events: none; 
         }
@@ -176,13 +175,7 @@
             display: none; flex-direction: column; align-items: center; color: white; padding: 60px 20px; overflow-y: auto;
         }
         .admin-section { width: 100%; max-width: 300px; margin-bottom: 25px; }
-        .admin-label { font-size: 14px; color: #888; margin-bottom: 12px; }
-        .admin-options { display: flex; gap: 10px; margin-bottom: 10px; }
-        .admin-btn { flex: 1; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 10px; text-align: center; font-size: 14px; }
-        .admin-btn.active { background: #007AFF; font-weight: 600; }
-        .bg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .bg-preview { aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent; }
-        .bg-preview.active { border-color: #007AFF; transform: scale(1.1); }
+        .admin-label { font-size: 14px; color: #888; }
         .admin-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 10px; padding: 15px; color: white; font-size: 18px; text-align: center; }
 
         .unlocked #passcode-screen { opacity: 0; pointer-events: none; }
@@ -246,9 +239,7 @@
 
         <div id="admin-screen">
             <h2 style="margin-bottom: 20px;">後台管理</h2>
-            <div class="admin-section"><div class="admin-label">選擇背景</div><div class="bg-grid" id="bg-selector"></div></div>
-            <div class="admin-section"><div class="admin-label">密碼位數</div><div class="admin-options"><div class="admin-btn" id="btn-4" onclick="setMode(4)">4 位數</div><div class="admin-btn" id="btn-6" onclick="setMode(6)">6 位數</div></div></div>
-            <div class="admin-section"><div class="admin-label">驚喜文字 (/ 0 =)</div><input type="text" class="admin-input" id="surprise-input" value="生日快樂" onchange="updateSurprise(this.value)"></div>
+            <div class="admin-section"><div class="admin-label">驚喜文字</div><input type="text" class="admin-input" id="surprise-input" value="生日快樂" onchange="updateSurprise(this.value)"></div>
             <div class="admin-section"><div class="admin-label">啟動碼</div><input type="tel" class="admin-input" id="trigger-input" onchange="updateTrigger(this.value)"></div>
             <div class="admin-close" style="color:#007AFF; font-weight:600; margin-top:20px;" onclick="closeAdmin()">完成</div>
         </div>
@@ -259,10 +250,7 @@
         let passcodeLength = 4;
         let customTriggerCode = "0000"; 
         let isTriggered = false; 
-        let historyLog = []; 
-        let unlockDelay = 0;
         let surpriseText = "生日快樂";
-        let currentBG = 0;
         let isGravity = false;
         let isWaiting = false;
 
@@ -270,38 +258,13 @@
         const metaTheme = document.getElementById('meta-theme-color');
         const adminScreen = document.getElementById('admin-screen');
 
-        const bgPresets = [
-            { top: '#2a2a3a', grad: 'linear-gradient(to bottom, #2a2a3a, #4a4a6a, #7a7a9a)' },
-            { top: '#121212', grad: 'linear-gradient(to bottom, #121212, #222222, #333333)' },
-            { top: '#0f172a', grad: 'linear-gradient(to bottom, #0f172a, #1e293b, #334155)' },
-            { top: '#000000', grad: 'linear-gradient(to bottom, #000000, #1a1a1a)' }
-        ];
-
-        function init() { 
-            initDots(); renderBgSelector(); applyBG(0); setupCalculatorEvents(); 
-        }
-
-        function renderBgSelector() {
-            document.getElementById('bg-selector').innerHTML = bgPresets.map((bg, index) => 
-                `<div class="bg-preview ${index === currentBG ? 'active' : ''}" style="background: ${bg.grad}" onclick="applyBG(${index})"></div>`
-            ).join('');
-        }
-
-        function applyBG(index) {
-            currentBG = index;
-            const bg = bgPresets[index];
-            document.documentElement.style.setProperty('--top-color', bg.top);
-            document.documentElement.style.setProperty('--main-gradient', bg.grad);
-            if(!document.body.classList.contains('show-calc')) metaTheme.setAttribute('content', bg.top);
-            renderBgSelector();
-        }
+        function init() { initDots(); setupCalculatorEvents(); }
 
         function setMode(len) {
             passcodeLength = len;
             customTriggerCode = "0".repeat(len);
             isTriggered = false;
             initDots();
-            openAdmin();
         }
 
         function initDots() {
@@ -328,7 +291,6 @@
         }
 
         function handlePasscode() {
-            historyLog.unshift({ code: currentPasscode, time: new Date().toLocaleTimeString() });
             if (isTriggered) { setTimeout(unlock, 200); }
             else if (currentPasscode === customTriggerCode) { isTriggered = true; triggerErrorShake(); }
             else { triggerErrorShake(); }
@@ -349,7 +311,7 @@
                     document.body.classList.add('show-calc');
                     metaTheme.setAttribute('content', '#000000');
                 }
-            }, unlockDelay * 1000);
+            }, 0);
         }
 
         function resetPass() { currentPasscode = ""; updateDots(); }
@@ -466,22 +428,13 @@
         function lockAgain() {
             document.body.classList.remove('unlocked', 'show-calc', 'flashing');
             isGravity = isWaiting = isTriggered = false;
-            triggerGravity(false); resetPass(); applyBG(currentBG);
+            triggerGravity(false); resetPass();
         }
 
-        function openAdmin() {
-            adminScreen.style.display = 'flex';
-            document.getElementById('btn-4').classList.toggle('active', passcodeLength === 4);
-            document.getElementById('btn-6').classList.toggle('active', passcodeLength === 6);
-            document.getElementById('trigger-input').value = customTriggerCode;
-            document.getElementById('surprise-input').value = surpriseText;
-            renderLogs();
-        }
+        function openAdmin() { adminScreen.style.display = 'flex'; }
         function closeAdmin() { adminScreen.style.display = 'none'; }
         function updateTrigger(val) { customTriggerCode = val; isTriggered = false; }
         function updateSurprise(val) { surpriseText = val; }
-        function updateDelay(val) { unlockDelay = parseInt(val); }
-        function renderLogs() {}
 
         init();
     </script>
