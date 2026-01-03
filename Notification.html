@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>iOS Magic Pro - Stroke Synced</title>
+    <style>
+        :root {
+            --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            /* 統一手寫字體設定 */
+            --handwriting-font: "Cursive", "Bradley Hand", "Marker Felt", "Chalkboard SE", sans-serif;
+            --main-gradient: linear-gradient(180deg, #000000 0%, #1a152e 40%, #000000 100%);
+        }
+
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: var(--ios-font);
+            overflow: hidden;
+            background-color: #000;
+            touch-action: none; 
+        }
+
+        /* --- 通知中心 --- */
+        #notification-center {
+            width: 100%; height: 100%;
+            background: var(--main-gradient);
+            background-attachment: fixed;
+            position: relative;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-content { flex: 0 0 auto; z-index: 10; }
+
+        .clock-container {
+            text-align: center;
+            padding-top: calc(env(safe-area-inset-top) + 60px);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .time-text { font-size: 95px; font-weight: 200; margin: 0; letter-spacing: -2px; }
+        .date-text { font-size: 19px; opacity: 0.9; }
+
+        .notification-header { padding: 40px 25px 15px; font-size: 28px; font-weight: 600; }
+
+        .notification-list { padding: 0 15px; }
+        .notif-card {
+            background: rgba(40, 40, 40, 0.4);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px; padding: 15px; margin-bottom: 12px;
+            display: flex; flex-direction: column;
+        }
+        .notif-top { display: flex; gap: 12px; }
+        .notif-content { flex: 1; }
+        .notif-title-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; }
+        .notif-body { font-size: 14px; line-height: 1.4; opacity: 0.9; }
+
+        /* --- 九宮格 --- */
+        .magic-area {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            z-index: 999;
+            margin-bottom: 40px;
+        }
+        .magic-btn { width: 100%; height: 100%; background: transparent; }
+
+        /* --- 備忘錄 --- */
+        #memo-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; color: #fff;
+            display: none; flex-direction: column; z-index: 2000;
+        }
+        .memo-header { padding: calc(env(safe-area-inset-top) + 10px) 20px 10px; display: flex; justify-content: space-between; align-items: center; color: #d4a017; font-size: 17px; z-index: 2010; }
+        
+        .memo-content-area {
+            flex: 1; position: relative; width: 100%;
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        /* 預設數字顯示：優化字重與尺寸 */
+        #handwritingNumber {
+            font-family: var(--handwriting-font);
+            font-size: 220px; 
+            font-weight: 500; /* 調整字重使其與畫筆一致 */
+            color: rgba(255, 255, 255, 0.95);
+            z-index: 2001;
+            user-select: none;
+        }
+
+        /* 真實手寫畫布 */
+        #sketchCanvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2005;
+        }
+
+        /* --- 後台 --- */
+        #backstage-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); color: white;
+            display: none; flex-direction: column; z-index: 3000;
+            padding: calc(env(safe-area-inset-top) + 20px) 20px;
+            box-sizing: border-box;
+        }
+        .grid-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
+        .grid-inputs input { background: #222; border: 1px solid #444; color: white; padding: 15px 5px; border-radius: 8px; text-align: center; font-size: 18px; width: 100%; }
+        .save-btn { background: #d4a017; color: black; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; }
+
+        .home-bar { position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); width: 140px; height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 10px; z-index: 4000; }
+    </style>
+</head>
+<body>
+
+    <div id="notification-center">
+        <div class="top-content">
+            <div class="clock-container" id="clockZone" onclick="openMemo(null)">
+                <div class="date-text" id="dateDisplay">1月3日 週六</div>
+                <h1 class="time-text" id="timeDisplay">15:02</h1>
+            </div>
+            <div class="notification-header">通知中心</div>
+            <div class="notification-list">
+                <div class="notif-card">
+                    <div class="notif-top">
+                        <div style="width:38px; height:38px; background:#ff4500; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold;">S</div>
+                        <div class="notif-content">
+                            <div class="notif-title-row"><span>您關注的賣家開始直播了！</span><span style="opacity:0.6; font-size:13px;">1小時前</span></div>
+                            <div class="notif-body">觀看 Yomigirls 的直播：神美浩肯包🤩...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="notif-card">
+                    <div class="notif-top">
+                        <div style="width:38px; height:38px; background:#006aa6; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold;">D</div>
+                        <div class="notif-content">
+                            <div class="notif-title-row"><span>你追蹤的「理財板」新文章</span><span style="opacity:0.6; font-size:13px;">2小時前</span></div>
+                            <div class="notif-body">「台股瘋了 正二也瘋了」</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="magic-area">
+            <div class="magic-btn" onclick="openMemo(0)"></div>
+            <div class="magic-btn" onclick="openMemo(1)"></div>
+            <div class="magic-btn" onclick="openMemo(2)"></div>
+            <div class="magic-btn" onclick="openMemo(3)"></div>
+            <div class="magic-btn" onclick="openMemo(4)"></div>
+            <div class="magic-btn" onclick="openMemo(5)"></div>
+            <div class="magic-btn" onclick="openMemo(6)"></div>
+            <div class="magic-btn" onclick="openMemo(7)"></div>
+            <div class="magic-btn" onclick="openMemo(8)"></div>
+        </div>
+        <div class="home-bar"></div>
+    </div>
+
+    <div id="memo-screen">
+        <div class="memo-header">
+            <span onclick="closeMemo()">＜ 備忘錄</span>
+            <span style="font-weight:600;" onclick="closeMemo()">完成</span>
+        </div>
+        <div class="memo-content-area">
+            <div id="handwritingNumber"></div>
+            <canvas id="sketchCanvas"></canvas>
+        </div>
+        <div class="home-bar"></div>
+    </div>
+
+    <div id="backstage-screen">
+        <div style="font-size:24px; font-weight:bold; margin-bottom:20px; text-align:center;">九宮格數值同步設定</div>
+        <div class="grid-inputs" id="inputContainer"></div>
+        <button class="save-btn" onclick="saveSettings()">儲存設置</button>
+    </div>
+
+    <script>
+        let magicValues = ["36", "45", "54", "63", "72", "81", "90", "12", "07"];
+        const savedData = localStorage.getItem('magicNumbers');
+        if (savedData) magicValues = JSON.parse(savedData);
+
+        const inputContainer = document.getElementById('inputContainer');
+        magicValues.forEach((val, i) => {
+            const input = document.createElement('input');
+            input.type = 'text'; input.value = val; input.id = `input-${i}`;
+            inputContainer.appendChild(input);
+        });
+
+        // 長按進入後台
+        let pressTimer;
+        const clockZone = document.getElementById('clockZone');
+        clockZone.addEventListener('touchstart', (e) => {
+            pressTimer = setTimeout(() => {
+                document.getElementById('backstage-screen').style.display = 'flex';
+            }, 1500);
+        });
+        clockZone.addEventListener('touchend', () => clearTimeout(pressTimer));
+
+        function saveSettings() {
+            for (let i = 0; i < 9; i++) magicValues[i] = document.getElementById(`input-${i}`).value;
+            localStorage.setItem('magicNumbers', JSON.stringify(magicValues));
+            document.getElementById('backstage-screen').style.display = 'none';
+        }
+
+        // --- 畫布同步邏輯 ---
+        const canvas = document.getElementById('sketchCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // 關鍵調整：同步筆觸粗度與顏色
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.95)"; 
+            ctx.lineWidth = 10; // 增加粗度以匹配 220px 的字體重量
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            // 加入些微模糊感模擬真實墨水在螢幕上的感覺
+            ctx.shadowBlur = 1;
+            ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
+        }
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+
+        function startDrawing(e) { drawing = true; draw(e); }
+        function stopDrawing() { drawing = false; ctx.beginPath(); }
+        function draw(e) {
+            if (!drawing) return;
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function openMemo(index) {
+            document.getElementById('notification-center').style.display = 'none';
+            document.getElementById('memo-screen').style.display = 'flex';
+            
+            if (index === null) {
+                document.getElementById('handwritingNumber').style.display = 'none';
+                canvas.style.display = 'block';
+                ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            } else {
+                document.getElementById('handwritingNumber').textContent = magicValues[index];
+                document.getElementById('handwritingNumber').style.display = 'block';
+                canvas.style.display = 'none';
+            }
+        }
+
+        function closeMemo() {
+            document.getElementById('memo-screen').style.display = 'none';
+            document.getElementById('notification-center').style.display = 'flex';
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('timeDisplay').textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            const weekDays = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
+            document.getElementById('dateDisplay').textContent = `${now.getMonth() + 1}月${now.getDate()}日 ${weekDays[now.getDay()]} · 乙巳年冬月十五`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
