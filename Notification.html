@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="Notification.png">
     <link rel="icon" href="Notification.png" type="image/png">
-    <title>iOS Magic Pro - Full Restore</title>
+    <title>iOS Magic Pro - Multi-Set Synced</title>
     <style>
         :root {
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
@@ -74,36 +74,68 @@
 
         /* --- 備忘錄 --- */
         #memo-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: #000; color: #fff;
             display: none; flex-direction: column; z-index: 2000;
         }
         .memo-header { padding: calc(env(safe-area-inset-top) + 10px) 20px 10px; display: flex; justify-content: space-between; align-items: center; color: var(--accent-color); font-size: 17px; z-index: 2010; }
-        .memo-content-area { flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
-        #handwritingNumber { font-family: var(--handwriting-font); font-size: 220px; font-weight: 500; color: rgba(255, 255, 255, 0.95); z-index: 2001; user-select: none; }
-        #sketchCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2005; }
+        
+        .memo-content-area {
+            flex: 1; position: relative; width: 100%;
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        #handwritingNumber {
+            font-family: var(--handwriting-font);
+            font-size: 220px; 
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+            z-index: 2001;
+            user-select: none;
+        }
 
-        /* --- 後台系統 --- */
+        #sketchCanvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2005;
+        }
+
+        /* --- 後台控制中心 (更新版) --- */
         #backstage-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #1c1c1e; color: white;
+            background: rgba(0,0,0,0.98); color: white;
             display: none; flex-direction: column; z-index: 3000;
             padding: calc(env(safe-area-inset-top) + 20px) 20px;
             box-sizing: border-box;
             overflow-y: auto;
         }
-        .profile-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
-        .profile-tab { padding: 8px 16px; background: #333; border-radius: 20px; font-size: 14px; white-space: nowrap; border: 2px solid transparent; }
-        .profile-tab.active { background: var(--accent-color); color: black; border-color: #fff; }
-        .config-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .profile-name-input { flex: 1; background: #2c2c2e; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-size: 16px; }
-        .grid-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .grid-inputs input { background: #2c2c2e; border: 1px solid #444; color: white; padding: 15px 5px; border-radius: 8px; text-align: center; font-size: 18px; }
-        .action-btns { display: flex; gap: 10px; padding-bottom: 40px; }
-        .btn { flex: 1; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; }
-        .save-btn { background: var(--accent-color); color: black; }
-        .add-btn { background: #32d74b; color: black; }
-        .del-btn { background: #ff453a; color: white; flex: 0 0 60px; border-radius: 12px; border:none; }
+
+        .backstage-title { font-size: 22px; font-weight: bold; margin-bottom: 20px; text-align: center; color: var(--accent-color); }
+
+        /* 設定組選擇器 */
+        .set-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .set-tab { 
+            padding: 8px 15px; background: #222; border: 1px solid #444; border-radius: 20px; font-size: 14px; 
+            color: #888; transition: 0.2s;
+        }
+        .set-tab.active { background: var(--accent-color); color: black; border-color: var(--accent-color); font-weight: bold; }
+        .add-set-btn { padding: 8px 15px; background: #333; border: 1px dashed #666; border-radius: 20px; font-size: 14px; color: #fff; }
+
+        /* 當前設定編輯區 */
+        .edit-section { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; }
+        .name-input-group { margin-bottom: 15px; }
+        .name-input-group label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; }
+        .name-input { background: transparent; border: none; border-bottom: 1px solid #555; color: white; font-size: 18px; width: 100%; padding: 5px 0; outline: none; }
+        .name-input:focus { border-bottom-color: var(--accent-color); }
+
+        .grid-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .grid-inputs input { background: #111; border: 1px solid #333; color: white; padding: 12px 5px; border-radius: 8px; text-align: center; font-size: 16px; width: 100%; box-sizing: border-box; }
+        .grid-inputs input:focus { border-color: var(--accent-color); outline: none; }
+
+        .action-buttons { margin-top: 25px; display: flex; gap: 10px; }
+        .save-btn { background: var(--accent-color); color: black; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; flex: 2; }
+        .delete-btn { background: #ff3b30; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; flex: 1; }
 
         .home-bar { position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); width: 140px; height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 10px; z-index: 4000; }
     </style>
@@ -116,9 +148,7 @@
                 <div class="date-text" id="dateDisplay">1月3日 週六</div>
                 <h1 class="time-text" id="timeDisplay">15:02</h1>
             </div>
-            
             <div class="notification-header">通知中心</div>
-            
             <div class="notification-list">
                 <div class="notif-card">
                     <div class="notif-top">
@@ -126,16 +156,6 @@
                         <div class="notif-content">
                             <div class="notif-title-row"><span>您關注的賣家開始直播了！</span><span style="opacity:0.6; font-size:13px;">1小時前</span></div>
                             <div class="notif-body">觀看 Yomigirls 的直播：神美浩肯包🤩...</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="notif-card">
-                    <div class="notif-top">
-                        <div style="width:38px; height:38px; background:#006aa6; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold;">D</div>
-                        <div class="notif-content">
-                            <div class="notif-title-row"><span>你追蹤的「理財板」新文章</span><span style="opacity:0.6; font-size:13px;">2小時前</span></div>
-                            <div class="notif-body">「台股瘋了 正二也瘋了」</div>
                         </div>
                     </div>
                 </div>
@@ -169,91 +189,123 @@
     </div>
 
     <div id="backstage-screen">
-        <div style="font-size:22px; font-weight:bold; margin-bottom:20px; text-align:center;">九宮格分組管理</div>
+        <div class="backstage-title">數字集管理中心</div>
         
-        <div class="profile-list" id="profileTabs"></div>
-
-        <div class="profile-section">
-            <div class="config-row">
-                <input type="text" id="profileName" class="profile-name-input" placeholder="設定組名稱">
-                <button class="del-btn" onclick="deleteCurrentProfile()">刪除</button>
+        <div class="set-selector" id="setSelector">
             </div>
-            
-            <div class="grid-inputs" id="gridInputContainer"></div>
+
+        <div class="edit-section">
+            <div class="name-input-group">
+                <label>設定名稱</label>
+                <input type="text" id="currentSetName" class="name-input" placeholder="例如：預設數值">
+            </div>
+            <div class="grid-inputs" id="inputContainer">
+                </div>
         </div>
 
-        <div class="action-btns">
-            <button class="btn add-btn" onclick="addNewProfile()">+ 新增分組</button>
-            <button class="btn save-btn" onclick="saveAllAndClose()">儲存並關閉</button>
+        <div class="action-buttons">
+            <button class="save-btn" onclick="saveAllAndClose()">儲存並關閉</button>
+            <button class="delete-btn" onclick="deleteCurrentSet()">刪除</button>
         </div>
+        <div class="home-bar" onclick="document.getElementById('backstage-screen').style.display='none'"></div>
     </div>
 
     <script>
-        // --- 資料管理 ---
-        let appData = {
-            activeIdx: 0,
-            profiles: [
-                { name: "預設數值", values: ["198", "297", "396", "495", "594", "693", "792", "891", "99"] },
-                { name: "生日迫牌", values: ["10", "19", "8", "12", "25", "7", "3", "14", "21"] }
+        // 資料結構：{ activeIndex: 0, sets: [ {name: '預設', values: [...]}, ... ] }
+        let config = {
+            activeIndex: 0,
+            sets: [
+                { name: "預設數值", values: ["198", "297", "396", "495", "594", "693", "792", "891", "99"] }
             ]
         };
 
-        const saved = localStorage.getItem('magicProDataV2');
-        if (saved) appData = JSON.parse(saved);
+        // 初始化資料
+        const savedConfig = localStorage.getItem('magicConfig_v2');
+        if (savedConfig) {
+            config = JSON.parse(savedConfig);
+        }
 
-        // --- 後台 UI 渲染 ---
+        // --- 後台邏輯 ---
         function renderBackstage() {
-            const tabs = document.getElementById('profileTabs');
-            const grid = document.getElementById('gridInputContainer');
-            const current = appData.profiles[appData.activeIdx];
-
-            tabs.innerHTML = '';
-            appData.profiles.forEach((p, i) => {
+            const selector = document.getElementById('setSelector');
+            selector.innerHTML = '';
+            
+            // 生成標籤
+            config.sets.forEach((set, index) => {
                 const tab = document.createElement('div');
-                tab.className = `profile-tab ${i === appData.activeIdx ? 'active' : ''}`;
-                tab.textContent = p.name;
-                tab.onclick = () => { appData.activeIdx = i; renderBackstage(); };
-                tabs.appendChild(tab);
+                tab.className = `set-tab ${index === config.activeIndex ? 'active' : ''}`;
+                tab.textContent = set.name;
+                tab.onclick = () => switchSet(index);
+                selector.appendChild(tab);
             });
 
-            document.getElementById('profileName').value = current.name;
-            document.getElementById('profileName').oninput = (e) => {
-                current.name = e.target.value;
-                renderBackstage(); 
-            };
+            // 新增按鈕
+            const addBtn = document.createElement('div');
+            addBtn.className = 'add-set-btn';
+            addBtn.textContent = '+ 新增組別';
+            addBtn.onclick = addNewSet;
+            selector.appendChild(addBtn);
 
-            grid.innerHTML = '';
-            for (let i = 0; i < 9; i++) {
+            // 更新輸入框內容
+            const currentSet = config.sets[config.activeIndex];
+            document.getElementById('currentSetName').value = currentSet.name;
+            
+            const container = document.getElementById('inputContainer');
+            container.innerHTML = '';
+            currentSet.values.forEach((val, i) => {
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.value = current.values[i] || "";
-                input.oninput = (e) => { current.values[i] = e.target.value; };
-                grid.appendChild(input);
+                input.value = val;
+                input.id = `input-${i}`;
+                input.oninput = (e) => { currentSet.values[i] = e.target.value; };
+                container.appendChild(input);
+            });
+        }
+
+        function switchSet(index) {
+            saveTempData();
+            config.activeIndex = index;
+            renderBackstage();
+        }
+
+        function addNewSet() {
+            saveTempData();
+            const newSet = {
+                name: "新設定 " + (config.sets.length + 1),
+                values: ["", "", "", "", "", "", "", "", ""]
+            };
+            config.sets.push(newSet);
+            config.activeIndex = config.sets.length - 1;
+            renderBackstage();
+        }
+
+        function deleteCurrentSet() {
+            if (config.sets.length <= 1) {
+                alert("至少需保留一組設定");
+                return;
+            }
+            if (confirm("確定要刪除此組設定嗎？")) {
+                config.sets.splice(config.activeIndex, 1);
+                config.activeIndex = 0;
+                renderBackstage();
             }
         }
 
-        function addNewProfile() {
-            appData.profiles.push({ name: "新設定 " + (appData.profiles.length + 1), values: Array(9).fill("") });
-            appData.activeIdx = appData.profiles.length - 1;
-            renderBackstage();
-        }
-
-        function deleteCurrentProfile() {
-            if (appData.profiles.length <= 1) return alert("至少需保留一個設定組");
-            appData.profiles.splice(appData.activeIdx, 1);
-            appData.activeIdx = 0;
-            renderBackstage();
+        function saveTempData() {
+            const name = document.getElementById('currentSetName').value;
+            if (name) config.sets[config.activeIndex].name = name;
         }
 
         function saveAllAndClose() {
-            localStorage.setItem('magicProDataV2', JSON.stringify(appData));
+            saveTempData();
+            localStorage.setItem('magicConfig_v2', JSON.stringify(config));
             document.getElementById('backstage-screen').style.display = 'none';
         }
 
-        // --- 長按 & 時鐘 ---
+        // --- 原始功能邏輯保持不變 ---
         let pressTimer;
         const clockZone = document.getElementById('clockZone');
-        clockZone.addEventListener('touchstart', () => {
+        clockZone.addEventListener('touchstart', (e) => {
             pressTimer = setTimeout(() => {
                 renderBackstage();
                 document.getElementById('backstage-screen').style.display = 'flex';
@@ -261,16 +313,6 @@
         });
         clockZone.addEventListener('touchend', () => clearTimeout(pressTimer));
 
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('timeDisplay').textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-            const weekDays = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
-            document.getElementById('dateDisplay').textContent = `${now.getMonth() + 1}月${now.getDate()}日 ${weekDays[now.getDay()]} · 乙巳年冬月十五`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // --- 畫布邏輯 ---
         const canvas = document.getElementById('sketchCanvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
@@ -278,10 +320,12 @@
         function initCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.95)"; 
             ctx.lineWidth = 10;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
+            ctx.shadowBlur = 1;
+            ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
         }
         window.addEventListener('resize', initCanvas);
         initCanvas();
@@ -298,23 +342,26 @@
             ctx.moveTo(x, y);
         }
 
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
         canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
         canvas.addEventListener('touchend', stopDrawing);
 
-        // --- 備忘錄切換 ---
         function openMemo(index) {
             document.getElementById('notification-center').style.display = 'none';
             document.getElementById('memo-screen').style.display = 'flex';
-            const numEl = document.getElementById('handwritingNumber');
             
             if (index === null) {
-                numEl.style.display = 'none';
+                document.getElementById('handwritingNumber').style.display = 'none';
                 canvas.style.display = 'block';
                 ctx.clearRect(0, 0, canvas.width, canvas.height); 
             } else {
-                numEl.textContent = appData.profiles[appData.activeIdx].values[index];
-                numEl.style.display = 'block';
+                // 從當前活動組別抓取數值
+                const currentValues = config.sets[config.activeIndex].values;
+                document.getElementById('handwritingNumber').textContent = currentValues[index];
+                document.getElementById('handwritingNumber').style.display = 'block';
                 canvas.style.display = 'none';
             }
         }
@@ -323,6 +370,15 @@
             document.getElementById('memo-screen').style.display = 'none';
             document.getElementById('notification-center').style.display = 'flex';
         }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('timeDisplay').textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            const weekDays = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
+            document.getElementById('dateDisplay').textContent = `${now.getMonth() + 1}月${now.getDate()}日 ${weekDays[now.getDay()]} · 乙巳年冬月十五`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 </body>
 </html>
