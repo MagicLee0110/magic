@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="Notification.png">
     <link rel="icon" href="Notification.png" type="image/png">
-    <title>iOS Magic Pro - Multi-Set Full</title>
+    <title>iOS Magic Pro - Animated Full</title>
     <style>
         :root {
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
@@ -30,10 +30,18 @@
             width: 100%; height: 100%;
             background: var(--main-gradient);
             background-attachment: fixed;
-            position: relative;
+            position: absolute; /* 改為絕對定位以利於滑動 */
+            top: 0; left: 0;
             color: white;
             display: flex;
             flex-direction: column;
+            z-index: 1000; /* 高於備忘錄 */
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); /* iOS 動畫曲線 */
+        }
+
+        /* 往上滑出的樣式 */
+        .slide-up-exit {
+            transform: translateY(-100%);
         }
 
         .top-content { flex: 0 0 auto; z-index: 10; }
@@ -77,7 +85,8 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #000; color: #fff;
-            display: none; flex-direction: column; z-index: 2000;
+            display: none; flex-direction: column; 
+            z-index: 500; /* 低於通知中心，等待它滑開 */
         }
         .memo-header { padding: calc(env(safe-area-inset-top) + 10px) 20px 10px; display: flex; justify-content: space-between; align-items: center; color: var(--accent-color); font-size: 17px; z-index: 2010; }
         
@@ -197,7 +206,7 @@
 
     <div id="backstage-screen">
         <div class="backstage-title">數字集管理中心</div>
-        <div class="set-selector" id="setSelector"></div>
+        <div id="setSelector" class="set-selector"></div>
         <div class="edit-section">
             <div class="name-input-group">
                 <label>設定名稱</label>
@@ -297,30 +306,61 @@
         canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
         canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
 
+        /* --- 修改後的動畫開啟邏輯 --- */
         function openMemo(index) {
-            document.getElementById('notification-center').style.display = 'none';
-            document.getElementById('memo-screen').style.display = 'flex';
+            const nc = document.getElementById('notification-center');
+            const memo = document.getElementById('memo-screen');
+            const handNum = document.getElementById('handwritingNumber');
+
+            // 1. 準備備忘錄內容
             if (index === null) {
-                document.getElementById('handwritingNumber').style.display = 'none';
+                handNum.style.display = 'none';
                 canvas.style.display = 'block';
                 ctx.clearRect(0, 0, canvas.width, canvas.height); 
             } else {
-                document.getElementById('handwritingNumber').textContent = config.sets[config.activeIndex].values[index];
-                document.getElementById('handwritingNumber').style.display = 'block';
+                handNum.textContent = config.sets[config.activeIndex].values[index];
+                handNum.style.display = 'block';
                 canvas.style.display = 'none';
             }
+
+            // 2. 顯示備忘錄 (此時在通知中心下方)
+            memo.style.display = 'flex';
+
+            // 3. 執行往上滑動畫
+            nc.classList.add('slide-up-exit');
+
+            // 4. 動畫完成後隱藏通知中心 (選用，為了效能)
+            setTimeout(() => {
+                if(nc.classList.contains('slide-up-exit')) {
+                    nc.style.visibility = 'hidden';
+                }
+            }, 600);
         }
 
+        /* --- 修改後的動畫返回邏輯 --- */
         function closeMemo() {
-            document.getElementById('memo-screen').style.display = 'none';
-            document.getElementById('notification-center').style.display = 'flex';
+            const nc = document.getElementById('notification-center');
+            const memo = document.getElementById('memo-screen');
+
+            // 1. 讓通知中心重新可見
+            nc.style.visibility = 'visible';
+            
+            // 2. 移除滑出 class，它會自動滑回來
+            nc.classList.remove('slide-up-exit');
+
+            // 3. 等滑回動畫結束後，隱藏下方的備忘錄
+            setTimeout(() => {
+                if(!nc.classList.contains('slide-up-exit')) {
+                    memo.style.display = 'none';
+                }
+            }, 600);
         }
 
         function updateClock() {
             const now = new Date();
             document.getElementById('timeDisplay').textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
             const weekDays = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
-            document.getElementById('dateDisplay').textContent = `${now.getMonth() + 1}月${now.getDate()}日 ${weekDays[now.getDay()]} · 乙巳年冬月十五`;
+            document.getElementById('dateDisplay').textContent = `${now.getMonth() + 1}月${now.getDate()}日 ${weekDays[now.getDay()]}`;
         }
         setInterval(updateClock, 1000); updateClock();
     </script>
